@@ -16,6 +16,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="${1:-$(cd "$SCRIPT_DIR/../../../.." && pwd)}"
 cd "$ROOT" || { echo "FAIL cannot enter $ROOT"; exit 1; }
 
+# rustup installs to ~/.cargo/bin and only a login shell has it on PATH. Source it here so the
+# toolchain check reflects what is actually installed rather than how this script was invoked —
+# without this, running from a non-login shell reports a false BLOCKED on the apt rustc.
+if [ -f "$HOME/.cargo/env" ]; then . "$HOME/.cargo/env"; fi
+
 PASS=0; WARN=0; FAIL=0
 pass() { printf '  \033[32mPASS\033[0m %s\n' "$*"; PASS=$((PASS+1)); }
 warn() { printf '  \033[33mWARN\033[0m %s\n' "$*"; WARN=$((WARN+1)); }

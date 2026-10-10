@@ -20,6 +20,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="${1:-$(cd "$SCRIPT_DIR/../../../.." && pwd)}"
 cd "$ROOT" || { echo "cannot enter $ROOT"; exit 1; }
 
+# rustup installs to ~/.cargo/bin and only a login shell has it on PATH. Source it here so the
+# toolchain check reflects what is actually installed rather than how this script was invoked —
+# without this, running from a non-login shell reports a false BLOCKED on the apt rustc.
+if [ -f "$HOME/.cargo/env" ]; then . "$HOME/.cargo/env"; fi
+
 if [ ! -f Cargo.toml ] || ! grep -q '^\[workspace\]' Cargo.toml 2>/dev/null; then
   echo "This is not the fork checkout (no workspace Cargo.toml). Run M0 first."
   exit 3
