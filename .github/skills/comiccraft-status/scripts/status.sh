@@ -88,17 +88,19 @@ shopt -u nullglob
 if [ ${#reviews[@]} -eq 0 ]; then
   echo "  none yet — every implementation needs two rounds in docs/reviews/"
 else
-  echo "  ${#reviews[@]} record(s)"
-  for r in "${reviews[@]}"; do
-    rounds="$(grep -cE '^#+ *Round [0-9]' "$r" 2>/dev/null || echo 0)"
-    r2="$(awk '/^#+ *Round 2/ {i=1; next} i {print}' "$r" 2>/dev/null | grep -icE '^Verdict:[[:space:]]*approved' || true)"
-    if [ "$rounds" -ge 2 ] && [ "${r2:-0}" -ge 1 ]; then
-      printf '  ok   %-44s %s round(s)\n' "$r" "$rounds"
-    else
-      printf '  gap  %-44s %s round(s)\n' "$r" "$rounds"
-    fi
-  done
-  echo "  check them: bash .github/skills/comiccraft-verify/scripts/check-reviews.sh"
+  # Delegate to the authoritative checker rather than reimplementing it: this script's own
+  # round-counting was markdown-blind (it missed `Verdict: **approved**`) and reported complete
+  # records as gaps. One implementation, one answer.
+  checker=".github/skills/comiccraft-verify/scripts/check-reviews.sh"
+  if [ -x "$checker" ] || [ -f "$checker" ]; then
+    out="$(bash "$checker" "" "" 2>&1)"; rc=$?
+    printf '  %s record(s); checker exit %s\n' "${#reviews[@]}" "$rc"
+    printf '%s\n' "$out" | grep -E '^  (OK|GAP|SKIP)' | sed 's/^/  /' || true
+    [ "$rc" -eq 0 ] && echo "  all complete" || echo "  incomplete — see the GAP lines above"
+  else
+    echo "  ${#reviews[@]} record(s); $checker not found, cannot verify"
+  fi
+  echo "  check them: bash $checker"
 fi
 
 # Divergence
