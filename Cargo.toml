@@ -34,6 +34,12 @@ vectorcraft-eps = { path = "crates/eps" }
 vectorcraft-metafile = { path = "crates/metafile" }
 vectorcraft-plugins = { path = "crates/plugins" }
 vectorcraft-affinity = { path = "crates/affinity" }
+# ComicCraft. Layers and rationale: docs/comiccraft-design.md §4.2. The names keep the
+# `vectorcraft-` prefix so `xtask/src/layers.rs` shortens them to comic-model / comic-ai /
+# comic-layout, matching every other crate.
+vectorcraft-comic-model = { path = "crates/comic-model" }
+vectorcraft-comic-ai = { path = "crates/comic-ai" }
+vectorcraft-comic-layout = { path = "crates/comic-layout" }
 
 # foundation
 kurbo = { version = "0.13", features = ["serde"] }

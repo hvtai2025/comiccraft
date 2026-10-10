@@ -61,6 +61,12 @@ pub const TABLE: &[(&str, Class)] = &[
     ("metafile", Class::Layer(3)),
     ("plugins", Class::Layer(2)),
     ("affinity", Class::Standalone),
+    // ComicCraft (docs/comiccraft-design.md §4.2). Placed so that every dependency points
+    // downward and no same-layer edge exists, which is why comic-ai sits above comic-model
+    // and comic-layout above the renderers and exporters it assembles.
+    ("comic-model", Class::Layer(2)),
+    ("comic-ai", Class::Layer(3)),
+    ("comic-layout", Class::Layer(4)),
 ];
 
 /// Explicit orderings *within* a layer (earlier may be used by later).

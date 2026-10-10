@@ -71,6 +71,20 @@ pub fn document_fonts() -> Vec<&'static CraftFont> {
     v
 }
 
+/// The ComicCraft lettering faces (ComicCraft design ADR-017): **Comic Neue** for dialogue,
+/// captions and narration, and **Bangers** for display — sound effects, titles and cover text.
+/// Empty when built without craft-fonts, in which case lettering falls back and reports a
+/// missing font rather than failing to render.
+///
+/// These are **Latin-only** faces, so they are deliberately outside [`document_fonts`], which
+/// covers the Japanese and Arabic fallbacks. They are loaded by name only: they are appended
+/// after the bundled fonts, so Latin text still resolves to the bundled family first and adding
+/// these changes no existing document's rendering.
+pub fn comic_fonts() -> Vec<&'static CraftFont> {
+    const COMIC_FAMILIES: &[&str] = &["Comic Neue", "Bangers"];
+    CRAFT_FONTS.iter().filter(|f| COMIC_FAMILIES.contains(&f.family)).collect()
+}
+
 /// The craft-fonts faces for Japanese text, best for UI text first: Gothic (sans) families, then
 /// the others; `bold` puts bold faces before regular ones. Empty when built without craft-fonts.
 pub fn japanese_ui_fonts(bold: bool) -> Vec<&'static CraftFont> {

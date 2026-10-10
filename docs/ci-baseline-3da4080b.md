@@ -1,0 +1,6094 @@
+    Finished `dev` profile [optimized + debuginfo] target(s) in 0.23s
+     Running `target/debug/xtask ci`
+
+=== ci: fmt ===
+$ cargo fmt --all -- --check
+
+=== ci: clippy ===
+$ cargo clippy --workspace --all-targets -- -D warnings
+    Finished `dev` profile [optimized + debuginfo] target(s) in 0.87s
+
+=== ci: test ===
+$ cargo test --workspace
+    Finished `test` profile [optimized + debuginfo] target(s) in 0.57s
+     Running unittests src/main.rs (target/debug/deps/vectorcraft-348e685bca28648c)
+
+running 64 tests
+test clipboard::tests::a_dibv5_keeps_its_alpha_top_down ... ok
+test clipboard::tests::a_screenshot_dib_pastes_opaque_and_upright ... ok
+test clipboard::tests::masks_and_colour_tables_come_before_the_pixels ... ok
+test control_server::tests::a_request_before_junk_still_runs ... ok
+test clipboard::tests::a_crlf_left_by_the_uri_list_is_ignored ... ok
+test clipboard::tests::untrusted_dibs_are_refused_not_trusted ... ok
+test control_server::tests::http_request_closes_before_the_body_runs ... ok
+test control_server::tests::non_request_json_closes_the_connection ... ok
+test control_server::tests::line_at_the_limit_is_accepted ... ok
+test control_server::tests::requests_are_answered_in_order_with_ids ... ok
+test gpu::tests::a_desktop_draws_on_the_gpu_that_drives_its_monitors ... ok
+test clipboard::tests::the_first_copied_file_that_is_art_pastes ... ok
+test gpu::tests::a_normal_exit_or_another_failure_does_not_restart ... ok
+test gpu::tests::a_restart_tries_the_next_adapter ... ok
+test gpu::tests::a_hybrid_laptop_draws_on_the_integrated_gpu_that_drives_its_panel ... ok
+test gpu::tests::adapters_that_cannot_present_to_the_window_are_never_tried ... ok
+test gpu::tests::automatic_keeps_the_systems_order_on_linux_and_saves_power_elsewhere ... ok
+test gpu::tests::displays_no_adapter_matches_leave_the_power_preference_in_charge ... ok
+test gpu::tests::a_named_adapter_comes_before_the_one_driving_the_display ... ok
+test gpu::tests::display_gpus_are_logged_as_pci_ids ... ok
+test gpu::tests::each_preference_orders_the_adapters_then_falls_back_to_opengl_and_software ... ok
+test gpu::tests::gpus_without_pci_ids_are_told_apart_by_name ... ok
+test control_server::tests::tcp_connection_is_closed_after_junk ... ok
+test gpu::tests::a_windows_gpu_renders_through_dx12_before_vulkan ... ok
+test gpu::tests::internal_panels_are_edp_lvds_and_dsi_connectors ... ok
+test gpu::tests::hybrid_laptop_on_windows_renders_on_the_integrated_gpu_with_power_saving ... ok
+test gpu::tests::pci_ids_come_from_windows_device_ids ... ok
+test gpu::tests::only_a_graphics_failure_while_starting_up_restarts_without_the_adapter ... ok
+test gpu::tests::skipped_adapters_parse_from_a_comma_separated_list ... ok
+test gpu::tests::the_primary_display_decides_between_gpus_that_both_drive_a_monitor ... ok
+test gpu::tests::wgpu_adapter_name_picks_an_adapter_first_and_the_rest_stay_as_fallbacks ... ok
+test gpu::tests::windows_never_loads_vulkan_drivers_unless_asked ... ok
+test gpu::tests::only_automatic_considers_which_gpu_drives_the_display ... ok
+test gpu::tests::linux_display_gpus_come_from_the_connected_connectors ... ok
+test gpu::tests::panics_in_wgpu_egui_wgpu_and_naga_are_graphics_failures ... ok
+test gpu::tests::power_preference_follows_the_environment_then_the_preference ... ok
+test gpu::tests::the_saved_engine_preference_is_found ... ok
+test logging::tests::directives_follow_env_logger_and_the_most_specific_one_wins ... ok
+test logging::tests::a_line_carries_time_level_thread_target_and_message ... ok
+test logging::tests::lines_logged_before_the_file_exists_are_written_when_it_is_attached ... ok
+test logging::tests::the_default_filter_shows_vectorcraft_info_and_other_crates_warnings ... ok
+test logging::tests::attaching_to_an_unusable_directory_reports_an_error_and_keeps_logging ... ok
+test logging::tests::rotation_into_an_unusable_directory_is_an_error_not_a_panic ... ok
+test logging::tests::the_file_stops_at_its_size_cap_with_one_note ... ok
+test logging::tests::exactly_a_full_pending_buffer_drops_nothing ... ok
+test logging::tests::timestamps_are_utc_with_milliseconds ... ok
+test logging::tests::without_a_file_nothing_is_kept_in_memory ... ok
+test printing::tests::job_files_hold_the_pdf ... ok
+test logging::tests::the_pending_buffer_is_bounded_and_says_how_much_it_dropped ... ok
+test prefs_dir::tests::the_font_scans_read_the_fonts_folder_next_to_the_settings ... ok
+test printing::tests::powershell_lines_become_printers ... ok
+test logging::tests::a_poisoned_sink_still_logs ... ok
+test tests::the_macos_bundle_opens_every_readable_format ... ok
+test logging::tests::the_logger_filters_records_and_writes_them_to_the_attached_file ... ok
+test logging::tests::rotation_keeps_the_previous_logs_and_starts_an_empty_file ... ok
+test control_server::tests::extra_connections_are_refused ... ok
+test printing::tests::lpstat_lists_names_and_the_default ... ok
+test window::tests::the_saved_window_comes_back_where_it_was ... ok
+test window::tests::the_first_window_fits_its_screen ... ok
+test window::tests::a_saved_window_stays_on_a_connected_monitor ... ok
+test logging::tests::records_from_many_threads_are_whole_lines ... ok
+test window::tests::the_window_geometry_is_tracked_for_the_next_launch ... ok
+test control_server::tests::overlong_line_is_refused ... ok
+test logging::tests::hostile_specs_never_panic_and_fall_back_sensibly ... ok
+
+test result: ok. 64 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_affinity-ff453a829392c5f2)
+
+running 20 tests
+test raster::tests::embedded_source_dimensions_and_pixel_budget_are_checked_before_decode ... ok
+test tests::archive::libraries_and_cyclic_tables_are_rejected ... ok
+test tests::archive::checksums_sizes_and_budgets_are_enforced ... ok
+test tests::archive::the_stream_parses_into_shared_objects_and_links ... ok
+test tests::archive::every_method_round_trips_with_checksums ... ok
+test tests::preview::an_unindexed_png_or_resource_is_never_used ... ok
+test tests::preview::compressed_metadata_and_animation_are_not_preview_support ... ok
+test tests::preview::critical_chunks_follow_a_single_complete_png_layout ... ok
+test tests::archive::a_declared_size_smaller_than_the_data_is_rejected_not_truncated ... ok
+test raster::tests::source_tiles_and_cached_edits_survive_crop_rotation_and_tile_boundaries ... ok
+test tests::preview::every_truncation_is_rejected ... ok
+test tests::preview::rejects_assets_versions_offsets_lengths_and_bombs ... ok
+test tests::preview::indexed_preview_and_header ... ok
+test tests::preview::every_chunk_checksum_including_the_end_is_checked ... ok
+test tests::archive::hostile_streams_fail_cleanly ... ok
+test tests::preview::mutations_never_panic ... ok
+test raster::tests::unreadable_sources_and_unknown_origins_preserve_cached_edits_and_warn ... ok
+test tests::preview::arbitrary_input_never_panics ... ok
+test tests::archive::mutated_containers_and_streams_never_panic ... ok
+test tests::archive::a_small_compressed_entry_cannot_make_the_stream_allocate_gigabytes ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+
+     Running tests/outline_limits.rs (target/debug/deps/outline_limits-8996771f10560205)
+
+running 10 tests
+test ordinary_nested_compound_preserves_repeated_operands_and_transforms ... ok
+test excessive_declared_curve_count_is_rejected_before_expansion ... ok
+test overflowing_compound_transform_is_reported_before_processing_geometry ... ok
+test deep_reference_chain_is_bounded_independently_of_stream_nesting ... ok
+test outline_at_the_depth_limit_is_still_imported ... ok
+test pie_angles_with_huge_finite_values_do_not_loop_or_emit_nonfinite_points ... ok
+test self_cycle_and_mutual_cycle_discard_the_entire_compound ... ok
+test wrapped_pie_angles_keep_the_same_geometry_as_the_positive_span ... ok
+test empty_shared_fanout_cannot_bypass_the_operand_visit_limit ... ok
+test shared_large_operands_are_charged_for_cumulative_geometry_work ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/raster.rs (target/debug/deps/raster-03623dbd6a6b6177)
+
+running 6 tests
+test eight_and_sixteen_bit_channels_retain_the_same_pixel_pattern ... ok
+test cmyk_and_lab_losses_are_reported ... ok
+test lazy_placed_images_keep_the_original_encoded_bytes ... ok
+test rotated_scaled_pixels_keep_the_full_affine_transform ... ok
+test source_backed_tiles_retain_the_embedded_jpeg_pixels ... ok
+test corpus::sha256::tests::known_digests ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/real_files.rs (target/debug/deps/real_files-e24c7f532336d00e)
+
+running 4 tests
+test affinity3_feature_retention_matches_pinned_signatures ... ok
+test public_documents_map_to_the_model ... ok
+test public_documents_parse_completely ... ok
+test corpus::sha256::tests::known_digests ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/text.rs (target/debug/deps/text-bb9cb5dfec278f8c)
+
+running 17 tests
+test boolean_opentype_and_observed_all_caps_selector_are_kept ... ok
+test malformed_ranges_do_not_discard_the_story ... ok
+test real_affinity3_text_fixtures_confirm_unicode_and_caps_fields ... ok
+test inline_fields_count_for_ranges_but_are_reported_and_omitted ... ok
+test excessive_feature_settings_are_bounded_and_reported ... ok
+test mixed_paragraph_alignments_are_explicitly_reported ... ok
+test mixed_fonts_keep_unicode_and_attribute_boundaries ... ok
+test missing_attributes_and_uncovered_tail_preserve_characters ... ok
+test partially_missing_attributes_use_visible_fill_but_explicit_no_fill_is_kept ... ok
+test unreadable_block_does_not_remove_later_readable_text ... ok
+test stored_fallback_font_is_used_only_when_it_names_a_font ... ok
+test unknown_alignment_and_invalid_font_weight_have_honest_fallbacks ... ok
+test arbitrary_unicode_survives_damaged_attribute_ranges ... ok
+test support::corpus::sha256::tests::known_digests ... ok
+test text_budget_preserves_prefix_and_reports_truncation ... ok
+test shared_gradient_attributes_are_bounded_without_losing_characters ... ok
+test shared_font_metadata_amplification_is_bounded_without_losing_characters ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_brush-c29fd0768c10b174)
+
+running 28 tests
+test tests::art_brush_arc_length_mapping_is_linear ... ok
+test tests::art_brush_proportional_keeps_aspect ... ok
+test tests::art_brush_between_guides_keeps_ends ... ok
+test tests::art_brush_follows_curves ... ok
+test tests::art_brush_stretches_to_path_length ... ok
+test tests::bristle_makes_translucent_strands ... ok
+test tests::calligraphic_flat_nib_is_thin_along_its_angle ... ok
+test tests::calligraphic_scales_with_stroke_weight ... ok
+test tests::brushes_without_modes_vary_randomly_as_before ... ok
+test tests::calligraphic_vertical_nib_is_full_width_across_horizontal_stroke ... ok
+test tests::calligraphic_width_at_45_degrees_matches_ellipse_support ... ok
+test tests::closed_calligraphic_makes_a_ring ... ok
+test tests::expand_keeps_fill_and_adds_pieces ... ok
+test tests::brushes_serde_round_trip ... ok
+test tests::pattern_places_corner_tiles ... ok
+test tests::pattern_tile_count_by_fit ... ok
+test tests::tints_colorization_uses_stroke_colour ... ok
+test track::tests::straight_track_frames ... ok
+test tests::scatter_count_and_spacing ... ok
+test track::tests::closed_square_has_four_corners ... ok
+test tests::pressure_maps_to_size_along_the_stroke ... ok
+test tests::round_nib_is_direction_independent ... ok
+test track::tests::rng_is_deterministic ... ok
+test tests::scatter_is_deterministic_and_randomised ... ok
+test tests::every_default_brush_draws_something ... ok
+test tests::pressure_varies_angle_and_roundness ... ok
+test tests::junk_pressure_brushes_draw_finite_art ... ok
+test tests::library_defaults_store_and_find ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_cad-a605f7d333792f2a)
+
+running 46 tests
+test aci::tests::the_palette_matches_its_known_entries ... ok
+test aci::tests::nearest_index_by_depth ... ok
+test import::curve::tests::a_bulge_of_one_is_a_half_circle_on_the_right_of_its_chord ... ok
+test import::curve::tests::a_bulge_over_one_is_the_major_arc ... ok
+test import::curve::tests::fit_points_make_a_smooth_curve_through_them ... ok
+test import::curve::tests::a_rational_quadratic_circle_stays_on_the_circle ... ok
+test import::curve::tests::polynomial_splines_become_exact_beziers ... ok
+test import::curve::tests::a_high_degree_spline_is_fitted_within_tolerance ... ok
+test import::tests::a_line_comes_in_at_the_drawings_unit_and_origin ... ok
+test import::tests::binary_dwg_damaged_and_foreign_files ... ok
+test import::tests::blocks_inside_themselves_are_left_out_without_hanging ... ok
+test import::tests::array_inserts_attributes_and_dimensions ... ok
+test import::tests::circles_arcs_and_ellipses ... ok
+test import::tests::entities_extruded_along_minus_z_are_mirrored ... ok
+test import::tests::by_block_colours_make_a_symbol_per_look ... ok
+test import::tests::info_lists_layers_layouts_and_version ... ok
+test import::tests::entity_colours_lineweights_and_transparency ... ok
+test import::tests::fit_and_aligned_text_without_a_second_point_keep_their_size ... ok
+test import::tests::layers_keep_their_state_colour_lineweight_and_linetype ... ok
+test import::tests::paper_layouts ... ok
+test import::tests::nurbs_splines_stay_within_a_hundredth ... ok
+test import::tests::inserts_become_symbol_instances_with_their_transform ... ok
+test import::tests::hatch_spline_edges_with_or_without_fit_data ... ok
+test import::tests::fit_and_centre_place_the_art_on_the_artboard ... ok
+test import::tests::polyline_bulges_are_exact_arcs ... ok
+test import::tests::text_and_multiline_text ... ok
+test import::tests::fit_and_aligned_text_scale_within_limits ... ok
+test import::tests::fit_attributes_span_their_two_points ... ok
+test import::tests::solid_hatches_fill_and_pattern_hatches_outline ... ok
+test import::tests::drawings_the_export_writes_read_back ... ok
+test import::tests::units_choose_the_default_scale ... ok
+test import::tests::fit_and_aligned_text_span_their_two_points ... ok
+test import::text::tests::control_codes_and_escapes ... ok
+test import::text::tests::mtext_formatting_is_dropped ... ok
+test tests::dashes_become_linetypes_and_opacity_transparency ... ok
+test tests::crop_leaves_out_art_outside_the_region ... ok
+test tests::images_link_png_or_jpeg_files ... ok
+test tests::text_outside_ascii_is_escaped_before_2007 ... ok
+test writer::tests::numbers_and_text_are_written_plainly ... ok
+test tests::colours_map_to_the_index_palette_or_true_colour ... ok
+test tests::layers_become_dxf_layers ... ok
+test tests::lines_are_lwpolylines_curves_splines_and_fills_hatches ... ok
+test tests::alter_paths_writes_strokes_as_filled_outlines ... ok
+test tests::every_version_declares_its_acadver_and_is_well_formed ... ok
+test tests::units_scale_coordinates_and_set_insunits ... ok
+test tests::type_is_text_or_outlines ... ok
+
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/main.rs (target/debug/deps/vectorcraft_cli-d195572662a50e6e)
+
+running 1 test
+test prefs_dir::tests::the_font_scans_read_the_fonts_folder_next_to_the_settings ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli.rs (target/debug/deps/cli-9332cae2cff1aa9e)
+
+running 7 tests
+test closed_stdout_ends_quietly ... ok
+test run_reports_errors ... ok
+test mcp_headless_over_stdio ... ok
+test commands_prints_catalogue ... ok
+test mcp_protocol_over_stdio ... ok
+test run_batch_exports ... ok
+test mcp_automation_roots ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/fileio.rs (target/debug/deps/fileio-b3edb37275a2fa1e)
+
+running 4 tests
+test help_lists_readable_formats ... ok
+test info_reports_why_an_eps_read_partly ... ok
+test images_open_at_their_pixel_size ... ok
+test convert_pdf_to_svg_and_info_on_ai ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/mcp_e2e.rs (target/debug/deps/mcp_e2e-b20e1f79983c99d8)
+
+running 5 tests
+test initialize_and_list_tools_with_valid_schemas ... ok
+test screenshot_is_a_decodable_png ... ok
+test draw_inspect_batch_undo_redo ... ok
+test many_requests_in_one_write_are_answered_in_order ... ok
+test export_formats_and_reopen ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_color-dc486d3d956ca060)
+
+running 111 tests
+test blend::tests::cmyk_planes_blend_inks ... ok
+test blend::tests::composite_lays_the_blend_over_the_backdrop_by_alpha ... ok
+test blend::tests::non_separable_modes_keep_the_reference_luminance ... ok
+test blend::tests::parse_labels ... ok
+test blend::tests::separable_modes_follow_the_reference_formulas ... ok
+test cms::lab::tests::ciede2000_reference_pairs ... ok
+test cms::lab::tests::lab_roundtrip ... ok
+test cms::lab::tests::white_and_black ... ok
+test cms::tests::bad_icc_rejected ... ok
+test cms::tests::cmyk_lab_cmyk_roundtrip ... ok
+test cms::tests::colour_blindness_proofs ... ok
+test cms::tests::device_cmyk_keeps_legacy_numbers ... ok
+test cms::tests::convert_between_models ... ok
+test cms::tests::gcr_puts_grey_into_black ... ok
+test cms::tests::gamut_warning ... ok
+test cms::tests::lab_colours_round_trip_through_the_cms ... ok
+test cms::tests::intents_parse_and_name ... ok
+test cms::tests::simulate_paper_tints_white ... ok
+test cms::tests::rgb_cmyk_rgb_roundtrip_in_gamut ... ok
+test cms::tests::paper_white_and_rich_black ... ok
+test cms::tests_icc::encoded_profiles_are_reproducible ... ok
+test freeform::tests::editing_keeps_lines_consistent ... ok
+test freeform::tests::lines_carry_colour_between_their_points ... ok
+test freeform::tests::auto_places_four_or_more_points_inside_the_shape ... ok
+test freeform::tests::serde_defaults_and_mode ... ok
+test cms::tests_icc::builtin_rgb_spaces_encode_under_their_names ... ok
+test freeform::tests::spread_keeps_the_colour_pure_inside_and_falls_off_outside ... ok
+test gradient::tests::duplicate_copies_the_stop_to_a_new_offset ... ok
+test freeform::tests::the_sample_at_a_point_is_its_colour ... ok
+test gradient::tests::fit_linear_horizontal ... ok
+test gradient::tests::focal_follows_transforms_and_rebases ... ok
+test gradient::tests::focal_is_kept_inside_the_ellipse_and_follows_its_reshaping ... ok
+test gradient::tests::insert_samples_color_and_sorts ... ok
+test gradient::tests::focal_round_trips_through_serde_and_defaults_to_none ... ok
+test gradient::tests::midpoint_math ... ok
+test gradient::tests::midpoint_shifts ... ok
+test gradient::tests::non_uniform_scale_turns_a_circle_into_an_ellipse ... ok
+test gradient::tests::param_runs_from_the_focal_point_to_the_ellipse ... ok
+test gradient::tests::move_reorders_and_tracks_index ... ok
+test gradient::tests::pin_fixes_the_fit_once ... ok
+test gradient::tests::rebase_keeps_relative_positions ... ok
+test gradient::tests::reflect_swaps_start_and_end ... ok
+test gradient::tests::radial_fit_uses_the_angle_and_param_honours_aspect ... ok
+test gradient::tests::remove_keeps_two ... ok
+test gradient::tests::rotate_90_gives_vertical_vector ... ok
+test gradient::tests::reverse_stops ... ok
+test gradient::tests::sample_endpoints_and_mid ... ok
+test gradient::tests::samples_follow_shear_and_rotation ... ok
+test harmony::tests::complementary_red ... ok
+test gradient::tests::swap_exchanges_only_the_colours ... ok
+test harmony::tests::every_rule_puts_the_base_first ... ok
+test harmony::tests::guide_rows_hold_the_colour_in_the_centre ... ok
+test harmony::tests::harmonies_keep_the_base_model ... ok
+test harmony::tests::high_contrast_flips_brightness ... ok
+test harmony::tests::moving_a_linked_colour_moves_the_others_alike ... ok
+test harmony::tests::rules_parse_by_id_and_label ... ok
+test harmony::tests::variations_step_out_from_the_colour ... ok
+test harmony::tests::themes_have_five_colours_base_first ... ok
+test libraries::tests::gradient_libraries_have_sorted_stops ... ok
+test libraries::tests::oklch_round_trips_in_gamut_colours ... ok
+test libraries::tests::sequential_scales_rise_in_lightness ... ok
+test harmony::tests::a_limited_guide_only_holds_palette_colours ... ok
+test libraries::tests::web_safe_has_the_216_web_colours ... ok
+test palette_io::tests::ase_clamps_components_and_writes_non_finite_ones_as_zero ... ok
+test palette_io::tests::ase_names_lose_nul_and_stop_at_the_reader_limit ... ok
+test palette_io::tests::ase_names_unnamed_and_repeated_entries_and_skips_other_blocks ... ok
+test libraries::tests::libraries_are_deterministic_unique_and_in_range ... ok
+test palette_io::tests::ase_reads_color_models_kinds_and_groups ... ok
+test palette_io::tests::ase_writes_each_model_kind_and_group ... ok
+test palette_io::tests::color_books_are_read ... ok
+test cms::tests::intents_differ ... ok
+test palette_io::tests::css_escapes_names_and_writes_gradients ... ok
+test palette_io::tests::gpl_writes_rgb_with_group_headers_and_reads_comments_and_headers ... ok
+test palette_io::tests::native_round_trip_keeps_cmyk_spot_and_groups ... ok
+test cms::tests_icc::gray_is_srgb_toned ... ok
+test recolor::tests::clustering_reduces_to_n_rows_of_similar_colours ... ok
+test recolor::tests::exact_tints_shades_and_hue_shift ... ok
+test recolor::tests::keys_keep_the_model_and_round_trip ... ok
+test recolor::tests::methods_parse_by_id_and_label ... ok
+test recolor::tests::palette_snaps_to_the_nearest_colour ... ok
+test recolor::tests::neutrals_and_preserve ... ok
+test recolor::tests::randomizers_are_deterministic_and_keep_hue ... ok
+test recolor::tests::preserve_tints_only_scales_real_tints ... ok
+test recolor::tests::scale_tints_keep_tint_ratios ... ok
+test swatch::tests::cmyk_defaults_are_cmyk_with_the_same_names ... ok
+test swatch::tests::default_swatches_parse ... ok
+test tests::cmyk_conversions ... ok
+test swatch::tests::defaults_start_with_none ... ok
+test tests::colours_convert_between_models_and_keep_them ... ok
+test tests::complement_and_invert ... ok
+test tests::complement_keeps_the_model ... ok
+test tests::gray_is_ink ... ok
+test tests::hex_roundtrip ... ok
+test tests::hsb_roundtrip ... ok
+test tests::lab_colours_serialize_with_their_tag_and_keep_their_model ... ok
+test tests::mapping_links_resets_the_tint_of_unlinked_colours ... ok
+test tests::paint_serde ... ok
+test tests::tints_scale_inks_and_mix_rgb_toward_white ... ok
+test cms::tests::legacy_profile_name_resolves ... ok
+test tests::tints_serialize_only_below_full_and_read_old_files ... ok
+test cms::tests::srgb_via_moxcms_matches_analytic ... ok
+test cms::tests::wide_gamut_working_space ... ok
+test freeform::tests::the_field_is_continuous_around_lines ... ok
+test palette_io::tests::ase_round_trip_keeps_models_kinds_and_groups ... ok
+test cms::tests::proof_lut_matches_direct_proof ... ok
+test cms::tests_icc::a_loaded_profile_is_embedded_as_loaded ... ok
+test cms::tests_icc::icc_cmyk_converts_into_a_wide_rgb_space_directly_without_clipping_to_srgb ... ok
+test palette_io::tests::ase_write_refuses_more_entries_than_the_reader_takes ... ok
+test palette_io::tests::damaged_ase_files_are_errors ... ok
+test cms::tests_icc::cmyk_profiles_convert_like_the_cms ... ok
+test cms::tests_icc::black_point_compensation_maps_the_darkest_ink_to_rgb_black ... ok
+
+test result: ok. 111 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.69s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_doc-f48f3798c2212cbb)
+
+running 149 tests
+test appearance::tests::outset_depends_on_align ... ok
+test appearance::tests::outset_covers_miter_spikes_projecting_caps_and_profile_maxima ... ok
+test appearance::tests::outset_covers_arrowheads ... ok
+test appearance::tests::basic_appearance ... ok
+test appearance::tests::hidden_attributes_show_again ... ok
+test appearance::tests::items_by_index ... ok
+test appearance::tests::basic_means_one_plain_fill_and_stroke ... ok
+test appearance::tests::profile_interp ... ok
+test appearance::tests::profile_presets_round_trip_their_ids ... ok
+test appearance::tests::arrowhead_names_are_stable_and_every_one_is_listed_once ... ok
+test appearance::tests::set_creates_missing ... ok
+test appearance::tests::pressure_profile_extends_and_reverses ... ok
+test blend::tests::affine_lerp_turns_the_short_way ... ok
+test blend::tests::closed_paths_start_where_they_twist_least ... ok
+test blend::tests::clicked_start_points_pair_up ... ok
+test appearance::tests::rebase_moves_fills_by_the_box_and_strokes_by_their_inflated_box ... ok
+test blend::tests::copied_steps_get_new_members ... ok
+test blend::tests::steps_follow_a_bent_spine ... ok
+test blend::tests::dashes_and_profiles_interpolate ... ok
+test blend::tests::a_replaced_spine_gets_anchors_where_its_keys_sit ... ok
+test blend::tests::gradients_with_different_stop_counts_interpolate ... ok
+test corners::tests::polygon_corners_follow_their_sides ... ok
+test appearance::tests::strokes_without_pressure_round_trip_unchanged ... ok
+test hit::tests::locked_and_hidden_skip ... ok
+test corners::tests::open_paths_and_curves_keep_their_ends_and_smooth_anchors ... ok
+test corners::tests::rectangle_corners_map_to_their_anchors ... ok
+test hit::tests::group_top_object ... ok
+test corners::tests::a_plain_path_keeps_its_cut_corners_live ... ok
+test hit::tests::hits_topmost ... ok
+test appearance::tests::arrow_align_defaults_to_extend_and_round_trips ... ok
+test hit::tests::objects_at_lists_the_stack ... ok
+test hit::tests::path_only_leaves_out_fills ... ok
+test appearance::tests::contents_slot_follows_item_edits_and_round_trips ... ok
+test hit::tests::type_path_only_picks_type_on_its_path ... ok
+test hit::tests::unfilled_interior_misses ... ok
+test hit::tests::sublayers_are_not_objects ... ok
+test hit::tests::type_path_only_picks_every_baseline ... ok
+test cmyk::tests::a_cmyk_jpeg_reads_back_as_ink_amounts ... ok
+test live::tests::grid_identity ... ok
+test live::tests::blend_steps_and_colours ... ok
+test live::tests::coons_rect_is_identity ... ok
+test live::tests::maps_go_on_past_the_content_box ... ok
+test links::tests::a_path_string_from_older_files_reads_as_a_link ... ok
+test live::tests::lerp_path_equalises_anchor_counts ... ok
+test cmyk::tests::other_images_are_not_cmyk ... ok
+test cmyk::tests::a_cmyk_tiff_with_alpha_reads_as_rgba ... ok
+test marks::tests::printer_marks_sit_in_a_band_outside_the_trim_box ... ok
+test metadata::tests::dates_and_statuses ... ok
+test marks::tests::japanese_printer_marks_share_the_centre_crosses_and_draw_as_art ... ok
+test live::tests::mesh_insert_and_remove_lines ... ok
+test node::tests::a_polygon_reports_and_takes_its_radius_angle_and_equal_sides ... ok
+test node::tests::a_scale_left_in_the_transform_folds_into_the_size ... ok
+test marks::tests::roman_marks_sit_off_the_corners_and_japanese_ones_are_doubled ... ok
+test node::tests::default_transparency ... ok
+test node::tests::rect_live_shape_roundtrip ... ok
+test metadata::tests::png_text_skips_empty_entries ... ok
+test node::tests::display_names ... ok
+test node::tests::shears_and_moves_keep_the_old_transform ... ok
+test node::tests::rotated_and_reflected_live_rectangles_scale_along_their_own_sides ... ok
+test node::tests::transform_group_recurses ... ok
+test node::tests::unplaced_gradients_pin_only_when_a_refit_would_differ ... ok
+test node::tests::uneven_scales_keep_live_corners_circular ... ok
+test node::tests::visual_bounds_include_stroke ... ok
+test overprint::tests::apply_covers_items_runs_gradients_and_spots ... ok
+test overprint::tests::black_ink_rules ... ok
+test orient::tests::local_scales_keep_the_angle_exactly ... ok
+test overprint::tests::legacy_overprint_black_list_migrates ... ok
+test orient::tests::rotations_add_and_moves_keep_the_angle ... ok
+test pattern::tests::brick_by_column_offsets ... ok
+test orient::tests::oriented_bounds_hug_a_rotated_rectangle ... ok
+test pattern::tests::grid_offsets ... ok
+test orient::tests::page_flips_mirror_the_angle ... ok
+test node::tests::corner_kinds_save_only_when_some_corner_isnt_round ... ok
+test links::tests::only_blobs_no_embedded_image_shows_are_linked_only ... ok
+test pattern::tests::brick_by_row_offsets ... ok
+test pattern::tests::hex_offsets ... ok
+test pattern::tests::instances_follow_paint_xf ... ok
+test pattern::tests::grid_repeat_flip ... ok
+test pattern::tests::covering_offsets_and_overlap_order ... ok
+test pattern::tests::grid_repeat_transforms ... ok
+test overprint::tests::overprint_round_trips_and_old_layers_load ... ok
+test pattern::tests::mirror_transforms ... ok
+test pattern::tests::radial_transforms ... ok
+test cmyk::tests::a_cmyk_tiff_keeps_its_ink_amounts_and_shows_as_rgb ... ok
+test pattern::tests::repeat_transform_moves_arrangement ... ok
+test pattern::tests::preview_offsets_count ... ok
+test pattern::tests::tile_type_parse ... ok
+test pattern::tests::radial_radius_is_authoritative ... ok
+test profiles::tests::legacy_profiles_migrate_both_ways ... ok
+test pixels::tests::samples_in_the_pixel_space_of_an_object_with_more_pixels ... ok
+test rastersettings::tests::partial_settings_fill_in_the_rest ... ok
+test pixels::tests::samples_a_pixel_or_the_average_around_it ... ok
+test pixels::tests::maps_each_colour_once_and_keeps_alpha ... ok
+test pattern::tests::tilings_are_periodic_on_their_period ... ok
+test placed_document::tests::round_trips_through_json ... ok
+test placed_document::tests::a_file_that_cant_be_read_shows_its_preview ... ok
+test pattern::tests::serde_roundtrip ... ok
+test puppet::tests::pins_hold_until_their_objects_change_and_are_never_saved ... ok
+test placed_document::tests::the_art_and_its_resources_join_only_a_prepared_copy_under_their_own_names ... ok
+test rastersettings::tests::pixels_follow_the_settings ... ok
+test reach::tests::a_bigger_arrowhead_grows_the_bounds ... ok
+test reach::tests::clicks_follow_the_width_profile ... ok
+test reach::tests::clicks_hit_heads_caps_and_spikes ... ok
+test reach::tests::rectangles_keep_exact_bounds_and_sharp_corners_spike_up_to_the_limit ... ok
+test selection::tests::basic_ops ... ok
+test reach::tests::document_hit_testing_and_visual_bounds_use_the_whole_stroke ... ok
+test selection::tests::selection_changes_clear_the_target ... ok
+test reach::tests::clicks_hit_outside_strokes_on_their_side_only ... ok
+test setup::tests::presets_and_defaults ... ok
+test selection::tests::guides_are_selected_on_their_own ... ok
+test setup::tests::bleed_grows_the_artboard ... ok
+test setup::tests::quotes_open_and_close_by_context ... ok
+test style_libs::tests::a_library_from_a_document_stands_alone_and_keeps_its_patterns ... ok
+test swatches::tests::default_names_follow_the_colour_model ... ok
+test swatches::tests::lookups_cover_colour_groups ... ok
+test swatches::tests::mapping_copies_only_changed_nodes ... ok
+test swatches::tests::mapping_within_ids_visits_each_paint_once ... ok
+test tests::char_position_round_trips ... ok
+test tests::art_on_artboard_takes_unlocked_objects_wholly_inside ... ok
+test tests::copy_on_write_shares_untouched ... ok
+test style_libs::tests::builtin_libraries_are_non_empty_with_unique_names ... ok
+test tests::find_and_paths ... ok
+test tests::move_and_remove ... ok
+test tests::new_document_has_layer_and_artboard ... ok
+test tests::reid_gives_fresh_ids ... ok
+test tests::layers_and_names ... ok
+test tests::units ... ok
+test tests_slices::an_object_slice_follows_its_object_and_numbers_run_by_rows ... ok
+test tests::serde_roundtrip ... ok
+test tests_units::readouts_show_two_decimals ... ok
+test tests_slices::auto_slices_fill_around_a_slice_in_rows ... ok
+test tests_slices::clip_to_artboard_clips_slices_and_off_covers_the_art ... ok
+test tests_units::odd_text_reads_as_nothing_without_panicking ... ok
+test tests_units::typed_units_win_over_the_fields_unit ... ok
+test tests_units::every_unit_round_trips_through_its_field_text ... ok
+test tests_units::units_are_named_by_label_key_or_suffix ... ok
+test text::tests::area_anchors_move_in_document_space ... ok
+test text::tests::point_text_basics ... ok
+test text::tests::paragraph_styles_split_merge_and_normalize ... ok
+test text::tests::auto_alignment_saves_readable_by_older_builds ... ok
+test trace::tests::ids_round_trip_and_unknown_views_show_the_result ... ok
+test text::tests::area_resizes_its_frame_and_keeps_its_type ... ok
+test tests::setup_round_trips_and_old_files_load ... ok
+test tests_slices::slices_survive_a_native_round_trip_and_old_files_load ... ok
+test style_libs::tests::vcstyles_round_trip ... ok
+test links::tests::large_images_get_a_small_png_preview ... ok
+test placed_document::tests::more_files_than_the_cache_holds_all_draw ... ok
+test tests_slices::auto_slices_cover_without_overlap ... ok
+test appearance::tests::pressure_profile_samples_simplify_and_interpolate ... ok
+
+test result: ok. 149 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_effects-e4fb7305274d1cb6)
+
+running 99 tests
+test adjust::tests::adjust_recolours_paints_members_and_strips_the_effects ... ok
+test bake::tests::plain_documents_are_not_copied ... ok
+test adjust::tests::neutral_settings_change_nothing ... ok
+test group::tests::a_random_transform_on_a_group_moves_its_members_together ... ok
+test adjust::tests::adjustments_move_colours_the_expected_way ... ok
+test group::tests::hidden_effect_or_plain_group_is_untouched ... ok
+test bake::tests::object_effects_become_geometry_and_raster_effects_stay ... ok
+test bake::tests::item_effects_split_into_one_path_per_item ... ok
+test marks::tests::the_marks_surround_the_object_and_follow_it ... ok
+test group::tests::shape_modes_follow_the_pathfinder_panel ... ok
+test pixel::tests::glowing_edges_glow_alike_on_every_side ... ok
+test pixel::tests::glowing_edges_defaults_keep_the_outline_bright_and_use_source_colour ... ok
+test pixel::tests::gaussian_and_plane_blurs_keep_their_mass ... ok
+test pixel::tests::pixel_timings ... ignored
+test pixel::tests::pixelate_params_take_defaults_and_stay_in_range ... ok
+test pixel::tests::outsets_follow_the_object ... ok
+test pixel::tests::glowing_edges_draw_a_bright_outline_and_preserve_premultiplication ... ok
+test pixel::tests::params_take_defaults_and_stay_in_range ... ok
+test pixel::tests::lengths_are_document_units ... ok
+test pixel::tests::unsharp_mask_overshoots_at_edges ... ok
+test pixel::tests::wrong_sizes_and_empty_rasters_are_left_alone ... ok
+test stroke::tests::aligned_width_doubles_only_closed_inside_and_outside_strokes ... ok
+test stroke::tests::dot_outlines_take_the_cap_shape_and_wind_like_stroked_dashes ... ok
+test stroke::tests::dots_on_a_closed_path_are_not_doubled_at_the_start ... ok
+test stroke::tests::extend_mode_keeps_the_path_and_overhangs_by_the_inset ... ok
+test stroke::tests::hollow_heads_are_rings_and_the_stroke_stays_out_of_the_hole ... ok
+test stroke::tests::dashes_follow_arc_length_and_join_across_the_start_of_closed_paths ... ok
+test pixel::tests::smart_blur_smooths_noise_and_keeps_edges ... ok
+test stroke::tests::line_outline_uses_the_profile_dashes_or_a_plain_stroke ... ok
+test stroke::tests::no_heads_borrows_the_path_and_closed_paths_get_none ... ok
+test stroke::tests::zero_length_dashes_are_dots_along_the_tangent ... ok
+test stroke::tests::tip_mode_shortens_the_stroke_by_the_head_and_puts_the_tip_on_the_end_point ... ok
+test stroke::tests::round_caps_never_poke_past_the_tip ... ok
+test stroke::tests_arrows::half_arrows_barb_on_their_own_side ... ok
+test stroke::tests_arrows::the_stroke_ends_inside_every_head ... ok
+test stroke::tests_fit::each_dash_takes_its_width_from_the_profile_along_the_whole_path ... ok
+test pixel::tests::crystallize_redraws_in_solid_polygons ... ok
+test stroke::tests_fit::fitted_dashes_ignore_the_offset_and_keep_exact_dashes_unchanged ... ok
+test stroke::tests_fit::every_corner_of_a_rectangle_falls_mid_dash ... ok
+test stroke::tests_fit::open_paths_start_and_end_mid_dash_and_runs_hold_whole_periods ... ok
+test stroke::tests_arrows::every_outline_is_drawn_inside_its_box_without_self_intersections ... ok
+test stroke::tests_fit::profile_corners_take_the_stroke_join ... ok
+test stroke::tests_fit::smooth_closed_paths_hold_a_whole_number_of_dashes ... ok
+test stroke::tests_gradient::along_keeps_a_corners_colour_round_its_outside ... ok
+test stroke::tests_fit::fitted_dots_sit_on_every_corner_and_end_once ... ok
+test stroke::tests_gradient::along_maps_the_length_of_the_path_in_any_direction ... ok
+test stroke::tests_gradient::an_aligned_stroke_spans_the_gradient_across_the_side_it_shows_on ... ok
+test stroke::tests_fit::smooth_points_of_curves_stay_smooth_with_any_join ... ok
+test stroke::tests_gradient::across_runs_from_the_left_edge_to_the_right ... ok
+test stroke::tests_gradient::span_is_the_part_of_the_gradient_between_two_positions ... ok
+test pixel::tests::pointillize_paints_dots_on_a_white_canvas ... ok
+test stroke::width::tests::a_discontinuous_point_steps_the_width ... ok
+test stroke::width::tests::closed_paths_make_a_ring ... ok
+test stroke::width::tests::curves_are_offset_by_the_profile ... ok
+test pixel::tests::spin_blur_smears_along_arcs_and_keeps_the_centre ... ok
+test stroke::width::tests::uniform_profile_matches_a_plain_stroke ... ok
+test stroke::width::tests::lens_profile_is_a_diamond_and_one_sided_profiles_stay_on_their_side ... ok
+test tests::bench_catalog_lookup ... ignored
+test tests::blend_mode_names ... ok
+test tests::catalog_complete_and_unique ... ok
+test stroke::tests_fit::fitted_dashes_on_curves_and_degenerate_paths_stay_finite ... ok
+test tests::bad_params_fall_back_to_defaults ... ok
+test tests::defaults_match_dialogs ... ok
+test tests::convert_to_shape_sizes ... ok
+test tests::effects_chain_in_order_and_skip_hidden_and_raster ... ok
+test pixel::tests::every_effect_is_deterministic ... ok
+test stroke::tests_gradient::meshes_colour_the_stroke_as_the_slices_do ... ok
+test tests::free_distort_identity_and_corner_move ... ok
+test tests::merged_params_override_defaults ... ok
+test pixel::tests::color_halftone_screens_midtones_into_dots_and_keeps_white_and_black ... ok
+test tests::offset_path_grows_and_shrinks ... ok
+test tests::outline_stroke_uses_context_stroke ... ok
+test tests::every_geometry_effect_changes_geometry_and_keeps_closedness ... ok
+test tests::open_paths_stay_open ... ok
+test tests::pucker_bloat_moves_anchors_in_opposite_directions ... ok
+test tests::geometry_effects_are_deterministic ... ok
+test tests::raster_effects_parse_and_outset ... ok
+test tests::roughen_seed_changes_result_and_detail_adds_points ... ok
+test tests::random_transform_is_stable_per_object_and_within_the_values ... ok
+test tests::transform_copies_and_move ... ok
+test tests::transform_copies_stop_before_they_overflow ... ok
+test tests::transform_scales_and_rotates_about_its_reference_point ... ok
+test tests::twist_fixes_the_outer_circle_and_rotates_inside ... ok
+test tests::warp_arc_bends_the_top_edge ... ok
+test tests::zigzag_ridge_count_and_amplitude ... ok
+test tests_scale::every_distance_parameter_is_a_parameter ... ok
+test tests::round_corners_replaces_corners ... ok
+test tests::warp_zero_bend_is_identity_ish ... ok
+test tests_scale::scale_effect_scales_distances_only ... ok
+test pixel::tests::color_halftone_screens_inks_in_cmyk_documents ... ok
+test pixel::tests::extreme_parameters_finish ... ok
+test tests::warp_keeps_bounds_sane ... ok
+test tests::scribble_produces_filled_outline_inside_bounds ... ok
+test pixel::tests::pixelate_patterns_follow_the_object_at_any_resolution ... ok
+test pixel::tests::mezzotint_turns_channels_fully_on_or_off ... ok
+test stroke::tests::degenerate_paths_and_patterns_neither_panic_nor_hang ... ok
+test stroke::tests_reach::bounds_and_clicks_cover_every_arrowhead ... ok
+test stroke::tests_gradient::slices_cover_everything_the_stroke_paints ... ok
+test stroke::tests_reach::bounds_and_clicks_cover_what_every_stroke_paints ... ok
+
+test result: ok. 97 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 6.76s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_engine-a86a7c7180ecc1b3)
+
+running 1579 tests
+test cmd::clipboard::tests::an_address_alone_is_told_from_other_text ... ok
+test cmd::cut::tests::open_half_mirrors_into_a_closed_shape ... ok
+test cmd::cut::tests::keep_names_a_side_of_the_axis ... ok
+test cmd::cut::tests::reflection_maps_across_the_axis ... ok
+test cmd::docinfo::tests::embedding_permissions_read_from_fs_type ... ok
+test cmd::effectcmd::tests::apply_uses_catalog_defaults_and_undoes ... ok
+test cmd::docinfo::tests::pixel_perfect_snaps_edges_and_strokes ... ok
+test cmd::clipboard::tests::foreign_svg_and_non_svg_text ... ok
+test cmd::clipboard::tests::paste_never_lands_in_an_object_that_reused_an_undone_layers_id ... ok
+test cmd::fileio::ppi::tests::jpeg_jfif_density_in_dpi_and_dpcm ... ok
+test cmd::effectcmd::tests::expand_transform_copies_makes_compound ... ok
+test cmd::fileio::save::tests_folders::the_desktops_documents_folder_is_read_from_user_dirs ... ok
+test cmd::clipboard::tests::copy_exports_svg_that_round_trips_through_paste ... ok
+test cmd::fileio::ppi::tests::tiff_and_exif_resolution_tags ... ok
+test cmd::fileio::pngtext::tests::text_chunks_round_trip_and_stay_valid ... ok
+test cmd::effectcmd::tests::pathfinder_effect_on_loose_objects_groups_them_first ... ok
+test cmd::clipboard::tests::pasted_type_gets_its_layout_bounds_cache ... ok
+test cmd::fileio::save::tests_folders::the_templates_dialog_folder_exists ... ok
+test cmd::fileio::tests::export_extensions_name_every_writable_format ... ok
+test cmd::fileio::tests::content_beats_a_wrong_extension ... ok
+test cmd::docinfo::tests::info_counts_objects_fonts_and_selection_only ... ok
+test cmd::fileio::ppi::tests::png_phys_round_trips_and_still_decodes ... ok
+test cmd::fileio::tests::open_exts_cover_every_readable_format ... ok
+test cmd::fileio::ppi::tests::bmp_pixels_per_metre ... ok
+test cmd::fileio::tests::cmyk_tiffs_keep_their_inks_and_other_tiffs_become_png ... ok
+test cmd::fileio::tests::oversized_raster_exports_are_refused ... ok
+test cmd::fileio::tests::ranges_parse_one_based ... ok
+test cmd::fileio::tests::webp_opens_at_its_pixel_size ... ok
+test cmd::effectcmd::tests::expand_appearance_bakes_geometry ... ok
+test cmd::fileio::tests_affinity::a_previewless_file_fails_without_replacing_the_active_document ... ok
+test cmd::effectcmd::tests::list_remove_and_set_params ... ok
+test cmd::fileio::tests_affinity::end_and_post_image_chunk_crcs_cannot_escape_pixel_decoding ... ok
+test cmd::fileio::tests::new_files_never_replace_a_file ... ok
+test cmd::fileio::tests::formats_query_lists_readers_writers_and_options ... ok
+test cmd::fileio::tests_affinity::native::a_damaged_native_document_falls_back_to_its_preview_with_the_reason ... ok
+test cmd::effectcmd::tests::pathfinder_effect_on_a_group_renders_live_and_expands ... ok
+test cmd::fileio::tests_affinity::malformed_crc_and_every_truncation_fail ... ok
+test cmd::fileio::tests_affinity::bounded_mutations_do_not_panic ... ok
+test cmd::fileio::tests_affinity::placing_a_preview_is_rejected_even_when_renamed_or_queued ... ok
+test cmd::fileio::tests_affinity::native::layers_artboards_curves_and_paints_open_as_editable_art ... ok
+test cmd::fileio::tests_affinity::preview_reaches_the_document_open_command ... ok
+test cmd::fileio::tests::pdf_export_honours_artboard_and_range ... ok
+test cmd::fileio::tests::template_sublayers_are_left_out_too ... ok
+test cmd::fileio::tests::export_for_screens_vector_rows_drop_scale_suffixes_and_names_ignore_case ... ok
+test cmd::fileio::tests_affinity::templates_and_libraries_cannot_silently_extract_preview_content ... ok
+test cmd::fileio::tests_affinity::preview_opens_with_a_warning_and_never_saves_to_the_source ... ok
+test cmd::fileio::tests::templates_open_untitled ... ok
+test cmd::fileio::tests_dxf::dwg_and_pict_say_what_to_use_instead ... ok
+test cmd::fileio::tests_dxf::bad_dxf_options_are_refused ... ok
+test cmd::fileio::tests::opens_every_readable_format ... ok
+test cmd::fileio::tests_affinity::native::native_documents_save_reopen_export_place_and_template ... ok
+test cmd::fileio::tests::export_without_path_returns_bytes_and_never_retargets ... ok
+test cmd::fileio::tests::raster_exports_leave_template_layers_out ... ok
+test cmd::fileio::tests_aiimport::what_the_reader_doesnt_read_opens_as_before_with_a_warning ... ok
+test cmd::fileio::tests_dxfimport::binary_dxf_says_to_save_it_as_ascii ... ok
+test cmd::fileio::tests_dxf::selected_only_exports_the_selection_in_its_layers ... ok
+test cmd::fileio::tests_dxfimport::document_open_reads_a_dxf_drawing ... ok
+test cmd::fileio::tests_dxfimport::a_drawing_export_writes_opens_again ... ok
+test cmd::fileio::tests_dxf::placed_images_come_back_as_linked_files ... ok
+test cmd::fileio::tests_dxfimport::dxf_info_lists_layouts_layers_and_units ... ok
+test cmd::fileio::tests_dxf::use_artboards_writes_one_drawing_per_artboard ... ok
+test cmd::fileio::tests_dxfimport::document_open_takes_the_dxf_options ... ok
+test cmd::fileio::tests_dxf::formats_list_dxf_and_what_can_not_be_written ... ok
+test cmd::fileio::tests_dxfimport::file_place_puts_a_drawing_in_as_one_group ... ok
+test cmd::fileio::tests_dxfimport::dxf_is_readable_and_detected_by_content ... ok
+test cmd::fileio::tests_aiimport::an_illustrator_ai_file_opens_from_its_editing_data ... ok
+test cmd::fileio::tests_dxf::export_writes_dxf_of_the_chosen_version ... ok
+test cmd::fileio::tests_eps::bad_eps_options_are_refused_and_formats_list_eps ... ok
+test cmd::fileio::tests_aiimport::fit_to_artwork_bounds_leaves_out_the_hidden_art_and_guides_the_editing_data_has ... ok
+test cmd::fileio::tests_eps::overprints_are_kept_or_discarded ... ok
+test cmd::fileio::tests_eps::eps_covers_the_art_y_up_from_the_first_artboard_with_a_preview_and_the_document ... ok
+test cmd::fileio::tests_eps::placed_images_are_written_and_previews_are_black_and_white_on_request ... ok
+test cmd::fileio::tests_epsimport::postscript_ai_files_and_garbage ... ok
+test cmd::fileio::tests_exportas::bad_artboard_choices_error ... ok
+test cmd::fileio::tests_exportas::formats_list_use_artboards ... ok
+test cmd::fileio::tests_epsimport::other_eps_files_are_read_by_the_postscript_interpreter ... ok
+test cmd::fileio::tests_eps::selected_only_writes_the_selection ... ok
+test cmd::fileio::tests_eps::use_artboards_writes_a_file_per_artboard_named_with_an_underscore ... ok
+test cmd::fileio::tests_epsimport::an_unreadable_eps_file_comes_in_as_its_preview ... ok
+test cmd::fileio::tests_metafile::a_pasted_metafile_becomes_objects ... ok
+test cmd::fileio::tests_metafile::export_writes_an_emf_or_wmf_of_one_artboard ... ok
+test cmd::fileio::tests_exportas::per_artboard_names_keep_the_folder_and_extension ... ok
+test cmd::fileio::tests_metafile::metafiles_open_and_place ... ok
+test cmd::fileio::tests_metafile::formats_list_emf_and_wmf ... ok
+test cmd::fileio::tests_epsimport::an_eps_file_of_ours_reopens_as_the_same_document ... ok
+test cmd::fileio::tests_metafile::raster_effects_are_written_as_images ... ok
+test cmd::fileio::tests::export_for_screens_one_page_per_pdf_unique_names ... ok
+test cmd::fileio::tests_aiimport::an_illustrator_eps_opens_with_its_layers ... ok
+test cmd::fileio::tests_metafile::use_artboards_writes_one_picture_each_or_the_art ... ok
+test cmd::fileio::tests_aiimport::editing_data_false_opens_only_what_the_page_prints ... ok
+test cmd::fileio::tests_aiimport::an_ai_file_saved_without_its_pdf_part_opens_from_its_editing_data ... ok
+test cmd::fileio::tests_exportas::without_artboards_the_export_covers_the_visible_art ... ok
+test cmd::fileio::tests_pdf::bad_options_are_refused ... ok
+test cmd::fileio::tests_pdf::formats_list_the_pdf_options ... ok
+test cmd::fileio::tests_exportas::use_artboards_writes_one_file_per_artboard_in_the_range ... ok
+test cmd::fileio::tests_pdf::export_pdf_writes_a_path ... ok
+test cmd::fileio::tests_epsimport::eps_files_place_as_one_group_clipped_to_their_bounding_box ... ok
+test cmd::fileio::tests_palette::palette_formats_reach_export_as_and_screens ... ok
+test cmd::fileio::tests_pdf::options_apply_over_the_preset ... ok
+test cmd::fileio::tests_pdf::export_pdf_writes_the_compatibility_header_and_the_range ... ok
+test cmd::fileio::tests_jpeg::image_maps_list_the_objects_with_a_url ... ok
+test cmd::fileio::tests_palette::png8_and_gif_export_palettes ... ok
+test cmd::fileio::tests_aiimport::type_asked_for_as_outlines_opens_a_file_whose_type_shows_from_its_pdf_part ... ok
+test cmd::fileio::tests_pdfcolor::a_cmyk_pdf_opens_as_a_cmyk_document_with_its_spot_swatch ... ok
+test cmd::fileio::tests_pdfedit::a_pdf_of_some_artboards_carries_no_editing_data ... ok
+test cmd::fileio::tests_pdfedit::ait_templates_open_their_document_untitled ... ok
+test cmd::fileio::tests_pdfcolor::color_mode_opens_the_file_in_the_mode_asked_for ... ok
+test cmd::fileio::tests_pdf::pdf_settings_summarise_changes_and_warnings ... ok
+test cmd::fileio::tests_pdfedit::save_dialogs_offer_every_format_save_writes ... ok
+test cmd::fileio::tests_pdfedit::the_legacy_payload_name_is_accepted ... ok
+test cmd::fileio::tests_pdf::options_not_applied_yet_and_document_features_warn ... ok
+test cmd::fileio::tests_pdfedit::exports_write_ai_as_save_as_does ... ok
+test cmd::fileio::tests_pdfedit::pages_changed_elsewhere_open_as_artwork_with_a_warning ... ok
+test cmd::fileio::tests_pdffidelity::load_options_read_text_and_layers ... ok
+test cmd::fileio::tests_pdffidelity::layers_option_keeps_or_flattens_optional_content ... ok
+test cmd::fileio::tests_pdfedit::a_pdf_saved_with_preserve_editing_reopens_as_the_same_document ... ok
+test cmd::fileio::tests_pdfimport::an_encrypted_pdf_needs_its_password ... ok
+test cmd::fileio::tests_pdfimport::a_postscript_ai_file_says_it_cannot_be_opened_yet ... ok
+test cmd::fileio::tests_pdffidelity::text_opens_as_type_or_outlines ... ok
+test cmd::fileio::tests_pdfimport::document_open_imports_the_pages_named ... ok
+test cmd::fileio::tests_pdfimport::load_options_read_pages_crop_and_password ... ok
+test cmd::fileio::tests_pdfimport::document_open_crops_each_page_to_the_box_asked_for ... ok
+test cmd::fileio::tests_eps::transparency_is_flattened_with_the_flattener_preset ... ok
+test cmd::fileio::tests_pdfimport::file_place_crops_a_pdf_page_to_any_box_and_takes_its_password ... ok
+test cmd::fileio::tests_pdflayers::export_pdf_overprint_is_preserved_or_discarded ... ok
+test cmd::fileio::tests_pdfimport::a_placeholder_only_pdf_part_is_detected ... ok
+test cmd::fileio::tests_pdflayers::ai_files_write_their_layers_and_sublayers_as_pdf_layers ... ok
+test cmd::fileio::tests_pdflayers::export_pdf_create_layers_writes_layers_that_reopen_as_layers ... ok
+test cmd::fileio::tests_pdfimport::pdf_info_lists_pages_boxes_and_a_thumbnail ... ok
+test cmd::fileio::tests_pdfsecurity::the_permissions_password_opens_a_protected_pdf_too ... ok
+test cmd::fileio::tests_pdffidelity::exports_that_draw_type_in_a_missing_font_say_it_is_the_fallback_font ... ok
+test cmd::fileio::tests_pdfedit::ai_files_are_pdfs_that_save_and_reopen_editable ... ok
+test cmd::fileio::tests_psd::psd_is_listed_with_its_options_and_writes_one_file_per_artboard ... ok
+test cmd::fileio::tests_pdfsecurity::permissions_without_a_password_warn_and_a_password_applies_them ... ok
+test cmd::fileio::tests_psdread::damaged_and_unsupported_files_are_refused_without_a_panic ... ok
+test cmd::fileio::tests_psdread::every_colour_mode_and_depth_reads ... ok
+test cmd::fileio::tests_psdread::packbits_zip_and_psb_files_read ... ok
+test cmd::fileio::tests_pdfwebview::fast_web_view_through_every_pdf_path ... ok
+test cmd::fileio::tests_pdfwebview::thumbnails_show_the_pages ... ok
+test cmd::fileio::tests_psdread::transparency_comes_back_straight_and_extra_channels_without_it_stay_out ... ok
+test cmd::fileio::tests_psdread::the_resolution_resource_sizes_the_placed_image ... ok
+test cmd::fileio::tests_raster::a_300_ppi_export_places_back_at_its_physical_size ... ok
+test cmd::fileio::tests_psdread::psd_exports_open_and_place_again ... ok
+test cmd::fileio::tests_raster::an_image_opens_at_the_size_its_resolution_declares ... ok
+test cmd::fileio::tests_raster::formats_list_the_raster_options ... ok
+test cmd::fileio::tests_raster::screens_rows_with_a_resolution_name_their_scale ... ok
+test cmd::fileio::tests_raster::screens_and_rasterize_take_anti_aliasing ... ok
+test cmd::fileio::tests_raster::the_document_background_is_the_default_export_background ... ok
+test cmd::fileio::tests_screens::a_zip_is_written_into_the_folder ... ok
+test cmd::fileio::tests_screens::a_width_or_height_row_gives_that_many_pixels ... ok
+test cmd::fileio::tests_screens::format_settings_apply_to_their_rows_and_rows_win ... ok
+test cmd::fileio::tests_screens::full_document_gives_one_file_per_format ... ok
+test cmd::fileio::tests_raster::png_options_resolution_background_interlace_and_anti_aliasing ... ok
+test cmd::fileio::tests_screens::include_bleed_grows_each_artboard ... ok
+test cmd::fileio::tests_screens::sizes_parse_as_factor_width_height_or_resolution ... ok
+test cmd::fileio::tests_screens::density_buckets_go_into_sub_folders ... ok
+test cmd::fileio::tests_screens::png_8_rows_write_indexed_colour ... ok
+test cmd::fileio::tests_screens::zip_archives_store_their_files ... ok
+test cmd::fileio::tests_screens::the_document_remembers_its_export_settings ... ok
+test cmd::fileio::tests_svg::every_option_changes_the_output ... ok
+test cmd::fileio::tests_screens::sub_folders_are_made_in_the_export_folder ... ok
+test cmd::fileio::tests_svg::fewer_tspans_reaches_the_writer ... ok
+test cmd::fileio::tests_svg::formats_list_the_svg_options_with_their_defaults ... ok
+test cmd::fileio::tests_svg::junk_options_are_rejected ... ok
+test cmd::fileio::tests_svg::preserve_editing_reopens_the_native_document ... ok
+test cmd::fileio::tests_svg::linked_images_are_written_next_to_the_svg ... ok
+test cmd::fileio::tests_screens::zip_downloads_round_trip ... ok
+test cmd::fileio::tests_svg::save_writes_svg_and_remembers_its_options ... ok
+test cmd::fileio::tests_svg::svgz_opens_and_pastes_like_svg ... ok
+test cmd::fileio::tests_svg::several_artboards_write_one_file_each ... ok
+test cmd::fileio::tests_svgedit::link_mode_writes_no_data_uri ... ok
+test cmd::fileio::tests_svgedit::preserve_editing_restores_effects_symbols_and_patterns_exactly ... ok
+test cmd::fileio::tests_svgedit::save_keeps_hidden_layers_and_export_leaves_them_out ... ok
+test cmd::fileio::tests_svgenc::a_chosen_artboard_s_svg_holds_only_its_own_art ... ok
+test cmd::fileio::tests_svgenc::each_encoding_reopens_and_serializes_as_text ... ok
+test cmd::fileio::tests_svgenc::profile_and_embedded_fonts_reach_the_writer ... ok
+test cmd::fileio::tests_svgedit::an_svg_edited_elsewhere_opens_as_plain_svg_with_a_warning ... ok
+test cmd::fileio::tests_svg::svgz_is_the_svg_export_gzipped ... ok
+test cmd::fileio::tests_svgimport::opening_an_svg_links_its_images_from_its_folder ... ok
+test cmd::fileio::tests_text::text_export_writes_the_stories_in_stacking_order ... ok
+test cmd::fileio::tests_svgimport::placing_an_svg_reads_its_linked_images ... ok
+test cmd::fileio::tests_text::webp_is_lossless_and_says_so_when_lossy_is_asked_for ... ok
+test cmd::fileio::tests_jpeg::jpeg_options_reach_the_file ... ok
+test cmd::fileio::tests_pdf::pdf_a_refuses_pdf_2 ... ok
+test cmd::fileio::tests_pdfedit::standards_and_screens_leave_the_editing_data_out ... ok
+test cmd::fileio::tests_tiffbmp::targa_depth_reaches_the_file ... ok
+test cmd::fileio::tests_tiffbmp::the_formats_are_listed_and_write_one_file_per_artboard ... ok
+test cmd::findfiles::tests::a_picked_folder_that_cant_be_listed_fails_the_search ... ok
+test cmd::findfiles::tests::a_search_starts_with_the_threads_left_and_fails_when_none_is ... ok
+test cmd::findfiles::tests::a_search_takes_the_cpus_the_renderer_leaves_from_two_to_eight ... ok
+test cmd::findfiles::tests::a_visitor_that_panics_on_one_file_does_not_end_the_search ... ok
+test cmd::findfiles::tests::files_found_are_kept_as_they_are_read ... ok
+test cmd::findfiles::tests::files_past_those_the_search_reads_are_not_kept ... ok
+test cmd::fileio::tests_tiffbmp::bmp_options_reach_the_file ... ok
+test cmd::findfiles::tests::files_turned_down_by_the_file_are_not_read ... ok
+test cmd::findfiles::tests::links_are_not_followed_and_unreadable_folders_count ... ok
+test cmd::findfiles::tests::system_roots_and_homes_are_told_by_what_they_hold ... ok
+test cmd::fileio::tests_pdfsecurity::export_with_passwords_writes_a_pdf_that_only_its_passwords_open ... ok
+test cmd::findfiles::tests::a_picked_folder_inside_other_apps_folders_is_refused ... ok
+test cmd::findfiles::tests::the_search_ends_once_every_item_has_a_file ... ok
+test cmd::findfiles::tests::the_walk_stays_out_of_other_apps_and_the_systems_folders ... ok
+test cmd::findfiles::tests::windows_paths_lose_the_verbatim_prefix_where_they_read_the_same ... ok
+test cmd::fonts::dirty_tests::selection_never_marks_modified_and_undo_to_saved_is_clean ... ok
+test cmd::fileio::tests_tiffbmp::tiff_options_reach_the_file ... ok
+test cmd::fonts::open_tests::opened_documents_have_exact_text_bounds ... ok
+test cmd::findfiles::tests::the_search_ends_at_its_limits_and_when_stopped ... ok
+test cmd::fonts::tests::list_flag_missing_replace_and_select ... ok
+test cmd::graph::tests::a_column_stroke_stays_a_stroke_and_a_marker_fill_does_not_recolour_its_line ... ok
+test cmd::graph::tests::a_gradient_fill_survives_regeneration ... ok
+test cmd::graph::tests::a_series_index_past_the_graphs_series_is_ignored ... ok
+test cmd::graph::tests::a_series_named_legend_keeps_its_own_index_and_an_empty_series_is_omitted ... ok
+test cmd::graph::tests::column_heights_follow_data_and_data_edits_regenerate_in_place ... ok
+test cmd::fileio::tests_pdf13::pdf_1_3_files_are_encrypted_with_40_bit_rc4_and_can_be_linearised ... ok
+test cmd::graph::tests::csv_parsing ... ok
+test cmd::graph::tests::every_graph_type_generates_series_groups ... ok
+test cmd::graph::tests::painting_a_line_series_stroke_sets_its_persistent_colour ... ok
+test cmd::graph::tests::painting_a_series_is_one_undoable_edit ... ok
+test cmd::graph::tests::painting_one_bar_sets_the_colour_used_by_the_whole_series_on_rebuild ... ok
+test cmd::graph::tests::group_selection_paint_becomes_the_series_colour_and_survives_regeneration ... ok
+test cmd::help::tests::links ... ok
+test cmd::maskedit::tests::edit_mask_art_in_place ... ok
+test cmd::opacitymask::tests::flags_and_linking ... ok
+test cmd::opacitymask::tests::make_groups_several_objects ... ok
+test cmd::opacitymask::tests::make_moves_top_object_into_mask ... ok
+test cmd::opacitymask::tests::masks_survive_native_round_trip ... ok
+test cmd::opacitymask::tests::new_masks_clipping_toggle ... ok
+test cmd::opacitymask::tests::release_restores_mask_art_and_undo_restores_mask ... ok
+test cmd::package::tests::packaged_fonts_have_a_font_extension ... ok
+test cmd::place::text::tests::crlf_with_returns_removed_gives_one_paragraph_per_block ... ok
+test cmd::place::text::tests::decodes_by_character_set_and_platform ... ok
+test cmd::place::text::tests::options_parse_and_reject_bad_values ... ok
+test cmd::place::text::tests::runs_of_spaces_become_tabs_and_controls_go ... ok
+test cmd::fonts::tests::the_additional_fonts_folder_joins_the_font_scan ... ok
+test cmd::tabs::tests::set_get_clear_tabs ... ok
+test cmd::textstyles::tests::char_style_new_apply_range_redefine_keeps_overrides ... ok
+test cmd::textstyles::tests::new_from_selection_rename_delete_and_undo ... ok
+test cmd::textstyles::tests::paragraph_styles_and_survive_save ... ok
+test cmd::fileio::tests_pdf13::pdf_1_3_flattens_all_transparency_and_looks_the_same ... ok
+test cmd::fileio::tests_pdfoutput::export_pdf_converts_colours_writes_the_output_intent_and_real_text ... ok
+test cmd::threads::tests::release_and_remove ... ok
+test cmd::threads::tests::thread_flows_reflows_on_edit_and_survives_delete ... ok
+test cmd::graph::tests::series_colours_survive_native_save_open_and_export ... ok
+test cmd::typecmd::area_tests::burasagari_is_set_per_paragraph_and_saved_only_when_on ... ok
+test cmd::typecmd::area_tests::character_alignment_is_a_character_attribute_saved_only_when_set ... ok
+test cmd::typecmd::area_tests::area_options_columns_change_layout ... ok
+test cmd::typecmd::area_tests::kinsoku_set_is_set_per_paragraph_and_saved_only_when_not_hard ... ok
+test cmd::typecmd::area_tests::leading_model_is_set_per_paragraph_and_saved_only_when_top_to_top ... ok
+test cmd::typecmd::area_tests::new_type_is_composed_with_line_end_half_width_punctuation ... ok
+test cmd::textwrap::tests::text_flows_on_both_sides_of_a_centred_object ... ok
+test cmd::typecmd::area_tests::vertical_point_type_keeps_its_anchor_on_the_column_centre_line ... ok
+test cmd::typecmd::area_tests::new_type_takes_the_japanese_defaults_while_the_interface_is_japanese ... ok
+test cmd::wand::tests::fill_tolerance_stroke_weight_and_modes ... ok
+test cmd::views::tests::save_rename_delete_views ... ok
+test cmd::wand::tests::opacity_and_blending_mode ... ok
+test file_access::tests::a_missing_root_is_an_error_and_none_is_no_confinement ... ok
+test cmd::typecmd::headline_tests::fit_headline_fills_the_first_line ... ok
+test file_access::tests::device_names ... ok
+test file_access::tests::links_are_followed_before_comparing ... ok
+test file_access::tests::parent_traversal_is_resolved_or_refused ... ok
+test file_access::tests::paths_inside_the_roots_pass_and_others_dont ... ok
+test file_access::tests::relative_paths_resolve_against_the_working_directory ... ok
+test file_access::tests::a_sibling_with_the_same_prefix_is_outside ... ok
+test guard::tests::catch_panic_returns_value_or_message ... ok
+test steps::tests::plain_strings_and_escapes_are_left_alone ... ok
+test steps::tests::references_take_values_from_earlier_results ... ok
+test file_access::tests::scopes_nest_and_carry_to_other_threads ... ok
+test tests::a_click_sets_the_key_object_that_align_and_spacing_keep_still ... ok
+test tests::align_left ... ok
+test steps::tests::a_reference_to_nothing_is_an_error ... ok
+test tests::clipping_and_compound ... ok
+test tests::a_panicking_command_rolls_back_instead_of_crashing ... ok
+test cmd::fileio::tests_text::save_for_office_writes_a_png_at_the_resolution ... ok
+test tests::arrange_order ... ok
+test tests::copy_paste_front_back ... ok
+test tests::create_and_undo_redo ... ok
+test tests::direct_selection_moves_one_anchor ... ok
+test tests::direct_selection_drags_segments ... ok
+test tests::document_find_searches_names_kinds_and_text ... ok
+test tests::document_inspect_slices_the_layer_tree ... ok
+test tests::document_node_summary_matches_inspect ... ok
+test tests::every_command_has_unique_id_and_doc ... ok
+test tests::document_node_summary_slices_with_depth_and_limit ... ok
+test tests::flare_tool_two_step_gesture_is_one_undo ... ok
+test tests::given_targets_are_used_as_given_and_range_style_takes_the_selected_type ... ok
+test tests::fill_and_stroke_commands ... ok
+test tests::graph_tool_drag_creates_a_graph_and_asks_for_data ... ok
+test tests::group_ungroup ... ok
+test tests::layers_and_lock_hide ... ok
+test tests::inspect_lists_everything ... ok
+test tests::inspect_reports_the_paint_of_types_characters ... ok
+test tests::new_layers_and_sublayers_are_numbered_together ... ok
+test tests::pen_click_on_a_selected_path_adds_an_anchor_unless_disabled ... ok
+test cmd::fileio::tests_psd::psd_writes_layers_groups_and_text_named_after_it ... ok
+test cmd::textwrap::tests::area_type_wraps_around_objects_above_and_follows_edits ... ok
+test tests::rectangle_tool_draws ... ok
+test tests::pen_tool_draws_closed_path ... ok
+test tests::reshape_moves_the_grabbed_point_and_its_neighbourhood ... ok
+test tests::object_mosaic_tiles_follow_the_image_colours ... ok
+test tests::rotate_and_scale ... ok
+test tests::selection_tool_drag_is_one_undo_step ... ok
+test tests::select_same_fill ... ok
+test tests::snap_to_pixel_rounds_drawing_and_moves ... ok
+test tests::stale_current_layer_id_never_targets_a_reused_id ... ok
+test tests::shaper_creates_upright_or_inverted_live_triangles_with_one_undo_step ... ok
+test tests::shaper_square_started_mid_edge_closes_on_pointer_release_and_undoes_once ... ok
+test tests::text_create_has_bounds ... ok
+test tests::shaper_turns_rough_strokes_into_live_shapes_and_scribbles_punch_fills ... ok
+test tests_adjust::an_embedded_image_is_adjusted_for_export_without_changing_its_pixels ... ok
+test tests::unknown_and_disabled ... ok
+test tests::transform_and_again ... ok
+test tests_adjust::export_and_expand_write_the_adjusted_colours ... ok
+test tests_appearance::active_item_targets_paint_and_proxies_and_clears_on_selection_change ... ok
+test tests_appearance::add_fill_and_stroke_copy_the_top_ones ... ok
+test tests_adjust::adjustments_survive_the_native_file ... ok
+test tests_appearance::an_active_row_of_the_other_kind_leaves_edits_on_the_painted_leaves ... ok
+test tests_appearance::clear_and_reduce_keep_a_groups_stack_empty ... ok
+test tests_appearance::clear_and_reduce_to_basic ... ok
+test tests_appearance::edit_gradient_on_the_lower_fill ... ok
+test tests_adjust::the_effects_are_in_the_catalog_under_color_adjustments ... ok
+test tests_appearance::graphic_style_apply_replaces_the_stack ... ok
+test tests_appearance::group_rows_are_the_groups_own_stack ... ok
+test tests_appearance::item_transparency_is_one_step_and_checks_the_blend_mode ... ok
+test tests_appearance::effects_land_on_the_targeted_item ... ok
+test tests_appearance::item_rows_follow_remove_and_move ... ok
+test tests_adjust::an_adjustment_is_live_and_one_undo_step ... ok
+test tests_appearance::set_item_and_remove_item ... ok
+test tests_appearance::the_active_row_follows_only_edits_of_its_object ... ok
+test tests_appearance::stroke_set_with_item_changes_only_that_stroke ... ok
+test tests_appearance::text_items_take_item_paint ... ok
+test tests_appearance::transparency_goes_to_the_targeted_item ... ok
+test tests_appearance::per_fill_offset_path_renders ... ok
+test tests_areafit::auto_height_follows_edits_in_the_same_undo_step ... ok
+test cmd::fonts::open_tests::list_says_how_each_font_resolved ... ok
+test tests_areafit::auto_height_follows_the_leading_model_and_character_alignment ... ok
+test tests_areafit::shrink_text_round_trips_through_the_native_format ... ok
+test tests_assets::add_remove_and_rename_are_undo_steps ... ok
+test tests_areafit::inspect_reports_overflow_and_fit_scale ... ok
+test tests_assets::an_asset_exports_its_art_alone ... ok
+test tests_areafit::area_options_set_and_report_the_fit ... ok
+test tests_appearance::text_fill_items_composite_with_their_opacity ... ok
+test tests_assets::deleting_the_object_prunes_it_and_undo_brings_it_back ... ok
+test tests_assets::assets_round_trip_through_the_native_format ... ok
+test tests_assets::multiple_gives_an_asset_per_object_and_single_one_of_them_all ... ok
+test tests_areafit::auto_height_follows_typing_with_the_type_tool ... ok
+test tests_assets::moving_the_art_moves_the_crop ... ok
+test tests_assets::names_follow_the_object_or_count_up_and_can_be_changed ... ok
+test tests_assets::export_for_screens_writes_chosen_assets_and_keeps_its_rules ... ok
+test tests_attributes::each_attribute_sets_reads_back_and_undoes_in_one_step ... ok
+test tests_attributes::attributes_survive_a_native_round_trip ... ok
+test tests_attributes::fill_rule_reaches_compound_paths_and_the_paths_in_groups ... ok
+test tests_attributes::reverse_path_direction_on_and_off_set_the_winding ... ok
+test tests_attributes::svg_export_links_objects_and_import_reads_the_links_back ... ok
+test tests_attributes::object_data_is_set_saved_and_written_to_svg ... ok
+test tests_attributes::values_that_differ_read_null_and_recent_urls_keep_the_newest_first ... ok
+test tests_bboxrotate::groups_type_and_multiple_selections_keep_their_angle ... ok
+test tests_bboxrotate::handles_turn_with_the_object_and_scale_along_its_axes ... ok
+test tests_assets::assets_export_into_a_folder ... ok
+test tests_attributes::an_even_odd_star_has_a_hollow_centre ... ok
+test tests_bboxrotate::reset_bounding_box_squares_the_box_in_one_step ... ok
+test tests_bboxrotate::page_flips_keep_an_upright_box_upright ... ok
+test cmd::findfiles::tests::a_folder_with_more_folders_than_the_search_queues_ends_it_as_it_is_listed ... ok
+test tests_bboxrotate::rotated_box_rect_matches_page_bounds_when_upright ... ok
+test tests_bboxrotate::native_files_keep_the_angle ... ok
+test tests_bboxrotate::rotating_to_45_keeps_45 ... ok
+test tests_blendfidelity::closed_shapes_start_where_they_dont_twist ... ok
+test tests_blendfidelity::compound_steps_stay_compound_paths ... ok
+test tests_bboxrotate::transform_panel_sizes_follow_the_turned_box ... ok
+test tests_bboxrotate::the_selection_tool_reports_a_transforming_drag ... ok
+test tests_blendfidelity::groups_with_different_member_counts_interpolate_member_by_member ... ok
+test tests_blendfidelity::dashes_caps_and_width_profiles_interpolate ... ok
+test tests_blendfidelity::expand_and_release_keep_what_the_blend_carries ... ok
+test tests_blendfidelity::object_expand_expands_blends_inside_the_selection ... ok
+test tests_blendfidelity::symbol_instances_interpolate_their_transforms ... ok
+test tests_blendfidelity::text_moves_and_recolours_while_its_words_switch_halfway ... ok
+test tests_blendopts::a_blend_and_an_object_make_one_blend_with_more_keys ... ok
+test tests_blendopts::info_reads_the_selected_blend ... ok
+test tests_blendopts::options_with_nothing_selected_set_what_new_blends_start_with ... ok
+test tests_assets::the_shared_settings_drive_the_export_and_arent_an_undo_step ... ok
+test tests_blendopts::start_points_pair_the_clicked_anchors ... ok
+test tests_blendopts::the_blend_tool_blends_from_clicked_anchors_and_keeps_adding ... ok
+test tests_blendspine::a_spine_point_added_and_moved_bends_the_blend ... ok
+test tests_blendspine::a_blend_with_an_edited_spine_takes_more_keys_along_it ... ok
+test tests_blendopts::start_points_round_trip_and_old_blends_load ... ok
+test tests_blendspine::info_lists_the_spine ... ok
+test tests_blendspine::key_anchors_round_trip ... ok
+test tests_blendspine::release_keeps_the_spine_as_a_path ... ok
+test tests_blendspine::reverse_spine_and_front_to_back_keep_an_edited_spine ... ok
+test cmd::findfiles::tests::the_search_answers_at_its_deadline_while_a_walker_is_blocked ... ok
+test tests_blendspine::moving_a_key_point_moves_the_key_and_the_other_way_round ... ok
+test tests_brushsym::apply_adds_a_stroke_when_missing_and_reaches_into_groups ... ok
+test tests_blendspine::only_points_without_a_key_can_be_deleted ... ok
+test tests_brushsym::apply_and_remove_brush_with_undo ... ok
+test tests_brushsym::brush_freehand_paints_with_a_brush_in_one_step ... ok
+test tests_brushsym::brush_list_has_the_default_library ... ok
+test tests_blendfidelity::knockout_blends_draw_as_they_export ... ok
+test tests_blendspine::direct_selection_picks_keys_and_edits_update_the_blend_live ... ok
+test tests_brushsym::edit_then_update_redefines_all_instances ... ok
+test tests_brushsym::delete_duplicate_and_replace_symbols ... ok
+test tests_brushsym::continuing_a_stroke_joins_its_pressure ... ok
+test tests_brushsym::expand_brush_replaces_path_with_art_group ... ok
+test tests_brushsym::new_symbol_replaces_selection_with_instance_of_same_bounds ... ok
+test tests_brushsym::brushed_strokes_and_instances_render ... ok
+test tests_brushsym::paintbrush_tool_uses_the_current_brush ... ok
+test tests_areafit::auto_height_in_columns_and_by_hand ... ok
+test tests_brushsym::place_and_break_link_round_trip_geometry ... ok
+test tests_brushsym::sprayer_command_creates_a_symbol_set_and_alt_removes ... ok
+test tests_brushsym::pressure_stays_with_its_own_path ... ok
+test tests_brushsym::symbolism_adjustments ... ok
+test tests_brushsym::symbol_sprayer_tool_gesture_is_one_undo_step ... ok
+test tests_brushsym::brush_options_set_variation_modes ... ok
+test tests_build::a_line_across_a_live_paint_shape_splits_its_face ... ok
+test tests_brushsym::brushes_and_symbols_survive_vectorcraft_round_trip ... ok
+test tests_brushsym::brush_options_rename_duplicate_and_delete_update_strokes ... ok
+test tests_build::image_trace_create_strokes_makes_stroked_centre_lines ... ok
+test tests_build::image_trace_make_and_expand_and_color_presets ... ok
+test tests_build::image_trace_make_places_paths_over_the_image ... ok
+test tests_build::image_trace_object_remembers_its_settings ... ok
+test tests_brushsym::new_brushes_from_params_and_selection ... ok
+test tests_build::image_trace_presets_query_and_errors ... ok
+test tests_build::live_paint_bucket_fills_an_area_enclosed_by_lines ... ok
+test tests_build::live_paint_bucket_tool_fills_face ... ok
+test tests_build::image_trace_view_is_stored_kept_and_validated ... ok
+test tests_build::image_trace_palettes_and_swatch_libraries ... ok
+test tests_build::live_paint_fill_on_plain_paths_makes_the_group ... ok
+test tests_build::live_paint_fill_assigns_the_face_under_the_point ... ok
+test tests_build::live_paint_make_builds_group_with_hidden_sources ... ok
+test tests_build::live_paint_merge_keeps_paint_and_adds_faces ... ok
+test tests_build::live_paint_stroke_edge ... ok
+test tests_build::image_trace_release_and_expand ... ok
+test tests_build::live_paint_release_and_expand ... ok
+test tests_build::shape_builder_closes_filled_open_paths ... ok
+test tests_build::shape_builder_click_on_a_side_of_a_line_splits_the_shape ... ok
+test tests_build::shape_builder_drag_merges_touched_regions ... ok
+test tests_build::shape_builder_click_splits_out_one_region ... ok
+test tests_build::shape_builder_erase_click_on_an_edge_opens_its_path ... ok
+test tests_build::shape_builder_alt_deletes_a_region_or_a_line_piece ... ok
+test tests_build::shape_builder_erase_deletes_regions ... ok
+test tests_build::shape_builder_erase_drag_along_edges_deletes_each ... ok
+test tests_build::shape_builder_fill_option_and_untouched_shapes_kept ... ok
+test tests_build::shape_builder_fills_an_area_lines_enclose ... ok
+test tests_build::shape_builder_line_splits_a_shape_into_regions ... ok
+test tests_build::shape_builder_erase_drag_into_regions_deletes_them_not_the_edges_it_crosses ... ok
+test tests_build::shape_builder_merge_across_a_line_removes_the_piece_between ... ok
+test tests_build::shape_builder_regions_query ... ok
+test tests_build::shape_builder_tool_alt_deletes_line_pieces ... ok
+test tests_build::shape_builder_miss_is_an_error_and_undo_restores ... ok
+test tests_charstroke::an_object_stroke_on_type_is_still_reached_through_its_item ... ok
+test tests_charstroke::eyedropper_and_outlines_carry_the_character_stroke ... ok
+test tests_charstroke::character_stroke_options_round_trip_natively_and_old_files_load ... ok
+test tests_build::shape_builder_tool_drives_the_command ... ok
+test tests_charstroke::range_stroke_options_split_runs ... ok
+test tests_charstroke::stroke_options_on_type_style_every_run_and_add_no_object_stroke ... ok
+test cmd::fileio::tests_pdfx::choosing_a_pdfx_standard_sets_its_version_and_turns_off_what_it_forbids ... ok
+test tests_clip::make_refuses_a_top_object_that_cannot_clip ... ok
+test cmd::rasterfx::tests::settings_and_pdf_flattening ... ok
+test tests_clipboard::a_failed_batch_puts_the_clipboard_back ... ok
+test tests_clipboard::a_spot_swatch_brings_its_plate ... ok
+test tests_brushsym::paintbrush_records_pen_pressure_on_the_stroke ... ok
+test tests_clipboard::clipboard_svg_carries_its_own_patterns ... ok
+test tests_clipboard::front_and_back_without_a_selection_use_the_current_layers_ends ... ok
+test tests_clipboard::brushes_travel_with_their_strokes ... ok
+test tests_clip::compound_clip_keeps_its_hole_and_release_gives_the_compound_back ... ok
+test tests_clip::imported_multi_shape_and_even_odd_clip_paths_clip ... ok
+test tests_clipboard::gradient_swatches_come_along_with_their_stop_links ... ok
+test tests_clipboard::gradient_stops_stay_linked_to_their_swatches ... ok
+test tests_clip::text_on_top_clips_by_its_glyphs ... ok
+test tests_build::image_trace_views_draw_on_screen_only_and_expand_to_the_result ... ok
+test tests_clipboard::graphic_style_links_follow_the_style_into_the_document ... ok
+test tests_clipboard::an_image_symbol_and_pattern_rect_pasted_into_a_new_document_render_the_same ... ok
+test tests_clipboard::in_place_pastes_go_onto_the_artboard_named ... ok
+test tests_clipboard::paste_centres_on_the_given_point ... ok
+test tests_clipboard::lab_spot_colours_show_as_the_target_documents_spot_option_says ... ok
+test tests_clipboard::paste_on_all_artboards_keeps_the_offset_to_the_source_artboard ... ok
+test tests_clipboard::registration_is_never_copied_as_a_swatch ... ok
+test tests_clipboard::paste_remembers_layers_restores_the_source_layers ... ok
+test tests_clipboard::pasting_back_into_the_source_document_adds_nothing ... ok
+test tests_clipboard::paste_without_formatting_leaves_text_styles_behind ... ok
+test tests_clipboard::pasting_again_reuses_what_an_earlier_paste_added ... ok
+test tests_clipboard::swatch_conflicts_merge_relinks_and_add_renames ... ok
+test tests_clipboard::tints_and_their_tint_swatches_follow_the_base ... ok
+test tests_clipboard::paste_remembers_layers_survives_save_and_old_files_load_without_it ... ok
+test tests_clipboard::undo_removes_everything_the_paste_added ... ok
+test tests_clipflavours::copied_files_paste_by_their_content ... ok
+test tests_clipflavours::import_image_then_paste_gives_an_image ... ok
+test tests_clipflavours::exported_pdf_pastes_back_as_vectors ... ok
+test tests_clipflavours::import_text_then_paste_gives_point_text ... ok
+test tests_clipflavours::exported_png_of_a_red_square_is_red ... ok
+test tests_clipflavours::type_only_copies_offer_their_text ... ok
+test tests_clippaint::type_as_a_clipping_path_paints_its_characters ... ok
+test tests_clippaint::release_and_ungroup_keep_the_clipping_paths_paint ... ok
+test tests_clipboard::styles_symbols_and_images_of_the_same_name_are_renamed ... ok
+test tests_cmdsplit::duplicate_names_stay_unique ... ok
+test tests_cmdsplit::leaf_targets_expand_groups_and_stop_at_compound_paths ... ok
+test tests_cmdsplit::unique_name_appends_the_first_free_number ... ok
+test tests_clipflavours::keep_plain_text_preference_drops_pasted_formatting ... ok
+test tests_colorguide::harmony_query_returns_the_group_and_its_grid ... ok
+test tests_cmdsplit::moved_commands_keep_their_ids ... ok
+test tests_colorguide::new_swatch_saves_several_colours_in_one_step ... ok
+test tests_colorguidelib::document_swatches_limit_the_guide_and_recolor ... ok
+test tests_clipflavours::copy_offers_flavours_by_the_preferences ... ok
+test tests_clippaint::a_clipping_paths_fill_and_stroke_show_in_render_svg_and_pdf ... ok
+test tests_build::image_trace_flat_logo_preset_makes_a_true_circle ... ok
+test tests_build::image_trace_flat_logo_refuses_a_gradient_and_a_bad_palette ... ok
+test tests_colorguidelib::every_guide_colour_is_a_library_member ... ok
+test cmd::findfiles::tests::one_walker_and_eight_find_the_same_files_and_every_search_ends ... ok
+test tests_build::shape_builder_merges_rosette_rings_cleanly ... ok
+test cmd::fileio::tests_pdfx::pdfx_1a_and_x3_flatten_transparency_and_x4_keeps_it ... ok
+test tests::every_command_survives_empty_params ... ok
+test tests_cmykflatten::every_blend_mode_flattens_to_the_canvas_pixels_in_cmyk ... ok
+test tests_cmykflatten::cmyk_documents_flatten_to_ink_colours ... ok
+test tests_colormgmt::assign_profile_is_stored_and_undoable ... ok
+test tests_colormgmt::convert_query_and_intents ... ok
+test tests_colormgmt::document_mode_conversion_is_idempotent ... ok
+test tests_colormgmt::document_mode_converts_through_cms ... ok
+test tests_colorthemes::add_to_swatches_makes_a_colour_group_in_one_step ... ok
+test tests_colormgmt::gamut_check_flags_unprintable_colours ... ok
+test tests_colorthemes::themes_save_list_edit_and_delete ... ok
+test tests_colorthemes::themes_round_trip_with_the_preferences ... ok
+test tests_containers::appearance_commands_target_the_object_or_its_contents ... ok
+test tests_colormgmt::intents_reach_the_document_conversion ... ok
+test tests_containers::effects_and_fills_apply_to_layers_by_id ... ok
+test tests_containers::type_fills_go_above_or_below_the_characters ... ok
+test tests_colormgmt::overprint_black_multiplies_in_preview ... ok
+test tests_css::a_rounded_rectangle_gives_background_border_and_radius ... ok
+test tests_containers::group_appearance_round_trips_and_expands ... ok
+test tests_css::generate_covers_the_document_and_an_empty_selection_has_none ... ok
+test tests_css::type_gives_font_properties_and_gradients_css_gradients ... ok
+test tests_css::export_writes_the_sheet_and_rasterized_art ... ok
+test tests_colormgmt::pdf_cmyk_document_writes_device_cmyk ... ok
+test tests_cut::cut_commands_need_paths ... ok
+test tests_colormgmt::pdf_spot_colour_is_a_separation ... ok
+test tests_cut::line_cut_that_misses_changes_nothing ... ok
+test tests_cut::line_cut_splits_a_shape_in_one_undo_step ... ok
+test tests_containers::a_group_fill_paints_both_members_and_the_contents_slot_moves ... ok
+test tests_cut::mirror_cut_axes_and_sides ... ok
+test tests_cut::line_cut_keeps_compound_holes_and_splits_open_paths ... ok
+test tests_cut::mirror_cut_closes_an_open_half ... ok
+test tests_cut::mirror_cut_makes_a_symmetric_shape ... ok
+test tests_dashalign::align_dashes_and_the_offset_edit_the_pattern_in_place ... ok
+test tests_cut::tools::rect_and_mirror_tools_cut_and_escape_restores ... ok
+test tests_cut::rect_cut_crops_to_real_geometry ... ok
+test tests_dashalign::outline_stroke_of_fitted_dashes_wraps_every_corner ... ok
+test tests_cut::tools::line_cut_tool_previews_live_and_commits_one_step ... ok
+test tests_distort::a_hidden_grid_stays_hidden_back_from_a_temporary_tool ... ok
+test tests_distort::attach_projects_onto_the_plane_and_releases ... ok
+test tests_dashalign::fitted_dashes_survive_the_native_format ... ok
+test tests_distort::grid_preset_and_set_are_undoable ... ok
+test tests_distort::grid_show_and_plane_are_view_state ... ok
+test tests_distort::liquify_without_selection_hits_paths_under_the_brush ... ok
+test tests_distort::perspective_move_attaches_loose_objects_to_the_given_plane ... ok
+test tests_distort::liquify_is_deterministic_and_localized ... ok
+test tests_distort::liquify_tool_replays_from_the_journal ... ok
+test tests_distort::perspective_selection_moves_within_the_plane ... ok
+test tests_distort::width_point_move_and_remove ... ok
+test tests_distort::the_grid_hides_while_a_perspective_tool_is_chosen ... ok
+test tests_distort::width_point_set_creates_profile_and_undoes ... ok
+test tests_distort::width_profile_set_and_clear ... ok
+test tests_docsetup::bad_values_are_rejected_and_change_nothing ... ok
+test tests_distort::width_tool_gesture_is_one_undo_step ... ok
+test tests_distort::rectangle_tool_draws_in_perspective_on_the_active_plane ... ok
+test tests_css::export_to_a_path_puts_the_pictures_next_to_the_sheet ... ok
+test tests_docsetup::character_styles_follow_the_setup_sizes ... ok
+test tests_docsetup::language_picks_its_quotes_unless_quotes_are_given ... ok
+test tests_docsetup::many_settings_are_one_undo_step ... ok
+test tests_docsetup::query_reports_the_defaults_and_accepts_them_back ... ok
+test tests_docsetup::saved_flattener_presets_and_background_contents ... ok
+test tests_docsetup::set_units_is_an_alias ... ok
+test tests_distort::puppet_warp_satisfies_pins_and_keeps_area ... ok
+test tests_docsetup::smart_punctuation_uses_the_document_quotes ... ok
+test tests_docsetup::setup_survives_save_and_load ... ok
+test tests_docsetup::superscript_and_small_caps_use_and_follow_the_setup_sizes ... ok
+test tests_docsetup::discard_white_overprint_keeps_white_overprints_in_overprint_preview ... ok
+test tests_draw2::a_dragged_handle_snaps_to_smart_guides ... ok
+test tests_draw2::add_and_delete_anchor_tools ... ok
+test tests_draw2::convert_anchors_turns_the_selected_anchors_corner_or_smooth ... ok
+test tests_draw2::curvature_click_first_point_closes ... ok
+test tests_draw2::anchor_point_tool_converts ... ok
+test tests_docsetup::svg_text_export_follows_the_export_text_setting ... ok
+test tests_draw2::curvature_clicks_build_smooth_path ... ok
+test tests_draw2::draw2_commands_reject_bad_params ... ok
+test tests_draw2::curvature_edits_any_selected_path ... ok
+test tests_draw2::cut_at_anchors_splits_paths_and_leaves_one_end_selected ... ok
+test tests_draw2::eraser_removes_small_shape_entirely ... ok
+test tests_draw2::delete_anchor_on_circle_keeps_curve ... ok
+test tests_draw2::join_takes_the_paths_and_the_ends_to_join ... ok
+test tests_draw2::join_tool_joins_two_lines ... ok
+test tests_draw2::eraser_splits_shapes_and_lines ... ok
+test tests_draw2::knife_cuts_rect_into_two_pieces ... ok
+test tests_draw2::knife_partial_cut_does_nothing ... ok
+test tests_distort::puppet_tool_drag_warps_selection ... ok
+test tests_draw2::line_family_tools_draw_and_click_asks_dialog ... ok
+test tests_draw2::path_eraser_splits_selected_path ... ok
+test tests_draw2::pen_with_alt_converts_the_anchors_of_the_path_being_drawn ... ok
+test tests_draw2::pen_with_cmd_borrows_direct_selection_and_goes_on_drawing ... ok
+test tests_draw2::pen_with_alt_moves_one_handle_and_converts_anchors ... ok
+test tests_draw2::pen_drag_from_the_first_anchor_closes_the_path ... ok
+test tests_docsetup::typographers_quotes_setting_changes_typed_quotes ... ok
+test tests_draw2::removing_an_anchor_refits_a_split_curve_and_undo_restores_it ... ok
+test tests_draw2::pencil_continues_selected_open_path ... ok
+test tests_draw2::reshaping_a_segment_keeps_smooth_anchors_smooth ... ok
+test tests_draw2::remove_anchor_points_keeps_the_paths_closed ... ok
+test tests_draw2::scissors_opens_closed_path ... ok
+test tests_draw2::scissors_splits_open_path_in_two ... ok
+test tests_draw2::shift_drag_keeps_a_smooth_anchor_smooth_and_alt_breaks_it ... ok
+test tests_draw2::smooth_tool_reduces_jagged_path ... ok
+test tests_draw2::shift_keeps_a_dragged_handle_at_45_degree_steps ... ok
+test tests_editcolors::balance_previews_and_commits_one_step ... ok
+test tests_draw2::the_pen_continues_any_open_path_and_joins_another ... ok
+test tests_editcolors::adjust_balance_modes ... ok
+test tests_editcolors::edit_colors_reach_mesh_points ... ok
+test tests_editcolors::invert_recolours_an_embedded_image ... ok
+test tests_editcolors::blend_moves_a_mesh_to_the_blended_colour ... ok
+test tests_editcolors::recolor_writes_a_new_pattern_swatch ... ok
+test tests_effectedit::duplicate_selected_works_for_effects ... ok
+test tests_effectedit::effects_reorder_within_a_list_and_undo_in_one_step ... ok
+test tests_effectedit::effects_move_and_copy_between_the_object_and_its_items ... ok
+test tests_effectedit::items_duplicate_to_a_position_and_several_remove_at_once ... ok
+test tests_draw2::paintbrush_uses_stroke_blob_brush_fills ... ok
+test tests_effectedit::show_all_hidden_attributes ... ok
+test tests_emptytype::a_command_that_deselects_the_text_ends_the_edit ... ok
+test tests_emptytype::discard_empty_command ... ok
+test tests_emptytype::frames_stay_when_left_empty ... ok
+test tests_emptytype::clicking_without_typing_leaves_no_text_and_no_history ... ok
+test tests_emptytype::switching_documents_discards_it_in_the_document_left ... ok
+test tests_emptytype::typed_text_stays_and_typing_it_away_leaves_nothing ... ok
+test tests_draw2::pencil_alt_closes_path ... ok
+test tests_envelope::expand_keeps_name_transparency_knockout_and_mask ... ok
+test tests_envelope::new_envelopes_take_the_reference_defaults_and_options_change_them ... ok
+test tests_envelope::envelope_options_round_trip_natively_and_old_files_load ... ok
+test tests_envelope::options_with_nothing_selected_are_the_defaults_for_new_envelopes ... ok
+test tests_envelope::release_groups_several_objects_under_the_transparency ... ok
+test tests_envelope::release_gives_back_the_warp_shape_as_a_mesh_and_keeps_the_transparency ... ok
+test tests_envelope::object_expand_expands_envelopes_inside_the_selection ... ok
+test tests_envelope::reset_with_warp_and_mesh_switch_the_kind_and_keep_the_content ... ok
+test tests_envelope_distort::a_rotated_warp_envelope_turns_with_its_warp ... ok
+test tests_envelope_distort::linear_gradients_bend_when_asked ... ok
+test tests_envelope_distort::new_envelopes_distort_appearance_and_old_ones_keep_their_look ... ok
+test tests_envelope_distort::pattern_fills_bend_when_asked ... ok
+test tests_envelope::enveloped_type_keeps_each_runs_colour_on_the_canvas ... ok
+test tests_envelope_distort::symbols_bend_with_the_envelope ... ok
+test tests_envelope_edit::edit_contents_clicks_reach_the_content_where_it_is ... ok
+test tests_envelope_distort::the_frame_round_trips_natively ... ok
+test tests_envelope_edit::mesh_handles_start_from_the_smooth_mesh ... ok
+test tests_envelope_edit::mesh_commands_edit_mesh_envelopes ... ok
+test tests_envelope_edit::reset_with_mesh_keeps_the_warp_shape_along_the_grid ... ok
+test tests_envelope_distort::distort_appearance_bends_strokes_and_effects_with_the_art ... ok
+test tests_envelope_edit::mesh_handles_turn_with_the_envelope_and_round_trip ... ok
+test tests_expand::a_blurred_layer_keeps_its_image_as_its_only_member ... ok
+test tests_expand::a_blur_turns_the_object_into_an_image ... ok
+test tests_expand::a_targeted_layer_with_a_fill_expands_into_art_among_its_members ... ok
+test tests_expand::an_art_brush_becomes_a_group_of_its_art ... ok
+test tests_envelope_distort::images_bend_as_a_raster_mesh_warp ... ok
+test tests_expand::a_shadow_becomes_an_image_under_the_art_and_transparency_stays_on_the_group ... ok
+test tests_draw2::pencil_fits_freehand_stroke_as_one_undo_step ... ok
+test tests_expand::type_with_a_shadow_stays_type_and_type_with_its_own_stroke_is_outlined ... ok
+test tests_eyedropper::alt_click_applies_the_selection_to_the_clicked_object ... ok
+test tests_eyedropper::cmyk_stays_cmyk ... ok
+test tests_eyedropper::clicking_an_image_samples_its_pixel ... ok
+test tests_eyedropper::picking_up_without_weight_keeps_the_target_weight ... ok
+test tests_eyedropper::every_appearance_attribute_copies_the_whole_stack ... ok
+test tests_eyedropper::shift_alt_click_appends_the_appearance ... ok
+test tests_eyedropper::the_options_are_a_preference ... ok
+test tests_file::batch_is_one_undo_step ... ok
+test tests_file::batch_rolls_back_on_error ... ok
+test tests_eyedropper::type_takes_the_stroke_options_it_has ... ok
+test tests_file::draw_behind_and_inside ... ok
+test tests_eyedropper::type_picks_up_font_and_size ... ok
+test tests_expand::two_fills_and_an_offset_stroke_become_three_paths_that_look_the_same ... ok
+test tests_file::export_selection_crops_to_the_selection ... ok
+test tests_file::pdf_roundtrip_through_engine ... ok
+test tests_file::recolor_maps_fills_strokes_gradients ... ok
+test tests_file::export_selection_reports_the_encoders_warnings ... ok
+test tests_file::serialize_and_reopen ... ok
+test tests_file::save_and_open_path ... ok
+test tests_fileinfo::file_info_is_one_undo_step_and_reports_everything ... ok
+test tests_fileinfo::file_info_round_trips_and_old_files_load ... ok
+test tests_fileinfo::junk_is_rejected ... ok
+test tests_fileinfo::pdf_info_carries_author_subject_and_keywords ... ok
+test tests_fileinfo::png_exports_carry_text_chunks ... ok
+test tests_file::template_opens_as_untitled ... ok
+test tests_fileinfo::svg_metadata_carries_file_info_as_dublin_core ... ok
+test tests_flatpresets::built_in_presets_are_listed_and_protected ... ok
+test tests_fileinfo::saving_to_a_file_stamps_the_modified_date ... ok
+test tests_flatpresets::saved_presets_are_made_changed_renamed_and_used ... ok
+test tests_flatpresets::presets_round_trip_through_export_and_import ... ok
+test tests_flatpresets::saved_presets_persist_with_the_preferences ... ok
+test tests_flatpreview::an_opaque_document_reports_nothing ... ok
+test tests_flatpreview::overprints_and_patterns_are_reported ... ok
+test tests_flatpreview::rasterized_areas_follow_the_balance_and_raster_effects ... ok
+test tests_envelope::enveloped_type_exports_distorted_in_every_format ... ok
+test tests_flatpreview::type_under_a_transparent_rectangle_counts_as_affected ... ok
+test tests_file::japanese_file_names_save_open_and_export ... ok
+test tests_file::export_for_screens_writes_every_combination ... ok
+test tests_colormgmt::proof_colors_simulate_press_on_screen ... ok
+test tests_colormgmt::rgb_art_separates_with_gcr ... ok
+test tests_colormgmt::rgb_cmyk_rgb_document_roundtrip_within_tolerance ... ok
+test tests_colormgmt::separation_plates_render_ink_coverage ... ok
+test tests_colormgmt::spot_colours_get_their_own_plate ... ok
+test tests_colormgmt::swatch_links_survive_mode_conversion ... ok
+test tests_colormgmt::view_toggles_redraw_without_dirtying ... ok
+test tests_flatten::a_mixed_scene_looks_the_same_flattened ... ok
+test tests_focal::set_gradient_geom_sets_aspect_and_focal_in_one_step ... ok
+test tests_focal::the_focal_point_keeps_its_place_as_the_gradient_moves_and_reshapes ... ok
+test tests_focal::the_focal_point_round_trips_through_params_and_the_native_format ... ok
+test tests_focal::the_radial_annotator_drags_the_focal_dot_the_aspect_handle_and_the_ring ... ok
+test tests_fontfiles::a_search_finds_a_missing_fonts_file_by_its_names ... ok
+test tests_fontfiles::a_search_skips_font_files_too_large_to_add ... ok
+test tests_fontfiles::adding_fonts_needs_vectorcraft_s_fonts_folder ... ok
+test tests_flatten::balance_trades_vector_regions_for_an_image ... ok
+test tests_fontfiles::an_overlong_font_name_leaves_the_other_fonts_searchable ... ok
+test tests_fontfiles::copying_never_replaces_a_file ... ok
+test tests_fontfiles::missing_fonts_are_listed_symbols_included ... ok
+test tests_fontfiles::only_font_files_are_copied ... ok
+test tests_fontfiles::stop_ends_only_the_search_it_names ... ok
+test tests_fontfiles::the_fonts_folder_next_to_a_document_in_another_apps_folder_isnt_offered ... ok
+test tests_fontfiles::the_fonts_folder_next_to_a_document_is_an_absolute_path ... ok
+test tests_flatten::every_blend_mode_flattens_to_its_pixels ... ok
+test tests_flatten::flatten_is_one_undo_step ... ok
+test tests_freeform::add_set_and_delete_points ... ok
+test tests_freeform::freeform_paints_survive_saving_and_old_files_load ... ok
+test tests_freeform::lines_join_split_and_follow_the_selection ... ok
+test tests_freeform::new_stops_recolour_the_points ... ok
+test tests_freeform::point_commands_need_a_freeform_gradient ... ok
+test tests_freeform::reapplied_gradients_place_their_points_afresh ... ok
+test tests_freeform::selection_follows_the_object_and_the_proxy ... ok
+test tests_freeform::the_first_application_places_points_inside_the_shape ... ok
+test tests_freeform::transforms_and_warps_move_the_points ... ok
+test tests_fontlist::refreshing_the_font_list_redraws_type_without_editing_the_document ... ok
+test tests_freeform::type_objects_keep_points_in_text_space ... ok
+test tests_gradient::annotator_gestures_edit_the_gradient_as_single_undo_steps ... ok
+test tests_gradient::bad_gradients_are_rejected_without_editing ... ok
+test tests_gradient::free_distort_maps_gradients_once ... ok
+test tests_gradient::geometry_and_aspect_in_one_call ... ok
+test tests_gradient::aspect_works_on_type_and_run_strokes_fit_the_inflated_box ... ok
+test tests_gradient::gradient_params_round_trip_through_fill_and_swatches ... ok
+test tests_gradient::gradient_vector_follows_the_active_proxy_or_an_item_index ... ok
+test tests_gradient::rotate_reflect_and_scale_carry_unplaced_gradients ... ok
+test tests_gradient::select_stop_is_validated_and_shared ... ok
+test tests_gradient::stop_opacity_and_offsets_are_normalised ... ok
+test tests_gradient::swatches_and_new_art_fit_a_placed_gradient_to_themselves ... ok
+test tests_gradient::the_selected_stop_belongs_to_its_gradient ... ok
+test tests_gradpanel::eyedropper_options_choose_what_copy_from_takes ... ok
+test tests_gradient::type_objects_take_the_vector_on_their_runs_in_text_space ... ok
+test tests_gradpanel::sample_color_with_a_stop_recolours_that_stop_in_one_undo_step ... ok
+test tests_gradpanel::graphic_styles_keep_gradients_relative_to_the_bounds ... ok
+test tests_gradpanel::the_eyedropper_places_copied_gradients_on_the_target ... ok
+test tests_gradpanel::the_gradient_tool_reads_the_constrain_angle_preference ... ok
+test tests_halftone::halftone_turns_art_into_dots_by_tone ... ok
+test tests_inline::create_outlines_turns_inline_graphics_into_symbol_instances ... ok
+test tests_fontlist::the_font_list_names_every_available_family_with_its_styles ... ok
+test tests_halftone::halftone_options ... ok
+test tests_inline::insert_inline_places_a_symbol_as_one_character ... ok
+test tests_inline::insert_inline_rejects_junk ... ok
+test tests_inline::saved_documents_keep_inline_graphics ... ok
+test tests_inline::type_tool_inserts_at_its_caret_and_deletes_the_graphic_whole ... ok
+test tests_journal::a_batch_step_records_what_it_took_from_the_preferences ... ok
+test tests_journal::a_batch_that_opens_a_new_document_is_journaled_and_replays ... ok
+test tests_journal::a_failed_batch_closes_the_documents_it_opened_and_restores_the_ones_it_closed ... ok
+test tests_journal::a_failed_batch_gives_back_the_highlighted_rows_and_the_current_layer ... ok
+test tests_journal::a_failed_batch_brings_back_a_document_it_reverted ... ok
+test tests_journal::a_save_in_a_batch_records_its_date_and_replays_it ... ok
+test tests_journal::an_undo_group_is_one_undo_step ... ok
+test tests_journal::file_new_records_its_created_date_in_the_journal ... ok
+test tests_journal::file_new_takes_a_given_created_date ... ok
+test tests_journal::recorded_actions_leave_out_replay_only_values ... ok
+test tests_journal::replay_reproduces_the_created_date_of_an_earlier_run ... ok
+test tests_knockout::knockout_settings_round_trip_and_old_bools_load ... ok
+test tests_knockout::knockout_shape_is_an_object_option ... ok
+test tests_knockout::knockout_takes_three_states_names_and_bools ... ok
+test tests_knockout::page_group_toggles_are_undoable_document_settings ... ok
+test tests_knockout::pdf_and_svg_write_knockout_groups_as_masks ... ok
+test tests_labspots::colour_values_parse_lab ... ok
+test tests_journal::a_save_records_its_date_and_replays_it ... ok
+test tests_inline::inline_graphics_follow_their_symbol ... ok
+test tests_flatten::gradients_rasterize_and_flat_areas_stay_vector ... ok
+test tests_flatten::groups_flatten_as_they_composite ... ok
+test tests_layerclip::a_selected_group_becomes_a_clip_group ... ok
+test tests_flatten::objects_without_transparency_stay_unless_outlined ... ok
+test tests_layerclip::making_a_layer_clipping_mask_is_one_undo_step ... ok
+test tests_layerclip::the_top_object_clips_the_layer_and_pressing_again_releases_it ... ok
+test tests_layerclip::the_top_object_must_be_able_to_clip ... ok
+test tests_layers::alt_drag_copies_rows_and_the_selected_art_moves_between_layers ... ok
+test tests_layers::art_in_a_sublayer_is_selected_as_objects_not_the_sublayer ... ok
+test tests_layers::clicking_rows_at_any_depth_highlights_them_and_sets_the_current_layer ... ok
+test tests_fontfiles::junk_search_params_never_fail_internally ... ok
+test tests_layers::collect_merge_flatten_and_reverse ... ok
+test tests_layers::hide_lock_and_outline_others_and_their_all_counterparts ... ok
+test tests_layers::delete_and_duplicate_rows ... ok
+test tests_layerclip::layer_clipping_masks_save_and_export ... ok
+test tests_layers::locate_object_highlights_its_row ... ok
+test tests_layers::layer_options_validate_and_template_locks_and_dims ... ok
+test tests_layers::moves_are_validated ... ok
+test tests_layers::release_to_layers_sequence_and_build ... ok
+test tests_layers::new_layers_go_above_the_current_one_at_its_level ... ok
+test tests_layers::the_clipping_mask_button_acts_on_the_highlighted_group ... ok
+test tests_layers::selecting_art_makes_its_layer_current ... ok
+test tests_layers::rows_move_above_below_and_into_layers_and_groups ... ok
+test tests_layers::the_selection_column_selects_a_rows_art_and_shift_adds_or_removes_it ... ok
+test tests_layers::visibility_and_lock_per_row_are_undoable ... ok
+test tests_library::colours_come_from_the_selection_and_paint_it ... ok
+test tests_library::libraries_are_made_renamed_and_deleted ... ok
+test tests_library::text_styles_come_from_the_selected_type_and_apply_in_one_step ... ok
+test tests_linked_stops::applying_a_gradient_swatch_records_the_link_until_the_stops_change ... ok
+test tests_linked_stops::gradient_swatches_keep_their_stop_links_and_follow_edits ... ok
+test tests_flatten::opacity_masks_are_rasterized_with_their_look ... ok
+test tests_flatten::options_come_from_presets_and_params ... ok
+test tests_linked_stops::spot_gradients_export_as_separation_shadings ... ok
+test tests_linked_stops::linked_stops_round_trip ... ok
+test tests_linked_stops::stops_link_to_swatches_and_follow_their_edits ... ok
+test tests_linked_stops::spot_stops_separate_on_their_plate ... ok
+test tests_flatten::preserve_alpha_composites_over_nothing ... ok
+test tests_library::a_graphic_goes_into_a_library_and_comes_out_in_another_document ... ok
+test tests_flatten::two_half_transparent_rects_give_three_regions_with_their_pixels ... ok
+test tests_flatten::single_paints_keep_their_colour_and_overprint ... ok
+test tests_links::relative_paths_are_written_against_the_saved_file ... ok
+test tests_library::libraries_are_kept_in_files_across_sessions ... ok
+test tests_links::a_placed_document_brings_its_links_with_the_files_pixels ... ok
+test tests_links::a_placed_link_records_the_file_and_the_document_saves_only_a_preview ... ok
+test tests_links::the_relative_path_finds_the_file_after_the_folder_moves ... ok
+test tests_links::links_from_older_files_load_and_keep_their_pixels ... ok
+test tests_links::without_a_file_system_the_saved_preview_shows ... ok
+test tests_linkspanel::go_to_selects_the_image ... ok
+test tests_linkspanel::a_missing_file_showing_its_preview_stays_linked ... ok
+test tests_linkspanel::the_links_commands_are_reachable_headless ... ok
+test tests_links::a_missing_link_renders_its_preview_and_relinks ... ok
+test tests_linkspanel::link_info_has_the_file_and_placement_details ... ok
+test tests_liquify::a_changed_brush_or_another_stroke_starts_afresh ... ok
+test tests_linkspanel::embed_keeps_the_pixels_without_the_file ... ok
+test tests_links::a_linked_photoshop_document_places_and_updates ... ok
+test tests_liquify::alt_drag_sizes_the_brush_from_its_size ... ok
+test tests_liquify::brush_affects_reach_the_command ... ok
+test tests_liquify::guides_are_left_alone_in_selection_mode_and_the_tool_reports_skips ... ok
+test tests_linkspanel::the_list_shows_each_image_with_its_status ... ok
+test tests_liquify::holding_still_keeps_twirling_scaled_by_time ... ok
+test tests_liquify::show_brush_size_hides_the_outline ... ok
+test tests_links::a_modified_link_follows_the_update_links_preference ... ok
+test tests_liquify::simplify_can_be_turned_off ... ok
+test tests_liquify::only_twirl_pucker_and_bloat_keep_going ... ok
+test tests_live::blend_align_to_path_rotates_steps ... ok
+test tests_live::blend_expand_makes_group_with_unique_ids ... ok
+test tests_live::blend_make_is_live_with_keys_as_children ... ok
+test tests_live::blend_interpolates_opacity_and_stroke_weight ... ok
+test tests_liquify::pen_pressure_is_the_intensity_with_use_pressure_pen ... ok
+test tests_live::blend_make_undo_is_one_step ... ok
+test tests_live::blend_mid_step_interpolates_geometry_and_colour ... ok
+test tests_live::blend_options_change_spacing_and_orientation ... ok
+test tests_live::blend_release_restores_keys ... ok
+test tests_live::blend_replace_spine_follows_path ... ok
+test tests_live::blend_resamples_different_anchor_counts ... ok
+test tests_live::blend_reverse_spine_and_front_to_back ... ok
+test tests_linkspanel::placement_options_read_set_and_round_trip ... ok
+test tests_live::blend_of_meshes_interpolates_mesh_points ... ok
+test tests_live::blend_smooth_colour_same_colours_uses_distance ... ok
+test tests_live::blend_renders_intermediate_steps ... ok
+test tests_live::blend_specified_distance ... ok
+test tests_live::blend_three_keys ... ok
+test tests_live::blend_specified_steps_count ... ok
+test tests_live::blend_smooth_colour_steps_from_colour_distance ... ok
+test tests_live::disabled_without_live_selection ... ok
+test tests_live::envelope_options_and_edit_contents ... ok
+test tests_live::envelope_release_and_expand ... ok
+test tests_linkspanel::a_relinked_file_follows_the_placement_options ... ok
+test tests_liquify::type_symbols_graphs_and_live_contents_are_left_alone_and_reported ... ok
+test tests_live::envelope_top_object_maps_corners ... ok
+test tests_live::envelope_mesh_identity_then_point_moves_content ... ok
+test tests_live::envelope_warp_make_and_content_stays_inside_bounds ... ok
+test tests_live::envelope_transform_moves_mesh_points ... ok
+test tests_live::live_commands_have_menus_and_params ... ok
+test tests_live::envelope_warp_zero_bend_is_identity ... ok
+test tests_live::mesh_create_flat ... ok
+test tests_live::mesh_add_line_and_delete_point ... ok
+test tests_live::mesh_create_at_point_single_undo ... ok
+test tests_live::mesh_hit_test_inside ... ok
+test tests_live::envelope_renders_distorted ... ok
+test tests_live::live_objects_round_trip_through_native_format ... ok
+test tests_live::mesh_point_colour_move_and_undo ... ok
+test tests_live::mesh_expand_to_flat_pieces ... ok
+test tests_live::mesh_to_center_highlight ... ok
+test tests_live::old_documents_still_load ... ok
+test tests_livecorners::a_direct_selected_star_anchor_rounds_its_corner_alone ... ok
+test tests_livecorners::a_drag_previews_one_corner_and_commits_one_step ... ok
+test tests_livecorners::a_pen_path_rounds_its_corners_but_not_its_ends ... ok
+test tests_livecorners::a_polygon_keeps_its_corners_through_sides_and_scales ... ok
+test tests_livecorners::a_polygon_takes_its_angle_radius_side_length_and_equal_sides ... ok
+test tests_livecorners::a_star_rounds_its_corners_and_keeps_them_live ... ok
+test tests_livecorners::an_ellipse_takes_pie_angles_and_inverts ... ok
+test tests_livecorners::a_whole_rectangle_rounds_all_corners_and_given_corners_alone ... ok
+test tests_livecorners::corners_of_a_non_square_rectangle_are_alike_circles ... ok
+test tests_livecorners::direct_selected_corners_round_alone_and_stay_selected ... ok
+test tests_live::mesh_renders_corner_and_centre_colours ... ok
+test tests_livecorners::bad_corners_and_kinds_are_errors ... ok
+test tests_livecorners::star_corners_stop_at_their_own_limit ... ok
+test tests_menucmds::a_document_keeps_at_most_25_saved_selections ... ok
+test tests_menucmds::area_to_point_turns_wraps_into_breaks ... ok
+test tests_menucmds::artboard_guides_go_with_their_artboard ... ok
+test tests_menucmds::blend_colors_horizontally ... ok
+test tests_menucmds::blend_front_to_back_uses_stacking ... ok
+test tests_menucmds::blend_expand_and_reverse ... ok
+test tests_menucmds::blend_make_release_options ... ok
+test tests_menucmds::close_all_documents ... ok
+test tests_menucmds::area_placeholder_fills_frame ... ok
+test tests_live::svg_export_expands_live_objects ... ok
+test tests_live::pdf_export_expands_live_objects ... ok
+test tests_menucmds::convert_rectangle_path_to_live_shape ... ok
+test tests_menucmds::change_case_variants ... ok
+test tests_menucmds::convert_to_shape_rejects_other_paths ... ok
+test tests_menucmds::convert_to_artboards_and_rearrange ... ok
+test tests_menucmds::convert_point_area_roundtrip ... ok
+test tests_menucmds::convert_rotated_rectangle_and_ellipse ... ok
+test tests_labspots::lab_spots_export_with_a_lab_alternate ... ok
+test tests_menucmds::crop_image_disabled_without_image ... ok
+test tests_labspots::spot_colors_options_switch_lab_spots_between_lab_and_cmyk ... ok
+test tests_menucmds::crop_image_trim_cuts_to_the_opaque_pixels_as_they_are ... ok
+test tests_menucmds::edit_selection_needs_a_saved_selection_and_a_free_name ... ok
+test tests_menucmds::every_new_command_has_params_doc_and_menu ... ok
+test tests_menucmds::edit_selection_applies_several_edits_as_one_step ... ok
+test tests_menucmds::document_color_mode_converts_colours ... ok
+test tests_menucmds::expand_nothing_errors ... ok
+test tests_labspots::spot_options_and_lab_colours_round_trip ... ok
+test tests_labspots::swatch_options_define_spot_colours_in_lab ... ok
+test tests_menucmds::file_info_sets_title ... ok
+test tests_menucmds::crop_image_to_rect ... ok
+test tests_menucmds::expand_live_shape_and_text_in_one_undo_step ... ok
+test tests_menucmds::hide_all_artwork_above ... ok
+test tests_menucmds::font_and_size_menu_items_use_set_style ... ok
+test tests_menucmds::guides_dragged_out_of_a_ruler_snap_and_take_the_artboard_tool_s_artboard ... ok
+test tests_menucmds::invert_and_convert_colors ... ok
+test tests_menucmds::find_next_cycles_through_text_objects ... ok
+test tests_menucmds::find_and_replace_options ... ok
+test tests_menucmds::lock_and_hide_other_layers ... ok
+test tests_menucmds::lock_all_artwork_above_only_overlapping_objects_above ... ok
+test tests_menucmds::moved_art_snaps_to_the_artboard_edges_and_centre ... ok
+test tests_menucmds::make_release_clear_guides ... ok
+test tests_menucmds::paste_without_formatting_resets_text_style ... ok
+test tests_menucmds::mask_image_clips_it_to_its_outline_and_selects_the_clipping_path ... ok
+test tests_menucmds::ruler_guides_and_lock ... ok
+test tests_menucmds::reset_bounding_box_is_a_noop ... ok
+test tests_menucmds::placeholder_and_insert_characters ... ok
+test tests_menucmds::document_color_mode_can_put_rgb_greys_on_the_black_plate ... ok
+test tests_menucmds::saturate_and_adjust_balance ... ok
+test tests_menucmds::opening_in_cmyk_can_put_rgb_greys_on_the_black_plate ... ok
+test tests_menucmds::select_direction_handles_selects_all_anchors ... ok
+test tests_menucmds::document_color_mode_separates_rgb_greys_through_the_profile ... ok
+test tests_linkspanel::unembed_writes_the_bytes_and_links_to_them ... ok
+test tests_menucmds::save_and_recall_selection ... ok
+test tests_menucmds::select_point_and_area_text ... ok
+test tests_menucmds::rasterize_replaces_selection_with_image ... ok
+test tests_menucmds::select_same_font_size_and_fill ... ok
+test tests_menucmds::saved_selections_live_in_the_document ... ok
+test tests_menucmds::saved_selection_names_are_trimmed_and_capped ... ok
+test tests_menucmds::ruler_guides_select_move_and_delete ... ok
+test tests_menucmds::selection_tool_drags_a_ruler_guide ... ok
+test tests_menucmds::transform_each_move_reference_and_copy ... ok
+test tests_menucmds::transform_each_random_is_deterministic_with_seed ... ok
+test tests_menucmds::transform_each_scales_each_about_its_own_center ... ok
+test tests_menucmds::smart_punctuation_quotes_dashes_ellipsis ... ok
+test tests_menucmds::trim_marks_around_selection ... ok
+test tests_newart::stroke_options_set_with_nothing_selected_carry_to_the_next_object ... ok
+test tests_newart::a_graphic_style_clicked_with_nothing_selected_styles_the_next_object ... ok
+test tests_newart::the_option_round_trips_with_the_preferences ... ok
+test tests_newart::with_basic_appearance_off_new_art_takes_the_last_selections_whole_appearance ... ok
+test tests_newdoc::a_preset_starts_the_document_and_params_change_it ... ok
+test tests_newdoc::every_setting_reaches_the_document ... ok
+test tests_nativefile::compressed_saves_open_by_their_content ... ok
+test tests_nativefile::unused_images_are_left_out_of_saves ... ok
+test tests_nativefile::use_compression_preference_sets_the_default ... ok
+test tests_nativefile::preview_is_at_most_256_pixels ... ok
+test tests_maskview::view_opacity_mask_shows_its_luminance_and_hides_the_artwork ... ok
+test tests_newdoc::a_white_background_exports_opaque ... ok
+test tests_nativefile::newer_keys_and_legacy_profiles_survive_open_and_save ... ok
+test tests_newdoc::categories_list_generated_presets_with_neutral_names ... ok
+test tests_newdoc::orientation_swaps_width_and_height ... ok
+test tests_newdoc::four_artboards_in_two_columns_make_a_two_by_two_grid ... ok
+test tests_newdoc::rearrange_aliases_and_rejects_bad_values ... ok
+test tests_newdoc::rearrange_keeps_its_grid ... ok
+test tests_nativefile::saving_writes_through_a_temporary_file ... ok
+test tests_newdoc::ppi_overprint_preview_and_bad_params ... ok
+test tests_newdoc::saved_presets_live_in_the_preferences ... ok
+test tests_nativefile::saves_for_older_versions ... ok
+test tests_newdoc::recent_remembers_the_last_sizes ... ok
+test tests_objexpand::eight_strips_match_the_gradient_samples ... ok
+test tests_objexpand::a_hard_stop_keeps_its_edge_in_the_mesh ... ok
+test tests_objexpand::create_gradient_mesh_takes_its_colours_from_the_gradient ... ok
+test tests_objexpand::a_radial_gradient_becomes_concentric_ellipses ... ok
+test tests_objexpand::expanded_colours_keep_the_stops_colour_model ... ok
+test tests_opacitymask::info_reports_mixed_values_as_null ... ok
+test tests_opacitymask::mask_and_transparency_commands_take_ids_without_a_selection ... ok
+test tests_opacitymask::mask_options_act_on_the_masked_object_while_editing ... ok
+test tests_objexpand::defaults_match_the_dialog_and_info_tells_what_applies ... ok
+test tests_newdoc::rearrange_lays_out_by_layout_and_order ... ok
+test tests_opacitymask::release_while_editing_leaves_editing_first ... ok
+test tests_opacitymask::undo_and_redo_walk_in_and_out_of_mask_editing ... ok
+test tests_opacitymask::opacity_is_a_percentage_everywhere ... ok
+test tests_opacitymask::saving_while_editing_writes_no_editing_layer ... ok
+test tests_outlinestroke::arrowheads_are_part_of_the_outline ... ok
+test tests_liquify::a_stroke_applied_as_it_grows_equals_the_whole_stroke ... ok
+test tests_outlinestroke::a_lens_profile_outlines_to_half_the_rectangle ... ok
+test tests_outlinestroke::brushed_strokes_outline_to_their_brush_art ... ok
+test tests_outlinestroke::a_dashed_line_gives_one_subpath_per_dash ... ok
+test tests_outlinestroke::every_stroke_is_outlined_in_paint_order ... ok
+test tests_outlinestroke::stroke_opacity_and_blend_move_to_the_new_fill ... ok
+test tests_outlinestroke::the_live_effect_outlines_the_stroke_it_sits_on ... ok
+test tests_outlinestroke::inside_alignment_keeps_the_outline_inside_the_path ... ok
+test tests_overprint::overprint_black_options ... ok
+test tests_opacitymask::one_object_gets_an_empty_mask_drawn_in_editing_mode ... ok
+test tests_overprint::cyan_stroke_overprinting_yellow_previews_green_under_the_stroke_only ... ok
+test tests_overprint::old_documents_with_an_overprint_black_list_still_preview ... ok
+test tests_overprint::set_overprint_is_one_undo_step_and_reports_through_attributes_info ... ok
+test tests_objexpand::fill_off_leaves_the_fill_live_and_stroke_off_keeps_the_stroke ... ok
+test tests_overprint::set_overprint_reaches_groups_items_and_type ... ok
+test tests_overprint::overprint_black_covers_type_gradients_spots_and_groups ... ok
+test tests_objexpand::a_freeform_gradient_expands_to_a_mesh_shaped_like_the_object ... ok
+test tests_overprint::overprinting_type_previews_through ... ok
+test tests_package::an_unsaved_document_cant_be_packaged ... ok
+test tests_objexpand::the_mesh_option_makes_a_mesh_that_paints_the_gradient ... ok
+test tests_opacitymask::exports_while_editing_leave_the_editing_layer_out ... ok
+test tests_package::the_document_info_report_has_every_category ... ok
+test tests_package::circular_placed_links_copy_each_document_once_and_warn ... ok
+test tests_package::packaging_nested_files_preserves_embedded_preview_pdf_and_compression ... ok
+test tests_package::package_finds_nested_assets_after_the_source_tree_moves ... ok
+test tests_package::package_recursively_relinks_placed_documents_and_their_images ... ok
+test tests_package::package_keeps_distinct_linked_documents_with_colliding_file_names ... ok
+test tests_package::a_missing_link_is_reported_not_copied ... ok
+test tests_paintproxy::a_group_shows_its_contents_in_the_proxies ... ok
+test tests_paintproxy::a_mixed_selection_shows_a_question_mark_proxy ... ok
+test tests_paintproxy::complement_of_red_on_the_fill_only_gives_cyan ... ok
+test tests_paintproxy::focus_false_keeps_the_active_proxy ... ok
+test tests_paintproxy::every_selection_change_bumps_the_revision ... ok
+test tests_paintproxy::last_color_and_gradient_are_reapplied ... ok
+test tests_paintproxy::invert_keeps_cmyk_and_acts_on_defaults_without_selection ... ok
+test tests_paintproxy::live_previews_remember_only_the_committed_colour ... ok
+test tests_paintproxy::live_paint_and_appearance_items_feed_recent_colours ... ok
+test tests_paintproxy::proxies_show_the_first_selected_object_or_the_defaults ... ok
+test tests_paintproxy::swap_and_default_work_on_type ... ok
+test tests_paintproxy::recent_colors_are_fed_by_every_paint_command ... ok
+test tests_panelcmds::appearance_duplicate_and_move ... ok
+test tests_panelcmds::artboard_tool_copy_and_paste_artboards_with_their_art ... ok
+test tests_panelcmds::artboard_tool_cut_removes_the_artboard_and_its_art ... ok
+test tests_package::identical_stale_paths_in_different_nested_documents_keep_separate_assets ... ok
+test tests_panelcmds::duplicate_artboard_copies_its_art ... ok
+test tests_panelcmds::edit_gradient_angle_reverse_and_errors ... ok
+test tests_panelcmds::artboards_reorder_and_duplicate ... ok
+test tests_panelcmds::edit_gradient_converts_and_keeps_stops ... ok
+test tests_panelcmds::stroke_advanced_scale_swap_flip ... ok
+test tests_panelcmds::graphic_style_delete_duplicate ... ok
+test tests_panelcmds::swatch_groups_duplicate_sort ... ok
+test tests_panelcmds::text_set_format ... ok
+test tests_package::the_report_lists_a_placed_documents_links_in_a_section_of_its_own ... ok
+test tests_paragraphs::paragraph_style_applies_to_one_paragraph ... ok
+test tests_paragraphs::editing_splits_and_merges_paragraph_styles ... ok
+test tests_paragraphs::ranged_set_format_sets_direction_mojikumi_and_leading_model_per_paragraph ... ok
+test tests_paragraphs::ranged_paragraph_commands_touch_only_their_paragraphs ... ok
+test tests_paragraphs::return_in_the_type_tool_continues_the_paragraph_it_splits ... ok
+test tests_pathops::add_anchor_points_doubles ... ok
+test tests_pathops::clean_up_removes_junk ... ok
+test tests_pathops::create_outlines_matches_text_bounds ... ok
+test tests_pathops::crop_and_outline ... ok
+test tests_pathops::divide_objects_below_cuts ... ok
+test tests_pathops::commands_reject_bad_input ... ok
+test tests_pathops::divide_produces_group_of_faces ... ok
+test tests_pathops::intersect_disjoint_is_error_and_no_change ... ok
+test tests_pathops::exclude_makes_compound ... ok
+test tests_pathops::intersect_rects ... ok
+test tests_pathops::minus_back_keeps_front_style ... ok
+test tests_pathops::minus_front_keeps_back_style ... ok
+test tests_package::two_links_and_a_font_are_collected_and_relinked ... ok
+test tests_pathops::outline_stroke_of_line ... ok
+test tests_pathops::offset_rect_grows_bounds ... ok
+test tests_pathops::outline_stroke_with_fill_makes_group ... ok
+test tests_pathops::pathfinder_undo_restores ... ok
+test tests_pathops::set_style_size_changes_bounds ... ok
+test tests_pathops::set_text_updates_bounds ... ok
+test tests_pathops::split_into_grid_cells ... ok
+test tests_pathops::trim_and_merge ... ok
+test tests_pathops::unite_two_rects ... ok
+test tests_pathops::simplify_dense_polyline ... ok
+test tests_pathtype::a_flip_round_a_closed_path_keeps_the_type_in_place ... ok
+test tests_pathops::unite_with_group ... ok
+test tests_paragraphs::threaded_frames_keep_each_paragraphs_style ... ok
+test tests_pathtype::dragging_the_centre_bracket_slides_the_type_and_across_the_path_flips_it ... ok
+test tests_pathtype::align_to_path_and_spacing ... ok
+test tests_pathtype::dragging_the_start_and_end_brackets_sets_where_the_type_runs ... ok
+test tests_pattern::cancel_new_pattern_removes_it ... ok
+test tests_pattern::delete_pattern_unpaints_objects ... ok
+test tests_pattern::done_saves_edited_art_and_leaves_mode ... ok
+test tests_pathtype::options_keep_the_brackets ... ok
+test tests_pathtype::flip_turns_the_type_to_the_other_side_of_its_stretch ... ok
+test tests_pattern::hit_testing_in_edit_mode_only_reaches_tile_layer ... ok
+test tests_pattern::edit_then_cancel_restores_definition ... ok
+test tests_pattern::expand_yields_n_copies ... ok
+test tests_package::unreadable_placed_document_is_copied_unchanged_with_warning ... ok
+test tests_pattern::grid_repeat_and_options ... ok
+test tests_pattern::list_reports_patterns_and_edit_state ... ok
+test tests_pattern::edit_defaults_to_selected_objects_pattern ... ok
+test tests_pattern::make_creates_definition_swatch_and_edit_mode ... ok
+test tests_pattern::mirror_repeat_reflects ... ok
+test tests_pattern::options_rename_updates_swatch_and_paints ... ok
+test tests_pattern::options_set_tile_type_spacing_and_overlap ... ok
+test tests_pattern::radial_instance_transforms_rotate_around_center ... ok
+test tests_pattern::repeat_commands_validate ... ok
+test tests_pattern::release_restores_source ... ok
+test tests_pattern::radial_repeat_wraps_selection ... ok
+test tests_pattern::pdf_export_expands_pattern_fills ... ok
+test tests_pattern::repeat_hit_test_uses_instances ... ok
+test tests_pattern::repeat_moves_with_transform ... ok
+test tests_pattern::save_a_copy_while_editing ... ok
+test tests_pattern::set_fill_with_pattern_name_without_swatch ... ok
+test tests_pattern::switching_repeat_kind_keeps_source ... ok
+test tests_pattern::set_fill_with_pattern_swatch ... ok
+test tests_pattern::undo_make_pattern ... ok
+test tests_package::options_leave_out_links_fonts_and_the_report ... ok
+test tests_pattern::transform_patterns_only_moves_placement ... ok
+test tests_pattern::svg_export_writes_pattern_def ... ok
+test tests_pattern::save_load_roundtrip_keeps_patterns_and_repeats ... ok
+test tests_package::zipped_package_recursively_relinks_without_absolute_creator_paths ... ok
+test tests_pdfpresets::saved_presets_apply_wherever_a_preset_is_named ... ok
+test tests_pdfmarks::non_printing_layers_are_left_out_unless_included ... ok
+test tests_pdfpresets::saved_presets_persist_with_the_preferences ... ok
+test tests_pdfmarks::the_document_bleed_or_custom_values_grow_each_page ... ok
+test tests_pdfpresets::presets_export_and_import_round_trip ... ok
+test tests_persp_planes::double_clicking_a_plane_widget_asks_for_its_options ... ok
+test tests_persp_planes::grid_edits_keep_attached_art_in_place_unless_reprojected ... ok
+test tests_persp_planes::move_plane_to_match_object ... ok
+test tests_persp_planes::moving_a_plane_alone_leaves_its_objects ... ok
+test tests_persp_planes::moving_a_plane_with_its_objects_or_copies ... ok
+test tests_persp_planes::plane_offsets_round_trip_and_old_grids_have_none ... ok
+test tests_persp_planes::plane_widgets_drag_with_shift_and_alt ... ok
+test tests_persp_select::alt_drag_copies_and_the_copy_stays_attached ... ok
+test tests_persp_select::arrow_keys_nudge_in_perspective ... ok
+test tests_pdfmarks::printer_marks_print_in_registration_with_no_warning ... ok
+test tests_persp_select::attachments_round_trip_through_native_files ... ok
+test tests_persp_select::handles_scale_in_perspective_about_the_opposite_handle ... ok
+test tests_persp_select::pressing_5_while_dragging_moves_perpendicular_to_the_plane ... ok
+test tests_persp_select::selecting_an_attached_object_switches_to_its_plane ... ok
+test tests_persp_select::transform_again_repeats_a_perspective_scale_and_copies ... ok
+test tests_package::a_font_named_by_another_of_its_names_is_copied ... ok
+test tests_persp_select::transform_again_repeats_the_last_perspective_move ... ok
+test tests_persp_text::a_selection_tool_move_keeps_the_attachment_and_type_follows ... ok
+test tests_persp_text::click_to_size_dialogs_draw_on_the_active_plane_in_plane_units ... ok
+test tests_persp_text::copies_pastes_and_duplicates_stay_attached ... ok
+test tests_persp_text::edit_text_shows_it_flat_in_isolation_then_projects_it_again ... ok
+test tests_persp_text::double_clicking_type_in_perspective_edits_it_and_projections_round_trip ... ok
+test tests_persp_text::flare_spiral_and_polar_grid_draw_in_perspective ... ok
+test tests_persp_text::moving_type_in_perspective_moves_its_projection ... ok
+test tests_persp_text::symbols_in_perspective_stay_instances ... ok
+test tests_package::a_substituted_style_names_the_style_shown ... ok
+test tests_package::nesting_limit_copies_boundary_file_and_reports_uncollected_links ... ok
+test tests_pdffidelity::freeform_gradients_are_images_of_their_colour_field ... ok
+test tests_persp_text::release_keeps_the_look_of_type_in_perspective ... ok
+test tests_persp_text::type_in_perspective_is_projected_and_stays_type ... ok
+test tests_perspgrid::define_switches_the_type_around_the_station_point ... ok
+test tests_perspgrid::define_sets_the_grid_from_the_dialog_fields_in_one_undo_step ... ok
+test tests_perspgrid::built_in_views_apply_by_name_or_type ... ok
+test tests_persp_text::type_in_perspective_exports_projected_outlines ... ok
+test tests_perspgrid::extents_cell_size_and_vanishing_points_follow_their_widgets ... ok
+test tests_perspgrid::grid_get_reports_the_model_the_define_fields_and_the_station_point ... ok
+test tests_perspgrid::digit_keys_pick_the_plane_while_the_grid_shows ... ok
+test tests_perspgrid::grid_definition_fields_survive_a_native_round_trip ... ok
+test tests_persp_text::the_canvas_draws_type_in_perspective_foreshortened ... ok
+test tests_perspgrid::grid_overlays_use_the_colours_opacity_and_rulers ... ok
+test tests_perspgrid::lock_station_point_swings_the_other_vanishing_point ... ok
+test tests_perspgrid::ground_level_points_move_the_whole_grid ... ok
+test tests_pdfpresets::built_in_presets_are_listed_and_read_only ... ok
+test tests_pdfraster::shadows_and_glows_keep_their_blend_modes ... ok
+test tests_perspgrid::lock_grid_keeps_the_widgets_still_but_planes_switch ... ok
+test tests_perspgrid::presets_export_import_and_live_in_the_preferences ... ok
+test tests_perspgrid::presets_save_rename_delete_and_protect_the_built_in_ones ... ok
+test tests_perspgrid::the_plane_widget_stays_on_screen_and_takes_clicks_with_any_tool ... ok
+test tests_perspgrid::perspective_grid_options_are_a_preference_group ... ok
+test tests_perspgrid::snapped_moves_keep_objects_on_a_plane_together ... ok
+test tests_perspgrid::snap_to_grid_lands_drawn_and_moved_art_on_gridlines ... ok
+test tests_place::bad_place_params_are_errors ... ok
+test tests_pdffidelity::pattern_strokes_are_tiles_clipped_to_the_stroke ... ok
+test tests_place::a_300_px_png_at_300_ppi_places_as_72_pt_centred_selected_and_undoable ... ok
+test tests_place::replace_keeps_the_transform_and_the_stacking_place ... ok
+test tests_perspgrid::widget_options_and_the_right_extent_are_saved ... ok
+test tests_perspgrid::view_options_toggle_without_undo_steps_and_survive_presets ... ok
+test tests_place::rect_fits_the_art_inside_keeping_its_aspect ... ok
+test tests_place::replace_needs_exactly_one_selected_object ... ok
+test tests_place::svg_with_a_data_png_renders_and_leaves_the_clipboard_alone ... ok
+test tests_place::template_puts_the_art_on_a_locked_template_layer_below_the_current_one ... ok
+test tests_place::info_reports_size_resolution_colour_mode_and_link ... ok
+test tests_place::placed_art_brings_its_symbols_and_swatches_renaming_on_conflict ... ok
+test tests_place::pdf_pages_and_native_artboards_place_as_clipped_groups ... ok
+test tests_placed_document::a_document_places_linked_by_default_at_its_artboard_size ... ok
+test tests_place::a_queue_of_3_with_click_drag_and_esc_places_2 ... ok
+test tests_package::without_a_folder_the_zip_has_the_same_files ... ok
+test tests_placed_document::link_info_gives_the_artboards_size_not_pixels ... ok
+test tests_placed_document::a_placed_document_inside_a_placed_document_outputs_from_its_own_file ... ok
+test tests_placed_document::break_link_gives_the_editable_copy_placing_without_link_gives ... ok
+test tests_placed_document::a_changed_file_is_modified_and_update_links_reads_it_again ... ok
+test tests_placed_document::expand_turns_a_placed_document_into_editable_art_with_its_resources ... ok
+test tests_placed_document::a_placed_documents_resources_stay_its_own ... ok
+test tests_placed_document::a_document_saved_with_previews_outputs_its_files_art ... ok
+test tests_placed_document::relink_points_a_placed_document_at_another_file ... ok
+test tests_plugins::failing_plugins_leave_the_document_and_history_alone ... ok
+test tests_plugins::object_filters_add_replace_and_generate_objects ... ok
+test tests_placed_document::without_link_or_a_file_a_document_places_as_an_editable_copy ... ok
+test tests_prefs::batch_set_is_atomic ... ok
+test tests_placed_document::what_cant_be_placed_linked_is_an_error ... ok
+test tests_prefs::every_spec_matches_a_prefs_field_and_back ... ok
+test tests_placed_document::saving_a_document_refreshes_the_open_documents_that_place_it ... ok
+test tests_prefs::gpu_preference_defaults_to_automatic_and_validates ... ok
+test tests_prefs::grid_prefs_apply_to_open_documents ... ok
+test tests_prefs::hyphenation_exceptions_preference_reaches_the_hyphenator ... ok
+test tests_plugins::live_effect_plugins_reshape_editable_art_and_expand ... ok
+test tests_prefs::history_states_limit_undo_depth ... ok
+test tests_prefs::list_describes_every_pref ... ok
+test tests_prefs::move_locked_and_hidden_artwork_with_artboard ... ok
+test tests_prefs::missing_glyph_protection_keeps_glyphs_a_new_font_lacks ... ok
+test tests_placed_document::a_placed_document_is_vectors_in_every_output ... ok
+test tests_plugins::plugin_management_commands ... ok
+test tests_prefs::prefs_serde_round_trip_and_tolerates_missing_fields ... ok
+test tests_prefs::rubber_band_preferences_hide_the_preview_to_the_pointer ... ok
+test tests_plugins::object_filter_recolours_the_selection_as_one_undo_step ... ok
+test tests_prefs::new_type_starts_with_placeholder_text ... ok
+test tests_prefs::reset_category_and_all ... ok
+test tests_prefs::select_same_tint_percent ... ok
+test tests_placed_document::documents_that_place_each_other_dont_loop ... ok
+test tests_placed_document::update_links_on_open_reads_a_modified_file_again ... ok
+test tests_prefs::show_font_names_in_english_preference_is_stored ... ok
+test tests_prefs::set_normalizes_strings_labels_and_colours ... ok
+test tests_prefs::selection_preferences_drive_the_selection_tool ... ok
+test tests_prefs::set_and_get_keyboard_increment_drives_nudge ... ok
+test tests_prefs::set_rejects_out_of_range_and_wrong_types ... ok
+test tests_prefs::snap_to_point_lands_a_dragged_selection_on_anchors ... ok
+test tests_prefs::use_precise_cursors_makes_drawing_cursors_crosshairs ... ok
+test tests_prefs::type_selection_by_path_only_picks_type_on_its_baseline ... ok
+test tests_prefs::smart_guide_display_preferences_filter_the_overlays ... ok
+test tests_prefs::type_selection_by_path_only_takes_every_line_and_spares_the_type_tool_and_eyedropper ... ok
+test tests_previewbounds::distribute_spacing_measures_preview_bounds ... ok
+test tests_prefs::spacing_guides_space_a_dragged_square_like_its_row ... ok
+test tests_previewbounds::the_w_field_sets_the_visual_width ... ok
+test tests_print::preview_lists_pages_tiles_inks_and_warnings ... ok
+test tests_prefs::type_increments_step_the_type ... ok
+test tests_prefs::transform_pattern_tiles_is_the_transforms_default ... ok
+test tests_print::bad_settings_are_bad_params ... ok
+test tests_previewbounds::the_bounding_box_handles_sit_on_the_preview_bounds ... ok
+test tests_pdfraster::groups_layers_type_images_and_symbols_keep_their_raster_effects ... ok
+test tests_printpresets::default_is_listed_first_and_protected ... ok
+test tests_previewbounds::align_left_differs_by_half_the_stroke ... ok
+test tests_print::raster_effects_print_as_images ... ok
+test tests_printadvanced::a_flattener_preset_flattens_transparency_before_printing ... ok
+test tests_printpresets::saved_presets_persist_with_the_preferences ... ok
+test tests_printpresets::presets_save_change_rename_and_delete ... ok
+test tests_printpreview::pages_place_the_artboard_on_the_trim_box ... ok
+test tests_printps::pages_equals_the_page_count ... ok
+test tests_printtiling::settings_saved_before_the_tile_origin_still_load ... ok
+test tests_print::setup_is_saved_with_the_document_as_one_undo_step ... ok
+test tests_printps::transparency_is_flattened_for_postscript ... ok
+test tests_printtiling::show_print_tiling_is_a_per_document_view_toggle ... ok
+test tests_placed_document::the_preview_is_saved_so_the_document_shows_it_without_its_file ... ok
+test tests_proxyitems::an_object_without_bounds_shows_its_paints ... ok
+test tests_printtiling::tiles_start_at_the_tile_origin_and_cover_the_art ... ok
+test tests_printtiling::untiled_pages_come_from_the_sheets_once_per_page ... ok
+test tests_printtiling::tiling_pages_are_print_preview_tiles ... ok
+test tests_proxyitems::invert_and_complement_recolour_the_active_item ... ok
+test tests_proxyitems::the_last_colour_keeps_its_model ... ok
+test tests_proxyitems::toggle_active_can_name_the_proxy ... ok
+test tests_proxyitems::the_mixed_proxy_compares_the_active_item ... ok
+test tests_printtiling::the_tool_puts_the_first_page_where_it_is_dragged_as_one_undo_step ... ok
+test tests_printps::marks_and_separations_are_written ... ok
+test tests_print::print_writes_the_saved_setup_with_overrides ... ok
+test tests_pdfraster::live_objects_and_single_fills_and_strokes_keep_their_raster_effects ... ok
+test tests_printpresets::presets_export_and_import_round_trip ... ok
+test tests_printps::a_ps_path_prints_postscript_and_pdf_stays_the_default ... ok
+test tests_puppetwarp::pins_appear_when_the_tool_is_chosen_or_art_selected ... ok
+test tests_rasterfilters::expand_appearance_makes_an_image ... ok
+test tests_puppetwarp::a_pin_with_an_angle_turns_the_art_around_it ... ok
+test tests_puppetwarp::warps_start_from_the_rest_shape_and_dont_stack ... ok
+test tests_puppetwarp::pins_are_never_saved ... ok
+test tests_puppetwarp::a_new_selection_clears_the_pins ... ok
+test tests_puppetwarp::alt_drag_with_the_tool_turns_the_art_in_one_undo_step ... ok
+test tests_puppetwarp::pins_follow_undo_and_redo ... ok
+test tests_rastersettings::raster_settings_round_trip_and_old_files_load ... ok
+test tests_rastersettings::settings_report_change_in_one_step_and_reject_junk ... ok
+test tests_rastersettings::add_around_grows_the_effect_image ... ok
+test tests_recolor::cmyk_colours_keep_their_identity_and_model ... ok
+test tests_rasterfilters::listed_applied_edited_and_undone ... ok
+test tests_recolor::edit_group_refuses_to_change_built_in_swatches ... ok
+test tests_rastersettings::a_white_background_makes_effect_images_opaque ... ok
+test tests_recolor::edit_group_rewrites_in_order_as_one_undo_step ... ok
+test tests_recolor::edit_group_relinks_art_and_apply_rewrites_the_group_with_the_art ... ok
+test tests_rastersettings::rasterize_takes_the_document_settings_as_defaults ... ok
+test tests_recolor::five_colours_reduce_to_two ... ok
+test tests_recolor::lab_colours_keep_their_identity_and_model ... ok
+test tests_recolor::methods_and_bad_params ... ok
+test tests_recolor::limit_to_library_snaps_new_colours ... ok
+test tests_recolor::preserve_flags_leave_neutrals_out ... ok
+test tests_recolor::tints_of_a_global_swatch_share_its_row ... ok
+test tests_recolor::scale_and_preserve_tints_keep_tint_ratios ... ok
+test tests_rastersettings::the_color_model_and_anti_alias_reach_the_pixels ... ok
+test tests_recolor::randomize_shuffles_new_colours_and_skips_excluded_rows ... ok
+test tests_rasterfilters::spin_blur_reaches_past_the_corners ... ok
+test tests_recovery::a_crashed_apps_copies_are_offered_once_its_lock_is_released ... ok
+test tests_recovery::a_crash_leaves_copies_that_restore_modified_and_titled ... ok
+test tests_recovery::a_paused_app_writes_its_copies_again_and_is_running_again ... ok
+test tests_recovery::a_restored_copy_still_refuses_to_replace_the_file_an_import_left_things_out_of ... ok
+test tests_recovery::announced_areas_stay_held_while_their_app_is_paused ... ok
+test tests_recovery::another_running_apps_copies_are_never_offered ... ok
+test tests_recovery::discard_deletes_copies_left_behind_only ... ok
+test tests_recovery::an_app_that_leaves_has_its_copies_offered_at_once ... ok
+test tests_recovery::heartbeats_hold_areas_where_the_store_has_no_locks ... ok
+test tests_recovery::undoing_back_to_the_saved_state_drops_the_copy ... ok
+test tests_recovery::recovery_save_writes_modified_documents_once ... ok
+test tests_registration::pdf_writes_registration_as_separation_all ... ok
+test tests_registration::registration_is_a_reserved_swatch ... ok
+test tests_registration::trim_marks_cover_every_artboard_and_take_the_japanese_style ... ok
+test tests_registration::crop_marks_effect_follows_the_object ... ok
+test tests_puppetwarp::puppet_warp_works_on_groups_compound_paths_and_open_strokes ... ok
+test tests_save::a_template_places_like_a_native_file ... ok
+test tests_registration::trim_marks_print_on_every_plate ... ok
+test tests_printadvanced::print_as_bitmap_prints_an_image_of_each_artboard ... ok
+test tests_recovery::without_a_store_the_commands_say_where_to_set_one ... ok
+test tests_save::a_pdf_opened_in_part_is_not_saved_back_over_the_whole_file ... ok
+test tests_save::choosing_the_current_color_mode_is_not_an_edit ... ok
+test tests_recovery::saving_reverting_or_closing_removes_the_copy ... ok
+test tests_save::document_color_mode_is_one_command_with_a_hidden_alias ... ok
+test tests_save::another_format_without_a_path_hands_the_bytes_back ... ok
+test tests_save::save_plans_suggest_names_and_folders ... ok
+test tests_recovery::folder_areas_are_locked_by_running_apps ... ok
+test tests_save::revert_reloads_the_saved_file_in_the_same_tab ... ok
+test tests_save::open_layers_rows_round_trip_without_dirtying ... ok
+test tests_save::save_a_copy_keeps_the_path_title_and_modified_state ... ok
+test tests_save::an_svg_path_writes_svg_and_save_writes_it_back ... ok
+test tests_save::save_as_takes_on_path_format_and_options ... ok
+test tests_save::older_native_files_open_converted_and_save_under_a_new_name ... ok
+test tests_save::templates_suggest_a_name_in_the_templates_folder_and_open_untitled ... ok
+test tests_saveoptions::format_options_list_the_save_options ... ok
+test tests_saveoptions::pdf_compatible_files_carry_a_pdf ... ok
+test tests_scalestrokes::a_bounding_box_drag_keeps_live_corners_circular ... ok
+test tests_scalestrokes::group_appearance_scales_with_its_members ... ok
+test tests_scalestrokes::live_corners_stay_circular_when_a_rectangle_is_scaled_unevenly ... ok
+test tests_scalestrokes::off_compensates_the_type_stroke_on_scales_it_with_the_type ... ok
+test tests_scalestrokes::off_nothing_visual_scales ... ok
+test tests_scalestrokes::relative_distances_and_fill_and_stroke_effects ... ok
+test tests_scalestrokes::scale_corners_keeps_or_scales_live_corner_radii ... ok
+test tests_scalestrokes::scaling_200_percent_doubles_the_stroke_dashes_and_shadow ... ok
+test tests_saveoptions::a_linked_pngs_bytes_are_embedded ... ok
+test tests_scalestrokes::replaying_the_journal_entry_scales_the_same_way ... ok
+test tests_scalestrokes::the_journal_records_the_scale_options_used ... ok
+test tests_save::the_saved_view_round_trips_without_dirtying ... ok
+test tests_scalestrokes::the_preference_applies_when_the_param_is_absent ... ok
+test tests_scalestrokes::transform_each_without_strokes_keeps_them ... ok
+test tests_shaper::shaper_double_click_selects_an_original_for_construction_editing ... ok
+test tests_shaper::shaper_exiting_scribble_erases_only_touched_fill_and_boundary_strokes ... ok
+test tests_shaper::shaper_interior_punch_removes_the_whole_visible_front_face ... ok
+test tests_shaper::shaper_lines_keep_free_angles_with_or_without_shift ... ok
+test tests_shaper::shaper_face_paint_survives_source_edits_and_expand_discards_only_sources ... ok
+test tests_saveoptions::ai_without_pdf_content_and_compression ... ok
+test tests_shaper::shaper_merges_with_origin_color_keeps_live_originals_and_undoes_once ... ok
+test tests_shaper::shaper_rejects_oversized_or_invalid_gestures_without_changing_art ... ok
+test tests_shaper::shaper_source_move_resize_native_roundtrip_and_release_preserve_live_art ... ok
+test tests_shaper::shaper_visible_dividing_stroke_keeps_fill_erasure_on_one_side ... ok
+test tests_shaper::shaper_tool_trims_both_diagonal_ends_and_only_construction_can_pick_them ... ok
+test tests_slices::clip_to_artboard_hide_lock_select_and_delete_all ... ok
+test tests_slices::an_object_slice_follows_its_object_and_releases_back_to_it ... ok
+test tests_shaper::shaper_joined_outline_keeps_its_stroke_paint_after_source_edits ... ok
+test tests_slices::combine_and_duplicate ... ok
+test tests_saveoptions::ai_files_save_each_artboard_too_and_reopen_editable ... ok
+test tests_slices::releasing_a_user_slice_leaves_an_unpainted_rectangle ... ok
+test tests_slices::divide_two_by_three_and_by_size ... ok
+test tests_slices::guides_give_nine_slices ... ok
+test tests_slices::slice_commands_check_their_params ... ok
+test tests_smartguides::a_pen_anchor_lines_up_with_another_objects_centre ... ok
+test tests_slices::slice_options_set_read_and_undo_in_one_step ... ok
+test tests_smartguides::a_rectangle_corner_lands_on_another_objects_anchor ... ok
+test tests_smartguides::a_rectangle_does_not_snap_to_itself_while_drawn ... ok
+test tests_slices::slice_tool_gestures_are_one_undo_step_each ... ok
+test tests_strokegeom::arrow_align_is_set_per_stroke_and_validated ... ok
+test tests_smartguides::construction_guides_follow_the_preference ... ok
+test tests_slices::slices_survive_a_native_round_trip ... ok
+test tests_shaper::shaper_three_circles_erase_a_visible_fill_and_keep_the_complete_shared_curve ... ok
+test tests_strokegeom::arrow_align_and_profiles_survive_the_native_format ... ok
+test tests_strokegradient::stroke_mode_sets_how_the_gradient_lies_with_one_undo_step ... ok
+test tests_strokegeom::profiles_come_from_the_preset_catalogue ... ok
+test tests_strokegradient::the_mode_round_trips_through_the_native_format_and_old_files_paint_within ... ok
+test tests_strokereach::a_300_percent_arrowhead_grows_the_visual_bounds ... ok
+test tests_strokereach::a_click_outside_an_outside_stroke_selects_it ... ok
+test tests_strokereach::a_click_at_the_lens_maximum_selects_its_stroke ... ok
+test tests_strokegradient::along_and_across_paint_the_canvas_by_position_on_the_path ... ok
+test tests_strokeux::mixed_values_and_align_stroke_follow_the_selection ... ok
+test tests_strokeux::inspect_reports_stroke_options ... ok
+test tests_strokeux::stroke_unit_follows_the_preference ... ok
+test tests_strokeux::stroke_set_on_a_group_skips_images_and_symbol_instances ... ok
+test tests_stylelib::add_dedupes_names_as_one_undo_step ... ok
+test tests_stylelib::add_with_apply_styles_the_selection_in_the_same_undo_step ... ok
+test tests_saveoptions::three_artboards_give_four_files ... ok
+test tests_stylelib::builtin_libraries_are_listed_with_original_styles_using_catalogued_effects ... ok
+test tests_stylelib::save_and_load_round_trip_with_patterns_and_unlinked_swatches ... ok
+test tests_printadvanced::simulated_overprints_print_what_overprint_preview_shows ... ok
+test tests_stylepanel::merge_combines_the_stacks_in_order ... ok
+test tests_stylepanel::move_reorders_and_undoes_in_one_step ... ok
+test tests_stylepanel::override_character_color_round_trips_and_defaults_on ... ok
+test tests_stylelib::user_libraries_and_other_documents_styles ... ok
+test tests_styles::a_style_from_a_group_or_type_is_not_empty ... ok
+test tests_stylepanel::override_character_color_clears_the_run_fill ... ok
+test tests_strokegradient::svg_and_pdf_write_the_same_gradient_as_slices_with_a_warning ... ok
+test tests_styles::alt_apply_adds_the_style_on_top ... ok
+test tests_styles::document_info_lists_style_names ... ok
+test tests_styles::deleting_a_style_unlinks_and_renaming_keeps_links ... ok
+test tests_styles::redefine_updates_every_linked_object ... ok
+test tests_styles::redefine_leaves_unlinked_and_edited_objects_alone ... ok
+test tests_styles::select_same_appearance_attribute ... ok
+test tests_swatchcmds::add_used_colors_skips_colours_that_have_swatches ... ok
+test tests_swatchcmds::a_cmyk_document_starts_with_cmyk_swatches_and_stores_new_colours_as_cmyk ... ok
+test tests_swatchcmds::merge_keeps_the_first_and_relinks_the_others_art ... ok
+test tests_styles::styles_carry_opacity_and_blend_through_a_save ... ok
+test tests_styles::style_names_are_unique ... ok
+test tests_styles::unused_styles_and_sort_by_name ... ok
+test tests_swatchcmds::move_between_groups_is_one_undo_step ... ok
+test tests_swatchcmds::rgb_documents_keep_colours_as_given_and_edits_keep_the_source_model ... ok
+test tests_strokegradient::outline_stroke_and_expand_keep_the_picture ... ok
+test tests_swatchcmds::move_reorders_groups_and_refuses_bad_moves ... ok
+test tests_swatchcmds::ungroup_and_sort_by_kind_are_one_undo_step_each ... ok
+test tests_swatches::deleting_several_swatches_and_groups ... ok
+test tests_swatches::a_group_from_a_mesh_holds_its_point_colours ... ok
+test tests_swatches::a_group_from_artwork_holds_its_unique_colours_and_links_the_art ... ok
+test tests_swatchcmds::unused_leaves_out_linked_colours_gradients_and_patterns_in_use ... ok
+test tests_swatches::colour_groups_hold_solid_colours_only ... ok
+test tests_swatches::deleting_a_global_swatch_unlinks_art_that_keeps_its_colour ... ok
+test tests_swatches::document_info_counts_grouped_swatches ... ok
+test tests_swatches::editing_a_global_swatch_recolours_linked_art_in_one_step ... ok
+test tests_swatches::group_names_are_never_blank_and_never_shared_with_their_swatches ... ok
+test tests_swatches::grouped_swatches_edit_and_convert_modes ... ok
+test tests_swatches::grouped_spot_swatches_print_on_their_own_plate ... ok
+test tests_swatches::document_color_mode_converts_grouped_swatches ... ok
+test tests_swatches::new_swatch_saves_the_active_pattern_or_gradient ... ok
+test tests_swatches::new_swatches_go_into_groups_convert_modes_and_can_be_spot ... ok
+test tests_swatches::new_swatches_are_named_by_their_colour_model ... ok
+test tests_swatches::renaming_relinks_and_spot_forces_global ... ok
+test tests_swatches::swatch_list_reports_kinds_and_groups ... ok
+test tests_swatchlib::a_library_group_stays_one_group_when_a_swatch_has_its_name ... ok
+test tests_swatchlib::add_dedupes_as_one_undo_step ... ok
+test tests_swatches::tints_of_global_swatches_get_swatches_only_when_asked ... ok
+test tests_swatchlib::add_with_apply_paints_the_selection_in_the_same_undo_step ... ok
+test tests_swatchlib::gradient_libraries_are_listed_and_gradient_swatches_rename_and_take_new_gradients ... ok
+test tests_swatchlib::list_and_get_every_builtin_library ... ok
+test tests_swatchlib::save_and_load_round_trip_keeps_cmyk_spot_and_groups ... ok
+test tests_swatchlib::another_documents_swatches_load_as_a_library ... ok
+test tests_swatchlib::reset_defaults_restores_missing_swatches_or_replaces_them ... ok
+test tests_swatchlib::text_libraries_sent_as_bytes_load_when_they_are_not_valid_utf8 ... ok
+test tests_targeting::a_targeted_layer_gets_an_opacity_mask ... ok
+test tests_swatchlib::swatch_exchange_files_load_add_and_list_as_user_libraries ... ok
+test tests_targeting::a_targeted_layer_takes_transparency_appearance_and_effects ... ok
+test tests_targeting::transfer_moves_or_copies_the_appearance ... ok
+test tests_targeting::targeting_an_object_selects_it_and_locked_layers_cannot_be_targeted ... ok
+test tests_shaper::shaper_erases_only_protruding_stroke_pieces_keeps_fill_and_original_line ... ok
+test tests_textcombos::auto_height_x_paragraph_attrs ... ok
+test tests_saveoptions::an_embedded_profile_is_restored ... ok
+test tests_textcombos::paragraph_attrs_x_inline_editing ... ok
+test tests_swatchlib::swatch_exchange_files_save_with_models_kinds_and_groups ... ok
+test tests_textcombos::vertical_align_x_inline_graphics_in_the_document ... ok
+test tests_textedit::a_frame_dragged_with_the_type_tools_is_the_dragged_rectangle ... ok
+test tests_swatchlib::libraries_saved_in_the_user_folder_are_user_defined ... ok
+test tests_textcombos::auto_height_x_inline_graphics ... ok
+test tests_textedit::automatic_alignment_updates_during_edits_and_can_be_overridden ... ok
+test tests_textedit::character_panel_flow_styles_the_selected_range_while_editing ... ok
+test tests_textcombos::auto_height_x_vertical_align ... ok
+test tests_textedit::clicking_away_keeps_marked_text_as_typed_and_undo_mid_composition_is_safe ... ok
+test tests_textedit::commands_are_listed_with_params ... ok
+test tests_textedit::fit_headline_fills_the_frame_width ... ok
+test tests_textedit::edit_range_replaces_and_undoes ... ok
+test tests_textedit::ime_cancel_leaves_no_undo_step_and_keeps_the_text ... ok
+test tests_textedit::area_type_from_a_circle_keeps_glyphs_inside ... ok
+test tests_textedit::ime_composition_shows_in_place_and_commits_as_one_step ... ok
+test tests_textedit::convert_area_point_keeps_text_in_place_for_every_alignment ... ok
+test tests_textedit::rtl_edit_commands_and_undo_preserve_logical_source_and_style_ranges ... ok
+test tests_textedit::set_range_style_defaults_to_all_text_and_get_range ... ok
+test tests_textedit::type_on_path_starts_where_clicked ... ok
+test tests_textedit::select_all_and_cut_like_ui ... ok
+test tests_textedit::set_range_style_splits_runs ... ok
+test tests_textedit::type_on_path_tool_through_session ... ok
+test tests_textedit::type_tool_state_does_not_leak_across_documents ... ok
+test tests_textedit::type_tool_selection_replace_and_delete ... ok
+test tests_textedit::undo_during_a_drag_takes_back_only_the_drag ... ok
+test tests_textedit::vertical_text_creation_orientation_and_persistence ... ok
+test tests_textedit::type_tool_typing_is_one_undo_step ... ok
+test tests_textedit::undo_while_typing_takes_back_only_the_typing_and_redo_returns_it ... ok
+test tests_textimport::place_reads_what_open_reads_and_text_files ... ok
+test tests_textimport::text_files_report_and_queue_with_their_options ... ok
+test tests_textimport::crlf_with_returns_removed_places_one_paragraph_per_block_as_area_type ... ok
+test tests_tints::a_swatch_applies_at_a_tint_and_the_tint_follows_swatch_edits ... ok
+test tests_tileedge::show_swatch_bounds_is_a_pattern_option_that_saves ... ok
+test tests_tileedge::tile_edge_color_is_a_preference_that_redraws_pattern_editing ... ok
+test tests_tints::global_mode_shifts_tints_of_linked_colours_only ... ok
+test tests_tints::new_swatch_saves_a_tint_swatch_linked_to_its_base ... ok
+test tests_toolsettings::a_gesture_keeps_what_it_changed_and_a_document_switch_keeps_options ... ok
+test tests_tints::tints_round_trip_through_the_native_format ... ok
+test tests_tints::spot_tints_print_their_percentage_of_the_plate ... ok
+test tests_tints::converting_the_document_colour_mode_keeps_tints_exact ... ok
+test tests_toolsettings::another_tools_options_are_stored_and_shared_ones_reach_the_active_tool ... ok
+test tests_textcombos::auto_height_x_composer ... ok
+test tests_toolsettings::liquify_tools_share_the_global_brush_but_not_their_own_options ... ok
+test tests_transparencygrid::transparency_grid_is_per_document_view_state ... ok
+test tests_toolsettings::options_survive_a_tool_switch ... ok
+test tests_toolsettings::options_are_saved_with_the_preferences ... ok
+test tests_typearea::a_rotated_type_area_resizes_along_its_own_axes ... ok
+test tests_typearea::area_type_options_align_the_lines_vertically ... ok
+test tests_typearea::a_handle_drag_resizes_the_type_area_and_the_text_reflows ... ok
+test tests_swatchlib::loaded_libraries_copy_into_the_user_folder_without_replacing_files ... ok
+test tests_typearea::a_resized_frame_reflows_its_thread ... ok
+test tests_typearea::point_type_still_scales_with_its_handles ... ok
+test tests_typearea::direct_selection_drags_a_frame_corner_or_edge ... ok
+test tests_typearea::reshape_area_is_a_registered_command ... ok
+test tests_typearea::the_type_widget_converts_point_and_area_type ... ok
+test tests_typearea::area_type_options_size_the_type_area ... ok
+test tests_typearea::reshape_area_takes_untrusted_params ... ok
+test tests_typearea::type_in_a_dragged_frame_resizes_with_the_selection_tool ... ok
+test tests_units::document_setup_without_a_document_fails ... ok
+test tests_units::distance_params_take_a_unit ... ok
+test tests_typearea::with_other_objects_the_type_area_resizes_and_the_others_scale ... ok
+test tests_units::canvas_measurement_labels_follow_the_units ... ok
+test tests_units::every_unit_is_a_units_choice ... ok
+test tests_units::stroke_and_type_units_are_preferences ... ok
+test tests_units::new_documents_start_in_the_preference_and_document_setup_only_changes_the_document ... ok
+test tests_units::length_preferences_take_typed_units_and_say_what_they_follow ... ok
+test tests_units::preferences_general_sets_the_open_documents_units_as_one_undo_step ... ok
+test tests_textcombos::every_feature_saves_and_reopens ... ok
+test tests_units::units_survive_a_native_round_trip ... ok
+test tests_textcombos::shrink_text_x_inline_graphics_and_paragraphs ... ok
+test tests_webexport::files_are_written_beside_the_path ... ok
+test tests_webexport::setting_keys_are_their_json_values ... ok
+test tests_webexport::gif_transparency_index_and_map_to_transparent ... ok
+test tests_webexport::presets_and_remembered_settings ... ok
+test tests_webexport::two_colours_give_a_two_colour_palette ... ok
+test tests_widthpoints::a_point_moved_onto_another_makes_a_discontinuous_point_that_renders_a_step ... ok
+test tests_widthpoints::adjust_adjoining_scales_the_neighbours ... ok
+test tests_widthpoints::copy_adds_one_point_and_the_tool_alt_drag_copies ... ok
+test tests_widthpoints::flipping_along_swaps_the_sides_of_a_discontinuous_point ... ok
+test tests_widthpoints::shift_selected_points_drag_together_in_one_step ... ok
+test tests_widthprofiles::built_ins_cant_be_deleted_and_names_stay_unique ... ok
+test tests_widthprofiles::add_list_apply_delete_reset ... ok
+test tests_widthprofiles::every_built_in_applies_and_the_params_doc_names_them ... ok
+test tests_widthtool::the_width_tool_edits_a_compound_paths_stroke ... ok
+test tests_widthtool::width_point_commands_given_a_member_edit_the_compound ... ok
+test tests_xform::artboard_alt_drag_duplicates_it_with_its_art ... ok
+test tests_widthprofiles::saved_profiles_round_trip_with_the_preferences ... ok
+test tests_xform::artboard_move_copy_reports_the_copies_and_follows_move_art ... ok
+test tests_xform::artboard_set_props_scales_art_only_when_asked_and_resized ... ok
+test tests_xform::artboard_resize_via_handle_and_move_command ... ok
+test tests_webexport::jpeg_size_grows_with_quality ... ok
+test tests_xform::artboard_set_props_scales_the_art_and_guides_with_the_artboard ... ok
+test tests_webexport::image_size_region_and_metadata ... ok
+test tests_xform::artboard_tool_scales_art_with_the_artboard ... ok
+test tests_xform::coordinate_moves_honor_move_art_and_keep_resize_behavior ... ok
+test tests_webexport::colour_table_lock_web_shift_snap_and_sort ... ok
+test tests_xform::artboard_tool_moves_with_art_creates_and_deletes ... ok
+test tests_xform::copy_from_requires_source ... ok
+test tests_xform::coordinate_moves_journal_the_locked_art_preference ... ok
+test tests_recovery::complex_documents_are_skipped_when_the_preference_says ... ok
+test tests_xform::distort_perspective_midpoint_is_projective ... ok
+test tests_xform::distort_command_maps_corners ... ok
+test tests_xform::eyedropper_copies_appearance_to_selection_and_defaults ... ok
+test tests_xform::direct_selection_shift_marquee_toggles_anchors ... ok
+test tests_xform::free_transform_cmd_held_once_a_corner_drag_started_distorts_in_one_step ... ok
+test tests_xform::free_transform_distort_mode_via_pointer ... ok
+test tests_webexport::preview_size_is_the_written_size ... ok
+test tests_xform::lasso_selects_anchor_subset ... ok
+test tests_xform::free_transform_side_handle_scales ... ok
+test tests_xform::gradient_tool_sets_vector_on_solid_fill ... ok
+test tests_xform::lasso_shift_adds_and_alt_subtracts ... ok
+test tests_xform::eyedropper_shift_samples_color_into_active_proxy ... ok
+test tests_xform::magic_wand_selects_same_fill ... ok
+test tests_xform::rotate_tool_alt_click_requests_dialog ... ok
+test tests_xform::measure_tool_leaves_document_untouched ... ok
+test tests_xform::rotate_tool_alt_release_copies ... ok
+test tests_xform::reflect_and_shear_tools ... ok
+test tests_xform::scale_tool_click_origin_then_drag ... ok
+test tests_xform::rotate_tool_drag_rotates_about_center_one_undo ... ok
+test tests_xform::scale_artwork_with_artboard_leaves_locked_art_unless_the_preference_says ... ok
+test tests_xform::selection_shift_marquee_toggles_objects ... ok
+test tests_stylelib::every_builtin_style_paints_visibly_on_a_rectangle ... ok
+test tests_webexport::slices_give_one_image_each_and_a_page ... ok
+test tests_rasterfilters::each_effect_changes_the_canvas_and_draws_the_same_twice ... ok
+test cmd::fileio::tests_pdf13::the_flattener_preset_and_options_apply ... ok
+test tests_rasterfilters::pdf_and_svg_write_the_effected_object_as_an_image ... ok
+test tests_webexport::colours_cap_the_palette_at_16 ... ok
+test tests_file::raster_export_too_large_is_an_error_not_a_crash ... ok
+
+test result: ok. 1579 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.53s
+
+     Running tests/affinity_artboards.rs (target/debug/deps/affinity_artboards-845938ae4762e6b6)
+
+running 6 tests
+test several_spreads_preserve_each_board_and_leave_room_between_spreads ... ok
+test invalid_board_keeps_children_and_reports_the_loss ... ok
+test coordinate_edits_move_imported_clipping_groups_and_undo_together ... ok
+test converted_ellipse_artboard_keeps_curved_clipping ... ok
+test rotated_board_clips_to_its_outline_instead_of_its_export_rectangle ... ok
+test nested_boards_keep_order_and_negative_origins_at_document_resolution ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/affinity_corpus.rs (target/debug/deps/affinity_corpus-1fbc66d187009fce)
+
+running 3 tests
+test affinity3_all_artboards_survive_native_save_and_export ... ok
+test public_affinity_documents_render_like_their_affinity_thumbnails ... ok
+test corpus_gate::sha256::tests::known_digests ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/affinity_text.rs (target/debug/deps/affinity_text-001df87f27fd1306)
+
+running 8 tests
+test pinned_affinity3_text_opens_as_editable_unicode_with_resolved_emoji_font ... ok
+test corpus::sha256::tests::known_digests ... ok
+test frame_type_keeps_dimensions_alignment_and_unit_conversion ... ok
+test absent_font_name_uses_named_default_and_postscript_name_is_preserved ... ok
+test installed_postscript_identity_overrides_ambiguous_family_and_weight ... ok
+test caps_and_feature_overrides_pass_through_to_editable_type ... ok
+test unicode_mixed_fonts_line_breaks_and_styles_remain_editable_after_save ... ok
+test each_font_weight_and_italic_maps_to_the_expected_style ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/clear_commands.rs (target/debug/deps/clear_commands-91302f1b80146e77)
+
+running 9 tests
+test clear_direct_selected_anchors_keeps_the_rest_of_the_path ... ok
+test clear_guides_and_empty_explicit_targets_keep_their_separate_behavior ... ok
+test cut_direct_selected_anchors_retains_anchor_deletion ... ok
+test clear_explicit_targets_are_validated_atomically ... ok
+test cut_compound_member_keeps_copy_and_delete_targets_consistent ... ok
+test clear_compound_and_member_together_deletes_the_compound ... ok
+test clear_selected_compound_member_preserves_its_sibling_and_is_undoable ... ok
+test clear_keeps_layers_but_deletes_an_explicitly_targeted_child ... ok
+test clear_explicit_ids_works_without_a_selection_and_overrides_selected_anchors ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/color_settings.rs (target/debug/deps/color_settings-c99d51b2666cf635)
+
+running 2 tests
+test color_settings_lists_profiles_and_validates ... ok
+test legacy_profile_name_resolves_in_commands_and_files ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/command_sweep.rs (target/debug/deps/command_sweep-5ab7518d21f76909)
+
+running 15 tests
+test registry_is_well_formed ... ok
+test bug_artboard_huge_props_break_svg ... ok
+test bug_huge_transform_makes_document_unloadable ... ok
+test artboard_rearrange_huge_columns ... ok
+test every_command_without_a_document ... ok
+test recovery_commands_with_a_damaged_store_and_junk_params ... ok
+test area_options_fit_junk ... ok
+test every_command_undoes_exactly ... ok
+test polygon_properties_junk ... ok
+test every_command_with_empty_params_in_every_fixture ... ok
+test text_commands_with_junk_params_on_inline_graphics ... ok
+test envelope_commands_with_junk_params_on_envelopes ... ok
+test structured_junk ... ok
+test fuzzed_calls_keep_documents_serializable ... ok
+test every_command_with_junk_params ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 34.28s
+
+     Running tests/font_folder.rs (target/debug/deps/font_folder-bb52a1c9416f75b0)
+
+running 1 test
+test a_found_font_is_copied_without_replacing_a_file_and_its_type_redraws ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/import_fuzz.rs (target/debug/deps/import_fuzz-b6cb166dd2db40cd)
+
+running 55 tests
+test affinity_garbage_never_panics ... ok
+test affinity_native_documents_with_mutated_streams_render_and_export ... ok
+test affinity_placement_is_rejected_without_panicking ... ok
+test affinity_native_containers_with_mutated_bytes_render_and_export ... ok
+test affinity_mutated_previews_render_and_export_without_panicking ... ok
+test eps_hostile_programs_never_panic ... ok
+test font_files_a_search_reads_never_panic ... ok
+test eps_mutated_files_never_panic ... ok
+test eps_mutated_postscript_never_panics ... ok
+test mutated_encrypted_pdfs_never_panic ... ok
+test ai_editing_data_never_panics ... ok
+test ai_mutated_save_never_panics ... ok
+test eps_editing_data_never_panics ... ok
+test dxf_garbage_never_panics ... ok
+test library_garbage_never_panics ... ok
+test dxf_hostile_entities_never_panic ... ok
+test mutated_print_presets_never_panic ... ok
+test mutated_perspective_presets_never_panic ... ok
+test mutated_flattener_presets_never_panic ... ok
+test mutated_saved_swatch_exchange_files_never_panic ... ok
+test native_mutated_files_never_panic ... ok
+test mutated_style_libraries_never_panic ... ok
+test pasted_text_never_panics ... ok
+test pdf_garbage_never_panics ... ok
+test mutated_swatch_exchange_files_never_panic ... ok
+test pasted_pdf_never_panics ... ok
+test eps_text_document_never_panics ... ok
+test mutated_pdf_presets_never_panic ... ok
+test pasted_metafiles_never_panic ... ok
+test mutated_images_place_without_panics ... ok
+test eps_text_frames_never_panic ... ok
+test pdf_presets_garbage_never_panics ... ok
+test pdf_hostile_content_never_panics ... ok
+test svg_garbage_never_panics ... ok
+test perspective_presets_garbage_never_panics ... ok
+test print_presets_garbage_never_panics ... ok
+test pdf_import_options_never_panic ... ok
+test mutated_swatch_libraries_never_panic ... ok
+test dxf_mutated_export_never_panics ... ok
+test the_frames_fixture_reads_as_threaded_area_type_and_type_on_a_path ... ok
+test the_native_affinity_sample_reaches_every_reader_path ... ok
+test the_search_font_samples_are_read_whole ... ok
+test pdf_layers_masks_patterns_and_text_never_panic ... ok
+test svg_mutated_save_never_panics ... ok
+test ai_hostile_editing_data_never_panics ... ok
+test pdf_mutated_export_never_panics ... ok
+test svg_hostile_markup_never_panics ... ok
+test random_wmf_records_never_panic ... ok
+test pasted_bitmaps_never_panic ... ok
+test svg_hostile_css_never_panics ... ok
+test random_emf_records_never_panic ... ok
+test ai_mutated_sample_never_panics ... ok
+test svg_mutated_export_never_panics ... ok
+test mutated_metafiles_never_panic ... ok
+test swatch_exchange_garbage_never_panics ... ok
+
+test result: ok. 55 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.50s
+
+     Running tests/inline_text.rs (target/debug/deps/inline_text-87a652237a91458b)
+
+running 4 tests
+test canvas_applies_the_text_objects_opacity_to_its_inline_art ... ok
+test svg_keeps_live_text_and_draws_the_symbol ... ok
+test canvas_draws_the_symbol_where_the_layout_puts_it ... ok
+test pdf_draws_the_symbol_art ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/known_bugs.rs (target/debug/deps/known_bugs-cf9744912c342847)
+
+running 4 tests
+test bug_bring_to_front_across_layers_underflows ... ok
+test bug_group_inside_compound ... ok
+test bug_nested_commands_double_journal ... ok
+test bug_native_roundtrip_not_bit_exact ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/lossy_overwrite.rs (target/debug/deps/lossy_overwrite-878d98ec6eae3757)
+
+running 3 tests
+test the_other_ways_of_writing_a_file_ask_too ... ok
+test a_file_the_import_read_whole_is_written_over_as_before ... ok
+test a_file_the_import_left_things_out_of_is_not_written_over_unasked ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/model_based.rs (target/debug/deps/model_based-9580c026bdee9247)
+
+running 8 tests
+test batch_is_one_undo_step_and_rolls_back_on_error ... ok
+test empty_batch_is_harmless ... ok
+test rich_fixture_satisfies_invariants_and_undoes_to_blank ... ok
+test save_open_via_commands_roundtrips ... ok
+test serialize_all_formats_on_rich_doc ... ok
+test journal_replay_reproduces_document ... ok
+test short_sequences_full_checks ... ok
+test random_command_sequences ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.00s
+
+     Running tests/plugin_fuzz.rs (target/debug/deps/plugin_fuzz-a018e4d54cd2a6a9)
+
+running 2 tests
+test mutated_and_garbage_modules_never_crash ... ok
+test hostile_filter_and_effect_output_never_crashes ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.42s
+
+     Running tests/selection_commands.rs (target/debug/deps/selection_commands-cd734cebfacd1083)
+
+running 4 tests
+test single_id_toggle_validates_before_mutating ... ok
+test selection_commands_report_the_resulting_selection ... ok
+test selection_commands_require_an_id_array ... ok
+test selection_commands_reject_invalid_ids_without_changing_state ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/text_import_fuzz.rs (target/debug/deps/text_import_fuzz-5600988a60d0b5fa)
+
+running 1 test
+test any_bytes_place_as_text_without_panics ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_eps-36a29447a74abbc0)
+
+running 145 tests
+test import::ai::lex::tests::binary_previews_are_skipped ... ok
+test import::ai::lex::tests::hidden_lines_and_comments ... ok
+test import::ai::lex::tests::hostile_input_ends ... ok
+test import::ai::lex::tests::image_data_is_one_token ... ok
+test import::ai::lex::tests::skip_past_data ... ok
+test import::ai::obj::tests::entries_and_content ... ok
+test import::ai::obj::tests::latin_text ... ok
+test import::ai::obj::tests::names_from_xml_ids ... ok
+test import::ai::paint::tests::colours ... ok
+test import::ai::paint::tests::gradient_definition_and_instance ... ok
+test import::ai::tests::a_drawn_look_stands_for_its_object ... ok
+test import::ai::tests::artboards ... ok
+test import::ai::tests::compound_paths_and_clipping ... ok
+test import::ai::tests::cmyk_documents ... ok
+test import::ai::tests::layers_and_sublayers ... ok
+test import::ai::tests::paths_colours_and_strokes ... ok
+test import::ai::tests::sections_it_skips ... ok
+test import::ai::tests::gradients ... ok
+test import::ai::tests::groups_names_hidden_and_locked ... ok
+test import::ai::tests::non_native_art_is_skipped_with_its_ascii85_data ... ok
+test import::ai::tests::images_with_alpha_channels ... ok
+test import::ai::tests::transparency_of_objects_and_groups ... ok
+test import::ai::tests::hostile_data_ends_without_panics ... ok
+test import::ai::tests::text_objects_are_slots_named_after_their_story ... ok
+test import::native::tests::interleaved_lines_are_joined_without_taking_each_others_pieces ... ok
+test import::ai::tests::ai_private_data ... ok
+test import::ate::tests::values_read_nested_dictionaries_lists_and_utf16_strings ... ok
+test import::tests::a_fill_then_a_stroke_of_the_same_path_is_one_object ... ok
+test import::ate::tests::damaged_documents_are_not_read ... ok
+test import::ai::tests::what_it_doesnt_read_is_an_error_where_it_shows ... ok
+test import::tests::an_unreadable_program_falls_back_to_the_preview ... ok
+test import::ai::tests::eps_containers ... ok
+test import::tests::a_palette_preview_with_alpha_is_placed ... ok
+test import::tests::device_settings_are_accepted_and_change_nothing ... ok
+test import::tests::clips_become_clipping_groups ... ok
+test import::tests::flushfile_skips_the_data_of_a_filter ... ok
+test import::tests::an_executable_filter_runs_its_data_as_a_program ... ok
+test import::tests::gsave_and_grestore_bring_the_state_back ... ok
+test import::tests::clipsave_and_cliprestore_bring_the_clip_back ... ok
+test import::tests::dictstack_and_internaldict_answer ... ok
+test import::tests::colours_in_every_model ... ok
+test import::tests::line_state_reaches_the_stroke ... ok
+test import::tests::languagelevel_is_an_integer_and_runs ... ok
+test import::tests::paths_fill_and_stroke_in_document_space ... ok
+test import::tests::images_and_image_masks ... ok
+test import::tests::procedures_bind_def_loops_and_dictionaries ... ok
+test import::tests::the_bounding_box_comes_from_the_header_or_the_trailer ... ok
+test import::tests::shadings_become_gradients ... ok
+test import::tests::intervals_share_their_arrays_and_strings ... ok
+test import::tests::the_standard_dictionaries_are_dictionaries_in_systemdict ... ok
+test import::tests::resourceforall_enumerates_matching_names ... ok
+test import::tests::the_generic_category_defines_new_categories ... ok
+test import::tests_fontnames::abbreviated_styles_in_postscript_names_are_spelled_out ... ok
+test import::tests_fontnames::reencoded_copies_of_a_font_name_the_font ... ok
+test import::tests::transforms_concat ... ok
+test import::ai::tests::many_zstandard_frames_are_read_in_one_pass_and_capped ... ok
+test import::tests_generators::a_gradient_with_a_functions_array_past_the_cap_is_sampled ... ok
+test import::tests_generators::a_stitching_function_that_refers_to_itself_is_rejected_not_crashed ... ok
+test import::tests_generators::affinity_files_read_as_vectors ... ok
+test import::tests_generators::a_deeply_shared_stitching_function_is_sampled_not_walked ... ok
+test import::tests_generators::a_stitching_function_with_one_piece_but_many_bounds_is_sampled ... ok
+test import::tests::the_writers_own_output_reads_back ... ok
+test import::tests_generators::errors_name_the_operator_and_the_procedures ... ok
+test import::tests_generators::executable_strings_and_integer_keys ... ok
+test import::tests::the_writers_output_reads_back_looking_the_same ... ok
+test import::tests_generators::hostile_patterns_glyphs_and_shadings_end ... ok
+test import::tests_generators::gradients_stitched_from_linear_pieces_keep_or_sample_their_stops ... ok
+test import::tests_generators::immediately_evaluated_names_are_read_as_their_values ... ok
+test import::tests_generators::level_2_and_3_probes_read_as_vectors ... ok
+test import::tests::embedded_font_programs_are_skipped ... ok
+test import::tests_generators::coreldraw_files_read_as_vectors ... ok
+test import::tests_generators::ghostscript_files_read_as_vectors ... ok
+test import::tests::type_becomes_point_type_in_the_font_named ... ok
+test import::tests_generators::libreoffice_files_read_as_vectors ... ok
+test import::tests_fontnames::postscript_names_resolve_to_the_available_family ... ok
+test import::tests_generators::matplotlib_files_read_as_vectors ... ok
+test import::tests::cshow_runs_its_procedure_for_each_character ... ok
+test import::tests_generators::masked_images_in_every_interleaving ... ok
+test import::tests_generators::type3_fonts_draw_their_glyph_procedures ... ok
+test import::tests_generators::metafile_and_epsi_previews_stand_in ... ok
+test import::tests_generators::mesh_and_function_shadings_become_gradient_meshes ... ok
+test import::tests_illustrator::groups_nest_with_clipping_groups ... ok
+test import::tests_illustrator::groups_and_nested_groups_come_in_as_groups ... ok
+test import::tests_generators::probing_operators_answer ... ok
+test import::tests_illustrator::other_postscript_keeps_its_own_u ... ok
+test import::tests_generators::restore_puts_dictionaries_back ... ok
+test import::tests_generators::user_paths_and_file_reads ... ok
+test import::tests_images::procedures_reading_one_file_are_read_in_turn ... ok
+test import::tests_images::predicted_rows_of_an_odd_width ... ok
+test import::tests_images::separate_sources_keep_their_planes ... ok
+test import::tests_images::rows_of_every_depth_start_at_a_byte ... ok
+test import::tests_illustrator::unbalanced_and_runaway_groups_are_read_safely ... ok
+test import::tests_native::a_dictionary_left_open_at_the_end_of_a_layer_is_a_damaged_file ... ok
+test import::tests_native::a_damaged_editing_copy_leaves_the_page ... ok
+test import::tests_native::an_ai_file_that_cant_be_read_through_its_editing_data_keeps_its_pdf_part ... ok
+test import::tests_native::an_ai_file_without_its_pdf_part_reads_its_layers_and_makes_its_type ... ok
+test import::ai::tests::closing_brackets_without_their_opening_dont_rescan_the_stack ... ok
+test import::tests_native::an_ai_file_gets_its_layers_and_the_art_outside_its_artboard ... ok
+test import::tests_native::a_gray_is_a_grayscale_colour ... ok
+test import::tests_native::a_line_the_page_draws_in_pieces_goes_to_its_text_object_whole ... ok
+test import::tests_native::a_commented_copy_of_a_story_that_has_a_plain_text_object_is_not_another_object ... ok
+test import::tests_native::a_run_longer_than_any_text_doesnt_overflow ... ok
+test import::tests_native::a_text_object_written_as_comments_is_read_like_any_other ... ok
+test import::tests_native::an_area_type_object_with_its_own_nested_art_doesnt_swallow_the_art_after_it ... ok
+test import::tests_native::an_eps_saved_as_its_artboard_keeps_the_art_outside_it ... ok
+test import::tests_native::custom_colours_open_paths_and_planar_group_marks_are_read ... ok
+test import::tests_native::files_from_before_zstandard_give_their_layers_too ... ok
+test import::tests_native::a_shown_text_object_on_the_page_that_the_page_doesnt_draw_is_left_out ... ok
+test import::tests_native::area_type_and_type_on_a_path_come_from_the_text_document ... ok
+test import::tests_native::an_object_the_page_doesnt_draw_makes_the_file_come_in_as_its_page ... ok
+test import::tests_native::pieces_of_two_lines_the_page_draws_alternately_go_each_to_its_own_text ... ok
+test import::tests_native::more_text_objects_than_are_matched_leave_the_page ... ok
+test import::tests_native::text_and_its_strokes_come_from_the_page_into_the_layer_of_its_text_object ... ok
+test import::tests_native::layers_come_in_with_their_names_colours_and_hidden_state ... ok
+test import::tests_native::shown_type_the_page_draws_in_pieces_comes_whole_from_the_text_document ... ok
+test import::tests_native::threaded_area_type_flows_through_its_frames ... ok
+test import::tests_native::sublayers_groups_compounds_clip_groups_and_hidden_objects_come_in ... ok
+test print::tests::separations_screens_flatness_negatives_and_tiles ... ok
+test print::tests::pages_follow_dsc_and_repeat_for_copies ... ok
+test tests::a_tiff_preview_sits_behind_the_binary_header ... ok
+test tests::clipping_groups_clip_and_hidden_or_template_art_is_left_out ... ok
+test import::tests_native::art_the_layers_print_outside_an_eps_page_of_its_art_makes_it_come_in_as_its_page ... ok
+test import::tests_native::type_asked_for_as_outlines_leaves_a_file_whose_type_shows_as_its_pdf_part ... ok
+test import::tests_native::shown_type_keeps_the_pages_and_type_off_the_page_comes_from_the_text_document ... ok
+test tests::level_preview_and_overprint_ids_read_back ... ok
+test import::tests_native::type_of_the_page_that_no_story_places_stays_with_the_nearest_text_object ... ok
+test tests::images_are_flate_with_masked_pixels_at_level_3_and_run_length_at_level_2 ... ok
+test import::tests_native::type_with_a_frame_it_cant_read_is_left_out_with_a_note ... ok
+test import::tests_native::type_on_a_hidden_layer_comes_from_the_text_document ... ok
+test import::tests_native::what_the_layers_cant_say_keeps_the_page_when_it_shows_and_not_when_it_doesnt ... ok
+test tests::gradients_are_smooth_shadings_at_level_3_and_stepped_fills_at_level_2 ... ok
+test tests::spot_colours_are_separations_and_overprints_are_kept_or_dropped ... ok
+test tests::run_length_and_ascii85_round_trip ... ok
+test tests::rgb_is_written_as_cmyk_when_asked_and_in_cmyk_documents ... ok
+test import::tests_generators::cairo_files_read_as_vectors ... ok
+test tests::strokes_keep_their_caps_joins_and_dashes ... ok
+test tests::the_bounding_box_is_y_up_from_the_origin ... ok
+test tests::the_header_follows_dsc_and_the_file_ends_with_eof ... ok
+test tests::transparency_is_written_opaque_with_a_warning ... ok
+test tests::the_native_document_and_thumbnail_come_back ... ok
+test tests::a_rich_document_is_well_formed_at_both_levels ... ok
+test import::tests::a_damaged_palette_preview_is_refused_without_panicking ... ok
+test import::tests::clips_nest_only_so_deep ... ok
+test import::tests::garbage_and_runaway_programs_are_refused ... ok
+test import::tests::hostile_executable_files_and_type_loops_are_refused ... ok
+
+test result: ok. 145 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.02s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_format-16c9378cdda1a7b0)
+
+running 10 tests
+test tests::base64 ... ok
+test legacy::tests::anchors_are_written_the_v1_way ... ok
+test tests::files_from_before_the_rename_still_open ... ok
+test tests::rejects_foreign_and_future ... ok
+test tests::roundtrip ... ok
+test tests::file_info_tells_old_files ... ok
+test atomic::tests::the_original_file_survives_a_failed_write ... ok
+test atomic::tests::write_new_leaves_links_alone ... ok
+test atomic::tests::write_new_never_replaces_what_is_there ... ok
+test atomic::tests::write_new_copies_where_hard_links_fail ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/links.rs (target/debug/deps/links-ea7e4fcc236a8bd0)
+
+running 1 test
+test link_details_round_trip_and_linked_only_images_save_their_preview ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/native_v3.rs (target/debug/deps/native_v3-d7ad352d244b3d09)
+
+running 11 tests
+test version_1_files_load ... ok
+test artboard_guides_round_trip_and_canvas_guides_save_as_before ... ok
+test unused_images_are_pruned ... ok
+test preview_is_embedded_and_read_back ... ok
+test pretty_files_are_indented_like_serde_json ... ok
+test compressed_files_load ... ok
+test text_composer_round_trips ... ok
+test area_type_vertical_alignment_round_trips ... ok
+test inline_graphics_in_text_round_trip ... ok
+test keys_from_newer_versions_round_trip ... ok
+test saves_down_to_older_versions ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/native_v4.rs (target/debug/deps/native_v4-e87e13f9d705e016)
+
+running 3 tests
+test damaged_offsets_are_refused_not_a_crash ... ok
+test small_files_stay_plain_json_and_older_versions_inline ... ok
+test large_data_goes_after_the_json_and_reads_back ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/prop_format.rs (target/debug/deps/prop_format-a93fdaaea177e08c)
+
+running 17 tests
+test load_garbage_never_panics ... ok
+test base64_decode_never_panics ... ok
+test sniff_distinguishes_formats ... ok
+test rejects_newer_versions_and_other_formats ... ok
+test unknown_fields_are_preserved ... ok
+test base64_roundtrip ... ok
+test approx_equal_documents_compare_equal ... ok
+test rich_document_roundtrips ... ok
+test load_repairs_next_id ... ok
+test saved_selections_from_a_file_are_tidied ... ok
+test bug_f64_bit_exact_roundtrip ... ok
+test load_mutated_file_never_panics ... ok
+test load_mutated_file_with_profiles_never_panics ... ok
+test load_mutated_compressed_file_never_panics ... ok
+test images_roundtrip ... ok
+test random_documents_roundtrip ... ok
+test compressed_and_older_saves_roundtrip ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.63s
+
+     Running tests/save_options.rs (target/debug/deps/save_options-4ceadd0ffb13b3dd)
+
+running 2 tests
+test include_linked_files_keeps_the_files_bytes ... ok
+test embedded_profiles_and_pdf_round_trip ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_geom-d66d62e582c96a5a)
+
+running 58 tests
+test arc::tests::points_and_nearest_distances_along_a_path ... ok
+test bez::tests::subpaths_and_tangents ... ok
+test corners::tests::a_star_has_ten_corners_cut_as_circles ... ok
+test corners::tests::ends_curves_smooth_and_straight_anchors_are_no_corners ... ok
+test corners::tests::kinds_share_their_ends ... ok
+test corners::tests::radii_stop_at_half_the_shorter_side_per_corner ... ok
+test hit::tests::evenodd_hole ... ok
+test hit::tests::fill_and_stroke ... ok
+test hit::tests::marquee ... ok
+test path::tests::anchors_serialize_compactly_and_read_v1_maps ... ok
+test path::tests::bezpath_roundtrip_curves ... ok
+test hit::regress_tests::nearest_on_degenerate_cubic ... ok
+test path::tests::bezpath_roundtrip_polyline ... ok
+test path::tests::insert_anchor_on_curve_keeps_shape ... ok
+test path::tests::insert_anchor_on_line_keeps_shape ... ok
+test path::tests::nearest_on_edge ... ok
+test path::tests::reverse_flips_area_sign ... ok
+test path::tests::transform_moves_bounds ... ok
+test projective::tests::compose_invert_and_round_trip ... ok
+test path::tests::length_of_square ... ok
+test path::tests::smooth_detection ... ok
+test projective::tests::affine_at_is_the_derivative ... ok
+test recognize::tests::non_finite_and_overflowing_strokes_are_not_shapes ... ok
+test path::tests::square_bounds_and_area ... ok
+test projective::tests::affine_and_conjugation ... ok
+test projective::tests::rect_bbox_is_the_corners_box ... ok
+test recognize::tests::hexagon_rotation_never_depends_on_rounding_between_equivalent_angles ... ok
+test recognize::tests::recognized_lines_keep_their_free_angle ... ok
+test path::tests::serde_roundtrip ... ok
+test recognize::tests::scribble_and_noise ... ok
+test recognize::tests::rough_rectangle_and_square ... ok
+test recognize::tests::ellipse_circle_triangle_hexagon_line ... ok
+test shapes::tests::a_pie_is_its_arc_closed_through_the_centre ... ok
+test shapes::tests::arc_open_and_closed ... ok
+test shapes::tests::corners_of_a_non_square_rectangle_are_alike ... ok
+test shapes::tests::each_corner_takes_its_own_radius_and_kind ... ok
+test shapes::tests::ellipse_bounds_and_area ... ok
+test recognize::tests::square_fit_ignores_sampling_density_and_document_offset ... ok
+test shapes::tests::grids ... ok
+test shapes::tests::polygon_first_vertex_up ... ok
+test shapes::tests::rect_is_4_corners_clockwise ... ok
+test shapes::tests::rect_normalizes_negative ... ok
+test shapes::tests::rounded_rect_clamps ... ok
+test shapes::tests::spiral_has_segments ... ok
+test shapes::tests::star_alternates_radii ... ok
+test shapes::tests::straight_star_five_points ... ok
+test shapes::tests::uniform_corners_keep_the_rounded_rectangle_layout ... ok
+test snap::tests::closest_target ... ok
+test snap::tests::grid ... ok
+test tests::angle_normalization ... ok
+test tests::constrain_45 ... ok
+test tests::constrain_from_a_base_angle ... ok
+test tests::reference_points ... ok
+test tests::union_options ... ok
+test recognize::tests::tilted_rectangles_ellipses_and_hexagons_snap_to_their_angle_steps ... ok
+test recognize::tests::rough_squares_are_rectangles_from_any_starting_point ... ok
+test recognize::tests::circles_and_real_polygons_keep_their_identity_across_stroke_seams ... ok
+test recognize::tests::rough_triangles_snap_upright_or_upside_down ... ok
+
+test result: ok. 58 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/prop_geom.rs (target/debug/deps/prop_geom-c650c394f1249940)
+
+running 19 tests
+test empty_and_degenerate_paths ... ok
+test from_bezpath_merges_duplicate_closing_point ... ok
+test convex_polygon_hit ... ok
+test lengths ... ok
+test cut_at_keeps_the_segments ... ok
+test bounds_transform_covariant ... ok
+test fill_contains_matches_winding ... ok
+test stroke_excludes_far_points ... ok
+test polygon_and_star_shapes ... ok
+test polygon_area_agrees ... ok
+test rect_and_ellipse_shapes ... ok
+test pathdata_bezpath_roundtrip ... ok
+test nearest_is_nearest ... ok
+test fill_rules_and_reverse ... ok
+test bounds_contain_samples ... ok
+test pathdata_serde_roundtrip ... ok
+test stroke_contains_outline ... ok
+test insert_anchor_preserves_shape ... ok
+test kurbo_shapes_roundtrip ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_mcp-1d27e0671ad9768e)
+
+running 66 tests
+test logging::tests::every_spec_level_is_understood ... ok
+test logging::tests::records_appear_as_messages_only_when_asked_for ... ok
+test logging::tests::levels_round_trip_and_reject_nonsense ... ok
+test prompts::tests::prompt_arguments_are_filled_in ... ok
+test prompts::tests::flow_keeps_paragraphs_and_list_items ... ok
+test prompts::tests::unknown_prompt_and_missing_argument_are_errors ... ok
+test prompts::tests::every_prompt_lists_and_renders ... ok
+test resources::tests::lists_are_well_formed ... ok
+test resources::tests::templates_are_addressable ... ok
+test resources::tests::variables_are_split_out_and_decoded ... ok
+test prompts::tests::unknown_completion_targets_are_empty_not_errors ... ok
+test resources::tests::missing_and_unknown_uris_are_errors ... ok
+test resources::tests::an_object_is_readable_once_it_exists ... ok
+test prompts::tests::completions_rank_prefix_first_and_cap_at_100 ... ok
+test tests::initialize_negotiates_version ... ok
+test tests::remote_connect_fails_fast ... ok
+test tests::framing_basics ... ok
+test tests::save_file_describes_the_formats_it_writes ... ok
+test tests::serve_loop_writes_one_line_per_request ... ok
+test tests::tool_schemas_are_valid ... ok
+test tests::inspect_document_reports_the_paint_of_type ... ok
+test tests::drawing_gestures_snap_to_smart_guides ... ok
+test tests::selection_preferences_apply_to_pointer_gestures ... ok
+test tests::shift_marquee_gesture_toggles_the_selection ... ok
+test tests_conventions::batch_steps_refer_to_earlier_results ... ok
+test tests_distortkeys::cmd_a_while_the_type_tool_edits_selects_the_text ... ok
+test tests_conventions::conventions_tool_panics_are_tool_errors ... ok
+test tests::oversized_screenshot_and_png_export_are_errors ... ok
+test tests_distortkeys::delete_and_backspace_reach_the_width_tool ... ok
+test tests::headless_backend_methods ... ok
+test tests::type_preferences_apply_to_agents ... ok
+test tests_fileio::export_tool_lists_engine_formats_and_options ... ok
+test tests::errors_are_tool_results_not_crashes ... ok
+test tests_fileio::export_is_the_same_call_in_the_app_and_headless ... ok
+test tests_fileio::document_color_mode_puts_rgb_greys_on_the_black_plate ... ok
+test tests_freeform::freeform_points_and_lines_on_the_canvas ... ok
+test tests_conventions::conventions_commands_batch_and_bounded_preview ... ok
+test tests_gradient::gradient_annotator_end_to_end ... ok
+test tests_fileio::headless_opens_pdf_ai_and_templates ... ok
+test tests_fileio::exporting_native_keeps_the_document_path ... ok
+test tests::text_effect_pathfinder_transform_graph_and_wrap_tools ... ok
+test tests_liquify::tool_options_are_set_headless_and_kept_across_tool_switches ... ok
+test tests_liquify::holding_still_through_mcp_and_skips_are_reported ... ok
+test tests_pen::a_drag_from_the_first_anchor_closes_the_path ... ok
+test tests_pen::cmd_with_the_pen_edits_the_path_being_drawn ... ok
+test tests_place::headless_place_cursor_places_on_clicks_and_esc_ends_it ... ok
+test tests_persp::perspective_selection_takes_5_and_the_arrows_over_mcp ... ok
+test tests_liquify::pointer_gestures_carry_pen_pressure ... ok
+test tests_protocol::initialize_advertises_what_the_server_actually_answers ... ok
+test tests_protocol::log_records_go_out_as_notifications_once_asked_for ... ok
+test tests_protocol::prompt_argument_errors_are_invalid_params ... ok
+test tests_exportas::export_with_a_range_writes_one_file_per_artboard ... ok
+test tests_protocol::logging_levels_are_validated_and_off_by_default ... ok
+test tests_protocol::prompts_are_listed_and_rendered_over_the_protocol ... ok
+test tests_distortkeys::delete_and_backspace_reach_the_puppet_warp_tool ... ok
+test tests_protocol::completions_come_from_the_live_catalogues ... ok
+test tests_place::headless_run_command_file_place ... ok
+test tests_conventions::conventions_catalog_and_strict_keys ... ok
+test tests_svg::export_tool_takes_svg_options ... ok
+test tests_protocol::templates_are_listed_and_readable ... ok
+test tests::headless_path_gesture_undo ... ok
+test tests_links::headless_links_report_missing_files_and_relink ... ok
+test tests::show_font_names_in_english_does_not_change_font_list_for_agents ... ok
+test tests_conventions::conventions_resources_and_versioned_results ... ok
+test tests::headless_end_to_end ... ok
+test tests::remote_forwards_methods ... ok
+
+test result: ok. 66 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests/automation_roots.rs (target/debug/deps/automation_roots-9ef32caa8c8d0e4c)
+
+running 4 tests
+test files_open_only_from_inside_the_read_root ... ok
+test links_out_of_a_root_are_refused ... ok
+test a_root_left_out_grants_none_of_its_access ... ok
+test saves_exports_and_captures_go_only_into_the_write_root ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running tests/protocol_props.rs (target/debug/deps/protocol_props-c1102473e3ac8d95)
+
+running 13 tests
+test tools_never_leave_interactions_open ... ok
+test framing_never_panics_on_malformed_messages ... ok
+test tool_definitions_are_valid ... ok
+test advertised_capabilities_all_answer ... ok
+test resources_are_json ... ok
+test undo_redo_tools_restore_documents ... ok
+test resource_templates_are_addressable ... ok
+test completions_are_well_formed_and_survive_junk ... ok
+test prompts_are_valid_and_render_with_junk_arguments ... ok
+test the_new_methods_survive_junk_and_keep_the_document_valid ... ok
+test run_command_sequences_match_local_session ... ok
+test a_confined_server_writes_only_inside_its_root ... ok
+test every_tool_survives_empty_and_junk_arguments ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.77s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_metafile-e91e6bd3d0f78bb2)
+
+running 24 tests
+test dib::tests::bgra32_round_trips_with_alpha ... ok
+test dib::tests::bgra32_is_premultiplied ... ok
+test dib::tests::palette_bitmaps_and_damage ... ok
+test dib::tests::rgb24_is_bottom_up_bgr_over_white ... ok
+test dib::tests::rgb24_round_trips_over_white ... ok
+test tests::emf_header_frame_is_the_region_in_hundredths_of_a_millimetre ... ok
+test tests::emf_dashes_are_pen_styles ... ok
+test tests::emf_paths_keep_their_curves_brushes_and_pens ... ok
+test tests::hidden_and_offboard_art_is_left_out ... ok
+test tests::emf_record_sizes_add_up_to_the_header_totals ... ok
+test tests::wmf_placeable_header_checksum_and_record_sizes ... ok
+test tests::wmf_sizes_fit_sixteen_bits ... ok
+test tests::emf_clips_gradients_and_images ... ok
+test tests_import::emf_mapping_modes_and_world_transforms ... ok
+test tests::wmf_reports_what_it_leaves_out ... ok
+test tests_import::dashes_gradients_and_images_round_trip_through_emf ... ok
+test tests_import::hand_built_wmf_plays_like_gdi ... ok
+test tests_import::wmf_output_round_trips ... ok
+test tests_import::emf_output_round_trips ... ok
+test tests::type_is_written_as_outlines ... ok
+test tests_import::damaged_files_fail_or_import_partly ... ok
+test dib::tests::large_images_are_scaled_to_fit ... ok
+test tests_import::hand_built_emf_plays_like_gdi ... ok
+test tests_import::clips_nest_only_so_deep ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_pathops-463ec23f6b2aa2fb)
+
+running 25 tests
+test fit::tests::fits_a_cubic_exactly ... ok
+test fit::tests::splits_when_needed ... ok
+test fit::tests::straight_detection ... ok
+test offset::tests::stroke_region_unites_outlines_whatever_their_winding ... ok
+test planar::tests::a_closed_loop_of_lines_inside_a_shape_is_a_hole_and_a_face ... ok
+test planar::tests::a_line_across_a_shape_splits_it ... ok
+test planar::tests::a_line_ending_on_an_edge_splits_the_shape ... ok
+test planar::tests::a_grid_of_lines_makes_its_cells ... ok
+test planar::tests::an_area_enclosed_by_shapes_is_an_unfilled_face ... ok
+test planar::tests::crossing_lines_enclose_a_face ... ok
+test planar::tests::cut_out_splits_open_paths_and_keeps_closing_edges_invisible ... ok
+test planar::tests::nothing_or_garbage_gives_an_empty_map ... ok
+test planar::tests::overlapping_shapes_keep_their_coverage ... ok
+test planar::tests::shape_builder_closed_only_or_degenerate_is_the_filled_arrangement ... ok
+test planar::tests::shape_builder_edges_are_the_outlines_cut_where_paths_meet ... ok
+test planar::tests::shape_builder_lines_cut_regions ... ok
+test planar::tests::curves_and_a_circle_crossed_by_a_line ... ok
+test planar::tests::free_lines_make_disjoint_faces ... ok
+test planar::tests::pieces_cut_out_of_their_inputs ... ok
+test planar::tests::faces_are_disjoint_and_know_what_covers_them ... ok
+test planar::tests::filled_faces_are_the_pathfinder_regions ... ok
+test planar::tests::many_lines_stay_quick ... ok
+test pathfinder::tests::crossing_strips_match_one_mask_at_a_time ... ok
+test planar::tests::shape_builder_stays_quick_up_to_its_cap ... ok
+test pathfinder::tests::batched_regions_match_one_mask_at_a_time ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running tests/ops.rs (target/debug/deps/ops-bd1bff1d360eee91)
+
+running 44 tests
+test average_axes ... ok
+test difference_of_rects ... ok
+test disjoint_union_keeps_both ... ok
+test circle_intersect_rect_keeps_curve ... ok
+test add_anchor_points_doubles ... ok
+test grid_split ... ok
+test fill_rules_differ_for_nested_same_direction ... ok
+test intersect_of_rects ... ok
+test a_minus_a_is_empty ... ok
+test join_single_path_closes ... ok
+test circle_union_is_curve_preserving_and_compact ... ok
+test join_two_open_paths ... ok
+test hole_from_difference ... ok
+test non_finite_input_errors ... ok
+test open_paths_are_closed_for_fill ... ok
+test outline_stroke_of_line ... ok
+test offset_circle_grows ... ok
+test pf_crop ... ok
+test normalize_figure_eight ... ok
+test offset_circle_insets ... ok
+test pf_intersect_and_exclude_three ... ok
+test outline_stroke_of_square_is_ring ... ok
+test outline_stroke_self_overlap_is_cleaned ... ok
+test pf_minus_front_and_back ... ok
+test pf_divide_faces ... ok
+test pf_outline_dedups_shared_edges ... ok
+test pf_outline_edges ... ok
+test remove_anchor_at_an_end_drops_its_segment_and_rejects_bad_input ... ok
+test pf_unite_takes_front_key ... ok
+test pf_merge_same_key ... ok
+test remove_anchor_between_straight_sides_draws_a_straight_one ... ok
+test pf_trim_removes_hidden ... ok
+test timing_unite_1000_circles ... ignored
+test smooth_rounds_corners ... ok
+test simplify_keeps_square_corners ... ok
+test offset_rect_joins ... ok
+test regions_and_region_at ... ok
+test remove_redundant_collinear_and_curve ... ok
+test union_idempotent_rect ... ok
+test remove_anchor_refits_the_curve_round_it ... ok
+test xor_of_rects ... ok
+test union_of_rects ... ok
+test simplify_dense_circle ... ok
+test simplify_straight_lines_option ... ok
+
+test result: ok. 43 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/prop_pathops.rs (target/debug/deps/prop_pathops-b84242cb46653a46)
+
+running 17 tests
+test non_finite_input_is_an_error ... ok
+test empty_inputs ... ok
+test bug_simplify_adds_anchors ... ok
+test offset_large_delta_keeps_area ... ok
+test polygon_area_matches_shoelace ... ok
+test add_anchor_points_preserves ... ok
+test split_into_grid_areas ... ok
+test offset_zero_identity ... ok
+test simplify_straight_lines ... ok
+test offset_convex_steiner ... ok
+test self_ops ... ok
+test area_identities ... ok
+test simplify_error_within_tolerance ... ok
+test outline_stroke_ring_area ... ok
+test divide_partitions_union ... ok
+test offset_monotone ... ok
+test boolean_membership ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s
+
+     Running tests/props.rs (target/debug/deps/props-5d08f72385e0d49b)
+
+running 9 tests
+test outline_stroke_line_area ... ok
+test self_difference_empty ... ok
+test unite_idempotent ... ok
+test grid_rects_with_shared_edges ... ok
+test inclusion_exclusion ... ok
+test offset_circle_area ... ok
+test difference_and_xor_consistent ... ok
+test divide_sums_to_union ... ok
+test simplify_within_tolerance ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running tests/regressions.rs (target/debug/deps/regressions-3f296ab0dcafeada)
+
+running 3 tests
+test self_crossing_quad_fills_both_loops ... ok
+test almost_horizontal_edge_meeting_an_arc_end ... ok
+test rect_edge_through_circle_cap ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_pdf-b33aee009045d31c)
+
+running 217 tests
+test lab_spot::tests::names_are_written_like_the_pdf_writer_writes_them ... ok
+test tests::creation_date_written ... ok
+test tests::artboard_range_and_bad_index ... ok
+test tests::import_clip_from_handmade_pdf ... ok
+test tests::clip_group_roundtrip ... ok
+test tests::export_is_valid_pdf ... ok
+test tests::compress_option_changes_output ... ok
+test tests::hidden_objects_and_template_layers_skipped ... ok
+test tests::import_keeps_art_outside_the_page ... ok
+test tests::import_rejects_garbage ... ok
+test tests::import_invalid_dash_array_strokes_solid ... ok
+test tests::opacity_mask_exports_as_luminosity_soft_mask ... ok
+test tests::objects_outside_artboard_are_culled ... ok
+test tests::metadata_creator_and_title ... ok
+test tests::one_page_per_artboard_with_sizes ... ok
+test tests::gradients_exported_as_shadings_and_reimported ... ok
+test tests::import_max_pages_and_multi_page ... ok
+test tests::opacity_and_blend_modes ... ok
+test tests::roundtrip_stroke_params_merge_fill_and_stroke ... ok
+test tests::image_roundtrip ... ok
+test tests_blend::a_knockout_group_with_blending_elements_is_non_isolated_unless_isolated ... ok
+test tests::roundtrip_open_path_and_even_odd ... ok
+test tests::roundtrip_colours_preserved ... ok
+test tests::stroke_alignment_and_arrowheads_export ... ok
+test tests::roundtrip_rect_and_ellipse_bounds ... ok
+test tests_blend::groups_without_blending_inside_stay_isolated_groups ... ok
+test tests_blend::a_group_is_written_non_isolated_unless_it_isolates_blending ... ok
+test tests::text_exported_as_outlines ... ok
+test tests_charstroke::character_and_object_strokes_on_type_keep_join_and_dashes ... ok
+test tests_blend::every_blend_mode_is_written_under_its_pdf_name_and_read_back ... ok
+test tests_dashalign::fitted_dashes_are_written_as_fills_and_exact_ones_as_a_dash_array ... ok
+test tests_dashalign::fitted_dashes_on_a_rectangle_look_as_on_the_canvas ... ok
+test tests_editing::changed_pages_are_noticed ... ok
+test tests_editing::pdf_a_carries_no_editing_data ... ok
+test tests_editing::the_legacy_name_is_read_and_plain_pdfs_have_no_editing_data ... ok
+test tests::import_handmade_pdf ... ok
+test tests_cmykimages::cmyk_images_with_odd_samples_open_in_rgb_with_a_warning ... ok
+test tests_cmykblend::soft_mask_groups_keep_screen_luminance ... ok
+test tests_cmykblend::rgb_documents_and_opaque_cmyk_pages_are_unchanged ... ok
+test tests_editing::the_native_document_comes_back_intact ... ok
+test tests_encrypt::permission_bits_follow_the_options ... ok
+test tests_cmykblend::groups_of_cmyk_documents_blend_in_device_cmyk ... ok
+test tests_encrypt::standards_and_bad_passwords_are_refused ... ok
+test tests_cmykimages::masked_cmyk_images_keep_their_inks_and_carry_the_mask_as_an_opacity_mask ... ok
+test tests_encrypt::the_permissions_password_opens_files_of_other_writers ... ok
+test tests_cmykimages::other_cmyk_images_keep_their_ink_amounts ... ok
+test tests_encrypt::damaged_files_never_panic_when_reading_the_owner_password ... ok
+test tests_encrypt::without_a_password_nothing_changes ... ok
+test tests_focal::a_centred_radial_imports_without_a_focal_point ... ok
+test tests_fx::raster_effects_warn_on_fills_strokes_and_objects ... ok
+test tests_encrypt::strings_and_streams_are_encrypted ... ok
+test tests_import_color::colour_spaces_are_read_from_the_interpreters_debug_form ... ok
+test tests_import_color::device_n_inks_become_spot_swatches_and_process_plates_cmyk ... ok
+test tests_import_color::gray_imports_as_gray_and_rgb_documents_stay_rgb ... ok
+test tests_import_color::ink_names_never_clash_with_the_document_swatches ... ok
+test tests_import_color::inks_that_cannot_be_told_apart_import_as_rgb ... ok
+test tests_import_color::a_cmyk_document_with_spot_colours_round_trips ... ok
+test tests_import_fidelity::a_coons_patch_mesh_becomes_a_gradient_mesh ... ok
+test tests_import_fidelity::a_luminosity_soft_mask_becomes_an_opacity_mask ... ok
+test tests_import_color::shading_stops_keep_cmyk_and_spot_tints ... ok
+test tests_import_fidelity::a_stroke_under_a_stretched_transform_stays_a_stroke ... ok
+test tests_import_fidelity::a_shading_that_does_not_extend_paints_only_between_its_ends ... ok
+test tests_import_fidelity::an_object_written_as_a_fill_and_a_closed_stroke_stays_one_path_with_a_live_stroke ... ok
+test tests_import_fidelity::an_alpha_soft_mask_becomes_an_opacity_mask_of_its_shape ... ok
+test tests_encrypt::plaintext_metadata_stays_readable ... ok
+test tests_import_fidelity::appearance_items_are_untouched_for_plain_art ... ok
+test tests_import_fidelity::art_past_the_page_clip_keeps_the_clip ... ok
+test tests_import_fidelity::different_outlines_filled_and_stroked_stay_apart ... ok
+test tests_import_fidelity::gradient_stop_opacity_round_trips ... ok
+test tests_import_fidelity::isolate_and_knockout_flags_of_a_group_are_kept ... ok
+test tests_import_fidelity::isolated_and_non_isolated_groups_round_trip ... ok
+test tests_import_fidelity::opacity_masks_round_trip_through_pdf ... ok
+test tests_focal::a_focal_point_round_trips_as_a_two_point_radial_shading ... ok
+test tests_import_fidelity::tiling_patterns_become_pattern_swatches ... ok
+test tests_import_layers::a_form_hidden_by_its_own_group_stays_hidden ... ok
+test tests_import_layers::a_page_fill_that_is_art_stays ... ok
+test tests_import_layers::a_sublayer_that_paints_first_brings_its_parent_layer ... ok
+test tests_import_layers::a_view_state_that_is_off_hides_the_layer_with_its_art ... ok
+test tests_import_layers::an_ai_file_notes_that_its_art_off_the_artboards_is_not_read ... ok
+test tests_import_layers::an_ai_files_private_data_is_its_streams_joined ... ok
+test tests_import_layers::an_ai_files_white_page_outside_its_layers_is_not_art ... ok
+test tests_import_layers::an_encrypted_file_keeps_its_hidden_layers ... ok
+test tests_import_layers::art_past_the_page_is_clipped_in_a_pdf_but_not_in_an_ai_file ... ok
+test tests_import_layers::art_past_the_scan_limit_never_shows_a_hidden_layer ... ok
+test tests_import_layers::art_past_the_scan_limit_of_shown_layers_stays_shown ... ok
+test tests_import_layers::base_state_on_lists_and_locks_are_read ... ok
+test tests_import_layers::groups_marked_inside_forms_and_clips_reach_their_layers ... ok
+test tests_import_layers::hostile_layer_orders_stay_bounded ... ok
+test tests_encrypt::a_permissions_password_alone_opens_without_a_password_and_restricts ... ok
+test tests_import_layers::nested_groups_become_sublayers_and_hidden_ones_keep_their_art ... ok
+test tests_import_layers::optional_content_groups_become_layers_and_off_art_a_hidden_layer ... ok
+test tests_import_layers::pages_share_the_layers_of_their_groups ... ok
+test tests_import_layers::without_layers_each_page_is_one_layer_of_what_shows ... ok
+test tests_import_lines::a_clip_ending_in_a_later_group_stays_with_its_art ... ok
+test tests_import_fidelity::font_names_resolve_to_available_families ... ok
+test tests_import_lines::layers_stack_as_the_pages_mark_them_when_one_first_paints_on_a_later_page ... ok
+test tests_import_fidelity::glyphs_turned_along_a_curve_become_type_on_a_path ... ok
+test tests_import_lines::a_stroke_written_as_stroked_glyph_outlines_is_the_types_stroke ... ok
+test tests_import_fidelity::text_becomes_point_type ... ok
+test tests_import_lines::type_ending_a_layers_marked_content_stays_in_its_layer ... ok
+test tests_import_options::a_page_without_area_gets_the_size_viewers_give_it ... ok
+test tests_import_lines::spaces_read_from_wide_gaps_keep_the_glyphs_after_them_in_place ... ok
+test tests_import_options::a_rotated_page_rotates_its_boxes ... ok
+test tests_import_lines::lines_that_were_not_wrapped_stay_point_type ... ok
+test tests_import_options::an_encrypted_pdf_opens_with_its_password_only ... ok
+test tests_import_options::art_of_neighbouring_artboards_off_a_page_is_left_to_its_own_page ... ok
+test tests_import_options::bounding_boxes_of_several_pages_do_not_overlap ... ok
+test tests_import_options::each_crop_box_sizes_the_artboard_and_places_the_art_in_it ... ok
+test tests_import_options::info_lists_pages_with_their_size_rotation_and_boxes ... ok
+test tests_import_options::missing_boxes_fall_back_to_the_crop_box_and_boxes_are_clipped_to_the_media_box ... ok
+test tests_import_options::pages_pick_which_pages_import_and_in_what_order ... ok
+test tests_import_options::postscript_is_refused_as_such ... ok
+test tests_layers::create_layers_writes_a_group_per_layer_with_its_states ... ok
+test tests_layers::layered_art_imports_as_it_was_drawn ... ok
+test tests_layers::identical_layers_stay_apart ... ok
+test tests_import_lines::lines_wrapped_in_a_frame_come_back_as_area_type ... ok
+test tests_layers::overprint_preserve_writes_an_overprinting_graphics_state ... ok
+test tests_layers::overprinting_art_imports_as_it_was_drawn ... ok
+test tests_encrypt::unicode_passwords_open_aes256_files ... ok
+test tests_import_layers::thousands_of_layers_hidden_ones_included_all_come_in ... ok
+test tests_layers::sublayers_are_nested_pdf_layers_and_import_back ... ok
+test tests_layers::white_overprint_is_discarded_as_the_document_setup_says ... ok
+test tests_layers::without_pdf_layers_the_layers_are_plain_page_content ... ok
+test tests_live_text::a_glyph_whose_unicode_names_another_letter_stays_outlined ... ok
+test tests_live_text::a_single_upright_glyph_comes_in_as_vertical_type_and_takes_no_horizontal_glyphs ... ok
+test tests_layers::pdf_layers_import_back_as_layers ... ok
+test tests_live_text::cid_tables_ignore_fonts_that_are_not_cid_keyed_cff ... ok
+test tests_live_text::a_tagged_span_inside_a_line_leaves_the_line_whole ... ok
+test tests_live_text::kangxi_radicals_from_cid_tables_become_ideographs ... ok
+test tests_live_text::letter_spaced_vertical_type_keeps_its_characters_together ... ok
+test tests_encrypt::editing_data_comes_back_with_the_password ... ok
+test tests_live_text::letter_spacing_in_the_pdf_becomes_tracking ... ok
+test tests_live_text::hebrew_comes_back_in_logical_order ... ok
+test tests_live_text::lines_of_text_in_installed_fonts_come_in_as_point_type ... ok
+test tests_live_text::rotated_lines_keep_their_angle_and_outline_text_option_outlines_everything ... ok
+test tests_marks::art_in_the_bleed_is_kept_and_clipped_to_the_bleed_box ... ok
+test tests_marks::bleed_grows_the_media_box_around_the_trim_box ... ok
+test tests_live_text::text_in_a_missing_font_stays_live_type ... ok
+test tests_marks::marks_are_drawn_in_registration_on_every_plate_inside_the_media_box ... ok
+test tests_marks::non_printing_layers_are_left_out_unless_asked_for ... ok
+test tests_output::an_unknown_destination_is_refused ... ok
+test tests_output::converting_to_a_cmyk_destination_writes_k_instead_of_rg ... ok
+test tests_output::converting_to_rgb_turns_cmyk_into_rg ... ok
+test tests_marks::page_information_names_the_file_artboard_and_date ... ok
+test tests_live_text::outlined_text_in_a_missing_font_keeps_the_embedded_glyphs ... ok
+test tests_compression::codecs_the_writer_lacks_are_zip_with_a_warning ... ok
+test tests_output::preserve_numbers_keeps_cmyk_values_that_destination_converts ... ok
+test tests_output::printers_marks_keep_their_inks ... ok
+test tests_encrypt::every_level_opens_only_with_a_password ... ok
+test tests_output::tagged_cmyk_documents_blend_in_the_cmyk_profile_space ... ok
+test tests_cmykimages::the_output_settings_convert_cmyk_images_and_compression_recompresses_them_in_cmyk ... ok
+test tests_pdf13::pdf_1_3_files_are_encrypted_with_40_bit_rc4 ... ok
+test tests_pdf13::pdf_1_3_files_say_so_and_have_no_transparency ... ok
+test tests_pdf13::which_standards_allow_pdf_1_3 ... ok
+test tests_output::profiles_tag_colours_with_icc_based_spaces ... ok
+test tests::compatibility_levels ... ok
+test tests_compression::images_above_the_threshold_are_resampled_to_the_target_resolution ... ok
+test tests_layers::pdf_a_layers_have_no_automatic_states ... ok
+test tests_pdfx::verify_finds_what_each_standard_forbids ... ok
+test tests_pdfx::pdfx_settings_rules ... ok
+test tests_presets::built_in_presets ... ok
+test tests_print::artboard_range_skip_blank_and_ignore ... ok
+test tests_print::copies_collate_and_reverse ... ok
+test tests_print::cmyk_and_a_spot_separate_into_five_plates ... ok
+test tests_print::defaults_and_json ... ok
+test tests_print::fit_to_letter_scales_the_artboard_into_the_paper ... ok
+test tests_print::placement_and_custom_scale ... ok
+test tests_print::print_layers_and_template_layers ... ok
+test tests_print::tiles_cover_the_artboard_with_overlap ... ok
+test tests_print::trim_marks_surround_the_artboard_on_the_paper ... ok
+test tests_layers::pdf_x1a_keeps_overprint ... ok
+test tests_print::golden_page_one ... ok
+test tests_printadvanced::discarded_and_simulated_overprints_write_no_overprint ... ok
+test tests_print::turns_mirror_and_negative ... ok
+test tests_printadvanced::separations_separate_with_a_cmyk_printer_profile ... ok
+test tests_printadvanced::settings_saved_before_the_advanced_options_load_with_their_defaults ... ok
+test tests_realtext::an_embedded_fonts_own_cmap_names_its_glyphs ... ok
+test tests_realtext::a_variable_font_instance_comes_back_in_its_own_style ... ok
+test tests_realtext::glyphs_mapped_to_the_replacement_character_keep_their_outlines ... ok
+test tests_realtext::gradients_on_real_text_stay_where_they_were ... ok
+test tests_printadvanced::a_cmyk_printer_profile_writes_device_cmyk_with_the_intent ... ok
+test tests_output::the_output_intent_embeds_its_profile_and_trapped_is_written ... ok
+test tests_realtext::fonts_whose_licence_forbids_embedding_fall_back_to_outlines ... ok
+test tests_layers::pdf_a_overprint_mode_is_0 ... ok
+test tests_realtext::real_text_lands_within_half_a_point_of_the_outlines ... ok
+test tests_realtext::slanted_type_reopens_as_type_that_still_leans ... ok
+test tests_realtext::type_is_written_as_text_in_embedded_subset_fonts ... ok
+test tests_realtext::subset_thresholds_below_100_percent_are_accepted_with_a_warning ... ok
+test tests_settings::json_is_camel_case_and_partial_objects_keep_defaults ... ok
+test tests_settings::options_not_applied_yet_come_back_as_warnings ... ok
+test tests_settings::passwords_are_never_serialized ... ok
+test tests_realtext::pdf_a_takes_real_text ... ok
+test tests_stroke::line_and_head_share_one_opacity_group ... ok
+test tests_strokeout::a_lens_profile_is_written_as_a_fill ... ok
+test tests_strokeout::an_open_path_with_inside_alignment_strokes_centred ... ok
+test tests_strokeout::brushed_strokes_are_written_as_their_art ... ok
+test tests_realtext::variable_font_instances_are_real_text_in_their_own_glyphs ... ok
+test tests_realtext::type_in_another_installed_version_reopens_in_that_version ... ok
+test tests_strokeout::outside_strokes_keep_their_miter_spikes ... ok
+test tests_textstroke::text_strokes_keep_cap_join_miter_dashes_and_alignment ... ok
+test tests_settings::checks_refuse_what_the_writer_cant_honour ... ok
+test tests_webview::pdf_layers_stay_with_a_linearised_file ... ok
+test tests_webview::thumbnails_are_embedded_on_every_page ... ok
+test tests_webview::with_both_off_the_file_is_unchanged ... ok
+test tests_webview::fast_web_view_writes_a_linearised_file_whose_hints_check ... ok
+test tests_cmykimages::a_cmyk_jpeg_passes_through_open_and_every_pdf_export ... ok
+test tests_stroke::arrowheads_and_the_trimmed_line_match_the_shared_geometry ... ok
+test tests_layers::pdf_x4_keeps_pdf_layers_and_x1a_refuses_them ... ok
+test tests_pdfx::pdfx_1a_and_x3_files_have_no_transparency ... ok
+test tests_output::pdf_a_keeps_its_own_output_intent ... ok
+test tests_webview::encrypted_files_stay_linearised ... ok
+test tests_compression::jpeg_zip_and_automatic_compression ... ok
+test tests_output::pdf_a_tags_cmyk_colours_with_the_cmyk_profile ... ok
+test tests_pdfx::each_standard_writes_its_header_output_intent_boxes_and_identification ... ok
+test tests_pdfx::pdfx_1a_files_have_no_rgb ... ok
+test tests_webview::pdf_x_files_take_thumbnails_and_stay_linearised ... ok
+test tests_output::images_are_converted_too ... ok
+
+test result: ok. 217 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.30s
+
+     Running tests/system_fonts.rs (target/debug/deps/system_fonts-17c4fb22bbc1495b)
+
+running 1 test
+test a_fresh_session_resolves_pdf_fonts_to_installed_families ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_plugins-6c73bff1c75bc2ca)
+
+running 10 tests
+test manifest::tests::resolves_defaults_clamps_and_rejects_wrong_types ... ok
+test manifest::tests::rejects_bad_manifests ... ok
+test manifest::tests::parses_and_keeps_param_order ... ok
+test objects::tests::changed_paints_lose_swatch_links_and_patterns_must_exist ... ok
+test objects::tests::new_objects_take_the_place_of_replaced_inputs_or_go_on_top ... ok
+test objects::tests::geometry_type_and_strokes_change ... ok
+test objects::tests::targets_are_selected_paths_in_paint_order ... ok
+test objects::tests::bad_outputs_are_refused ... ok
+test objects::tests::outputs_update_add_and_delete_in_place ... ok
+test objects::tests::objects_round_trip_through_the_json_model ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/abi.rs (target/debug/deps/abi-01397432c387c30f)
+
+running 10 tests
+test registry_install_list_remove ... ok
+test input_and_params_reach_the_plugin_and_output_comes_back ... ok
+test memory_cap_limits_input_and_growth ... ok
+test malformed_and_oversized_modules_are_refused ... ok
+test example_desaturate_loads_and_reports_its_manifest ... ok
+test folder_loading_skips_bad_files ... ok
+test budgets_stop_runaway_plugins ... ok
+test example_desaturate_moves_every_colour_model_to_grey ... ok
+test wall_clock_budget_stops_runaway_plugins ... ok
+test hostile_modules_fail_quickly ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.96s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_render-183b3d9bb06f684a)
+
+running 174 tests
+test encode::tests::guides_dont_count_in_the_arts_bounds ... ok
+test encode::tests::art_bounds_end_at_a_clipping_layers_clip ... ok
+test encode::tests::art_bounds_cover_visible_art_only ... ok
+test encode::tests::phys_holds_pixels_per_metre ... ok
+test encode::tests::png_refuses_a_buffer_of_the_wrong_size ... ok
+test encode::tests::anti_alias_none_is_the_same_on_every_thread_count ... ok
+test brush_fx::tests::stained_symbol_instance ... ok
+test brush_fx::tests::unknown_brush_falls_back_to_plain_stroke_and_scatter_renders ... ok
+test encode::tests::png_round_trips_plain_and_interlaced_at_odd_sizes ... ok
+test encode::tests::interlaced_export_decodes_to_the_same_pixels ... ok
+test encode::tests_bmp::flipped_rows_have_a_negative_height ... ok
+test encode::tests_bmp::greys_and_impossible_combinations ... ok
+test encode::tests_bmp::os2_bitmaps_have_a_core_header ... ok
+test encode::tests_bmp::every_depth_writes_its_bit_count_and_decodes ... ok
+test encode::tests_jpeg::model_and_method_ids_round_trip ... ok
+test encode::tests_jpeg::methods_write_baseline_or_progressive_frames ... ok
+test encode::tests_jpeg::size_falls_with_quality ... ok
+test encode::tests_bmp::rle8_and_rle4_decode_like_uncompressed ... ok
+test brush_fx::tests::calligraphic_brush_paints_wider_than_the_stroke ... ok
+test encode::tests_palette::ids_round_trip ... ok
+test encode::tests_palette::dithering_keeps_the_average_colour ... ok
+test encode::tests_palette::gif_decodes ... ok
+test encode::tests::anti_alias_none_paints_whole_pixels ... ok
+test encode::tests_palette::fixed_palettes ... ok
+test encode::tests_jpeg::gray_exports_keep_the_lightness ... ok
+test encode::tests::type_anti_aliasing_snaps_text_to_pixels ... ok
+test encode::tests::translucent_edges_over_opaque_art_stay_opaque ... ok
+test brush_fx::tests::brush_definition_edits_rerender ... ok
+test encode::tests_palette::two_colour_art_gives_two_entries ... ok
+test encode::tests_psd::a_background_colour_is_the_bottom_layer ... ok
+test encode::tests_palette::transparent_pixels_get_their_own_entry ... ok
+test encode::tests_palette::png8_decodes_at_every_bit_depth_and_interlaced ... ok
+test encode::tests::backgrounds_are_opaque_or_transparent ... ok
+test encode::tests_tga::targa_depths_alpha_and_footer ... ok
+test encode::tests_psd::flat_writes_the_merged_image_alone_on_white ... ok
+test encode::tests_tiff::big_images_take_several_strips_in_either_order ... ok
+test encode::tests_tiff::byte_order_writes_an_ii_or_mm_header ... ok
+test encode::tests_tiff::colour_models_write_their_samples ... ok
+test encode::tests_tiff::packbits_and_bilevel_images_decode ... ok
+test encode::tests_tiff::packbits_round_trips ... ok
+test encode::tests_psd::the_profile_and_the_size_limit ... ok
+test encode::tests_psd::guides_are_not_layers ... ok
+test encode::tests::resolution_sets_the_pixel_size_and_is_stored ... ok
+test encode::tests_tiff::lzw_is_smaller_and_decodes_the_same ... ok
+test encode::tests_psd::layers_are_the_top_level_layers_and_the_merged_image_is_the_render ... ok
+test encode::tests_web::comments_are_valid_files ... ok
+test encode::tests_web::locked_colours_survive_a_reduction ... ok
+test encode::tests_web::mapped_colours_become_the_transparent_entry ... ok
+test encode::tests_web::snapping_to_web_colours ... ok
+test encode::tests_web::sorting_keeps_every_pixel_colour ... ok
+test encode::tests_psd::hidden_top_level_layers_are_optional ... ok
+test encode::tests_web::lossy_makes_runs_and_smaller_gifs ... ok
+test fx::tests::geometry_effect_is_rendered ... ok
+test fx::tests::per_stroke_raster_effects_use_the_single_threaded_pipeline ... ok
+test fx::tests::drop_shadow_darkens_outside_the_shape ... ok
+test encode::tests_psd::cmyk_planes_hold_the_inks_inverted_and_gray_is_one_plane ... ok
+test fx::tests::hidden_effects_are_ignored_and_outline_mode_uses_effected_geometry ... ok
+test fx::tests::visual_bounds_include_shadow ... ok
+test ink::tests::fixed_colours_and_paper ... ok
+test fx::tests::thumbnails_of_glowing_objects_render_without_panicking ... ok
+test fx::tests::shadow_of_offscreen_object_is_not_culled ... ok
+test fx::tests::per_fill_effects_apply_to_that_fill_only ... ok
+test encode::tests_psd::maximum_editability_writes_groups_and_an_object_per_layer ... ok
+test fx::tests::blur_glow_and_feather_soften ... ok
+test pattern::tests::missing_pattern_is_grey ... ok
+test pattern::tests::brick_pattern_shifts_rows ... ok
+test pattern::tests::raster_scale_is_power_of_two_and_capped ... ok
+test pattern::tests::edit_mode_draws_only_tile_layer_with_copies ... ok
+test pattern::tests::pattern_fill_is_clipped_to_shape ... ok
+test pattern::tests::swatch_thumbnail_renders ... ok
+test fx::tests::photoshop_filters_draw_and_follow_a_pan_from_the_cache ... ok
+test placed_document::tests::zoom_steps_are_powers_of_two_at_or_above_the_scale ... ok
+test pattern::tests::pattern_fill_is_periodic ... ok
+test ink::tests::the_ink_table_matches_the_profile ... ok
+test tests::artboards_white_on_pasteboard ... ok
+test pattern::tests::repeat_renders_instances ... ok
+test tests::disabled_or_outline_mask_draws_unmasked ... ok
+test tests::clip_group_clips ... ok
+test tests::blend_mode_on_a_single_fill_is_exact_without_a_layer ... ok
+test tests::hidden_and_culled ... ok
+test tests::arrowheads_render ... ok
+test fx::tests::multithreaded_filters_match_single_threaded ... ok
+test tests::fills_red_rect ... ok
+test tests::images_take_their_nearest_pixel_without_smoothing ... ok
+test tests::inside_stroke_stays_inside ... ok
+test pattern::tests::pattern_follows_zoom_and_paint_transform ... ok
+test tests::linked_mask_moves_with_object ... ok
+test tests::opacity_blends ... ok
+test tests::opacity_mask_uses_luminance_and_clips ... ok
+test tests::multiply_blend ... ok
+test tests::linear_gradient_goes_white_to_black ... ok
+test tests::outside_stroke_stays_outside ... ok
+test tests::raster_size_limits ... ok
+test tests::outline_mode_no_fill ... ok
+test tests_adjust::a_group_recolours_its_members_and_type ... ok
+test tests::view_transform_zooms ... ok
+test tests::drop_shadow_profile_and_cache ... ok
+test tests::invalid_dash_pattern_strokes_solid ... ok
+test tests::opacity_mask_without_clip_and_inverted ... ok
+test tests_adjust::a_symbol_instance_recolours_its_art ... ok
+test tests::trim_view_clips_to_artboards ... ok
+test tests_adjust::a_path_takes_its_adjusted_colour_and_keeps_its_other_effects ... ok
+test tests::stroke_draws_outline_only ... ok
+test tests::region_export_png ... ok
+test tests_adjust::an_embedded_image_is_recoloured_and_the_original_pixels_stay ... ok
+test tests_clip::even_odd_star_clips_with_an_empty_centre ... ok
+test tests_clip::clip_regions_are_cached_per_clipping_path ... ok
+test tests_clip::compound_clip_keeps_its_hole ... ok
+test tests_clip::group_clip_is_the_union_of_its_members ... ok
+test tests_clip::text_clips_by_its_glyph_outlines ... ok
+test tests_clip::nothing_to_clip_by_hides_the_art ... ok
+test tests_cmykblend::cyan_multiplied_over_magenta_prints_both_inks ... ok
+test tests_charstroke::round_joined_character_strokes_have_no_miter_spikes ... ok
+test tests_cmykblend::opacity_masks_take_screen_luminance ... ok
+test tests_blend::a_translucent_source_mixes_the_blend_by_its_opacity ... ok
+test tests_cmykblend::opacity_mixes_inks ... ok
+test tests_container::a_group_fill_with_opacity_composites_as_one_layer ... ok
+test tests_container::a_fill_below_the_characters_is_hidden_by_the_glyphs ... ok
+test tests_container::a_group_fill_paints_every_member_above_or_below_them ... ok
+test tests_container::a_group_shadow_is_one_combined_shadow ... ok
+test tests_container::group_geometry_effects_move_the_members_as_one_piece ... ok
+test tests_cmykblend::rgb_documents_and_opaque_cmyk_documents_keep_screen_colours ... ok
+test tests_container::a_layer_paints_its_own_fill_and_a_knockout_group_keeps_knocking_out ... ok
+test tests_freeform::the_grid_is_clipped_to_the_path_and_takes_the_object_opacity ... ok
+test tests_freeform::strokes_take_freeform_paint ... ok
+test tests_charstroke::character_and_object_strokes_on_type_are_dashed ... ok
+test tests_freeform::the_rendered_grid_follows_the_colour_field ... ok
+test tests_cmykblend::black_blends_on_its_own_plane ... ok
+test tests_isolation::a_clip_group_does_not_isolate_its_children ... ok
+test tests_freeform::unplaced_freeform_gradients_seed_points_on_the_box ... ok
+test tests_isolation::a_group_blend_mode_applies_again_to_the_non_isolated_result ... ok
+test tests_isolation::a_masked_object_blends_with_the_backdrop ... ok
+test tests_isolation::a_non_isolated_group_inside_a_clip_group_stays_clipped ... ok
+test tests_isolation::a_multiply_child_of_a_half_opaque_group_multiplies_with_the_backdrop ... ok
+test tests_isolation::a_non_isolated_group_inside_an_isolated_one_blends_with_its_siblings_below ... ok
+test tests_isolation::copying_the_backdrop_changes_nothing_without_blending ... ok
+test tests_isolation::isolation_mode_dims_the_art_around_the_isolated_group ... ok
+test tests_isolation::a_non_isolated_knockout_group_composites_its_children_against_the_backdrop ... ok
+test tests_knockout::knockout_group_shows_the_top_object_over_the_backdrop ... ok
+test tests_isolation::trim_view_page_group_and_threads_keep_the_non_isolated_look ... ok
+test encode::tests_jpeg::colour_models_write_their_components_and_profiles ... ok
+test tests_knockout::neutral_groups_pass_knockout_through ... ok
+test encode::tests_jpeg::cmyk_exports_keep_the_inks_of_cmyk_colours ... ok
+test tests_knockout::opacity_defines_the_knockout_shape ... ok
+test tests_layeropts::guides_draw_on_screen_only ... ok
+test tests_layeropts::dim_images_fades_only_the_images ... ok
+test tests_layeropts::preview_off_draws_the_layer_in_outline_on_screen_only ... ok
+test tests_knockout::page_knockout_and_isolated_blending ... ok
+test tests_fontchange::type_redraws_when_its_font_becomes_available ... ok
+test tests_objectfx::blur_on_a_symbol_instance_softens_its_edges ... ok
+test tests_objectfx::geometry_effects_reshape_type_through_its_outlines ... ok
+test tests_objectfx::a_strokes_own_glow_paints_around_that_stroke_only ... ok
+test tests_objectfx::a_shadow_on_an_image_paints_offset_pixels ... ok
+test tests_placed_document::a_placed_document_draws_exactly_with_its_own_art ... ok
+test tests_placed_document::copies_of_one_placed_document_share_its_bitmap ... ok
+test tests_placed_document::a_document_that_places_itself_draws_a_few_levels_deep_then_stops ... ok
+test tests_placed_document::a_placed_document_kept_as_its_preview_draws_the_preview ... ok
+test tests_placed_document::on_screen_a_placed_document_shows_a_placeholder_then_its_bitmap ... ok
+test tests_setup::outline_mode_draws_images_in_grey_only_when_the_setup_asks ... ok
+test tests_tileedge::swatch_bounds_outline_the_period_dashed ... ok
+test tests_strokegradient::along_a_quarter_of_the_length_is_a_quarter_of_the_gradient_in_any_direction ... ok
+test tests_strokegradient::across_runs_from_the_left_edge_to_the_right ... ok
+test tests_strokegradient::slices_meet_without_seams_and_translucent_stops_paint_once ... ok
+test tests_tileedge::the_tile_edge_takes_the_tile_edge_color ... ok
+test encode::tests_tiff::resolution_tags_and_the_profile ... ok
+test tests_strokegradient::corners_and_tight_turns_have_no_holes ... ok
+test encode::tests_palette::colours_cap_the_palette ... ok
+test tests_blend::every_mode_matches_the_reference_formulas ... ok
+test tests_cmykblend::placed_images_are_separated_not_blackened ... ok
+test ink::tests::cmyk_images_show_through_the_profile_and_paint_their_own_inks ... ok
+test tests_fxzoom::blurred_type_stays_in_place_at_every_zoom_and_pan ... ok
+test tests_fxzoom::blurred_type_doesnt_wobble_as_the_view_moves_by_parts_of_a_pixel ... ok
+test tests_fxzoom::scrolling_moves_blurred_type_without_changing_it ... ok
+test fx::tests::photoshop_filters_on_content_larger_than_the_budget ... ok
+
+test result: ok. 174 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.97s
+
+     Running tests/dash_align.rs (target/debug/deps/dash_align-487152200592e35c)
+
+running 3 tests
+test dashes_of_a_lens_stroke_widen_towards_the_middle ... ok
+test a_round_join_on_a_profile_stroke_has_no_spike ... ok
+test fitted_dashes_wrap_every_corner_of_a_rectangle ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/golden.rs (target/debug/deps/golden-0be2150fcbe8030c)
+
+running 22 tests
+test clip_group_masks_content ... ok
+test png_encoding_roundtrips_pixels ... ok
+test outline_mode_draws_thin_black_edges_only ... ok
+test center_stroke_straddles_the_edge ... ok
+test linear_gradient_left_to_right ... ok
+test radial_gradient_centre_to_edge ... ok
+test linear_gradient_angle_90_is_vertical ... ok
+test hidden_effect_is_ignored ... ok
+test dashed_line_alternates ... ok
+test unclipped_group_draws_everything ... ok
+test invisible_and_hidden_nodes_are_not_drawn ... ok
+test group_opacity_equals_child_opacity ... ok
+test non_separable_blend_modes_match_formulas ... ok
+test scaled_render_matches_upscaled_geometry ... ok
+test renderer_reuse_matches_fresh_renderer ... ok
+test roughen_is_deterministic_and_seeded ... ok
+test drop_shadow_darkens_offset_region ... ok
+test text_renders_ink_inside_its_bounds ... ok
+test separable_blend_modes_match_formulas ... ok
+test opacity_folding_equals_layer_compositing ... ok
+test geometry_effects_render_without_panicking ... ok
+test arrowheads_add_ink_at_the_ends ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/gradient_text.rs (target/debug/deps/gradient_text-20bff67b65eab592)
+
+running 2 tests
+test gradient_vector_runs_across_the_text ... ok
+test unplaced_run_stroke_gradients_fit_the_stroke_inflated_box ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/radial_focal.rs (target/debug/deps/radial_focal-6856b150e41e73c1)
+
+running 2 tests
+test a_focal_point_on_a_squashed_rotated_ellipse_renders_as_its_model ... ok
+test an_off_centre_focal_point_renders_as_its_model ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/stroke_geometry.rs (target/debug/deps/stroke_geometry-433f32212bfd9748)
+
+running 7 tests
+test a_head_past_the_end_counts_in_the_visual_bounds_and_is_never_culled ... ok
+test a_gradient_runs_on_into_the_head ... ok
+test a_hollow_circle_head_is_empty_inside ... ok
+test line_and_head_take_the_opacity_once ... ok
+test zero_length_dashes_draw_dots_with_a_round_cap_and_squares_with_a_projecting_cap ... ok
+test dotted_lines_survive_svg_export_and_render_the_same ... ok
+test heads_are_drawn_where_the_shared_geometry_puts_them_and_never_past_the_tip ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_svg-e9cdf31577bb814b)
+
+running 15 tests
+test import::css::tests::unsupported_selectors_are_dropped ... ok
+test import::css::tests::presentation_attributes_lose_to_rules ... ok
+test import::files::tests::hrefs_resolve_against_the_folder ... ok
+test import::files::tests::percent_escapes_decode ... ok
+test import::css::tests::selectors_and_precedence ... ok
+test import::spread::tests::a_linear_gradient_repeats_over_the_area ... ok
+test import::spread::tests::a_radial_gradient_grows_about_its_focal_point ... ok
+test import::spread::tests::reflect_mirrors_every_other_period_and_its_midpoints ... ok
+test import::spread::tests::far_repeats_are_capped ... ok
+test import::spread::tests::stops_inside_the_period_hold_their_colours_to_its_ends ... ok
+test import::vector_effect::tests::conformal_transforms_keep_circles_round ... ok
+test tests::base64_vectors ... ok
+test import::files::tests::the_placeholder_is_a_png ... ok
+test tests::escaping ... ok
+test tests::numbers ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/blend_export.rs (target/debug/deps/blend_export-bbad5e6417c5648d)
+
+running 2 tests
+test clip_and_invert_masks_match_the_canvas ... ok
+test every_blend_mode_follows_the_reference_formulas ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/container_export.rs (target/debug/deps/container_export-e2608d790ee8e607)
+
+running 2 tests
+test a_group_fill_exports_as_paths_over_or_under_the_members ... ok
+test group_effects_bake_into_the_members_and_filter_the_group ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/css_rules.rs (target/debug/deps/css_rules-00d3603b9e5ddf37)
+
+running 8 tests
+test groups_stand_for_their_objects_and_hidden_ones_are_left_out ... ok
+test live_corners_give_per_corner_radii_and_only_round_ones ... ok
+test rectangle_gives_background_border_and_radius ... ok
+test ellipses_round_fully_and_options_change_units_and_names ... ok
+test gradients_give_css_gradients ... ok
+test type_gives_font_properties ... ok
+test shadows_and_unsupported_art ... ok
+test shared_properties_read_as_svg_export_writes_them ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/dash_align.rs (target/debug/deps/dash_align-512ade3cb0bf49f8)
+
+running 1 test
+test fitted_dashes_export_as_outlines_that_render_like_the_canvas ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/effects_export.rs (target/debug/deps/effects_export-1cf975f6c2c30897)
+
+running 2 tests
+test a_strokes_own_glow_filters_the_stroke_element_only ... ok
+test geometry_effects_on_type_export_as_its_reshaped_outlines ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/encoding_profile_fonts.rs (target/debug/deps/encoding_profile_fonts-6672cd3ceb05aa32)
+
+running 8 tests
+test style_entities_parse_in_usvg ... ok
+test tiny_has_no_filters_masks_symbols_or_style_sheets ... ok
+test utf16_files_start_with_a_byte_order_mark_and_read_back ... ok
+test latin1_files_write_other_characters_as_references ... ok
+test variable_font_instances_embed_as_themselves ... ok
+test embedded_fonts_hold_only_the_glyphs_used ... ok
+test any_bytes_decode_or_fail_cleanly ... ok
+test font_licences_are_respected ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/focal.rs (target/debug/deps/focal-7ae5ca979d58cc64)
+
+running 3 tests
+test imported_focal_points_outside_the_circle_are_pulled_in ... ok
+test an_ellipse_writes_its_focal_point_in_the_gradient_space ... ok
+test a_circle_writes_its_focal_point_as_fx_fy_and_reads_it_back ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/font_weights.rs (target/debug/deps/font_weights-cec4f52d19968e69)
+
+running 2 tests
+test every_style_is_written_with_its_numeric_weight ... ok
+test numeric_weights_read_back_to_the_style ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/gradients.rs (target/debug/deps/gradients-dc2fbe9ed273cdf9)
+
+running 4 tests
+test stroke_gradients_span_the_stroke ... ok
+test identical_gradients_share_a_def_named_after_the_swatch ... ok
+test midpoints_come_back ... ok
+test gradient_text_spans_its_layout ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/ids.rs (target/debug/deps/ids-9393f3a197f566fa)
+
+running 4 tests
+test minimal_writes_only_referenced_ids ... ok
+test label_attributes_name_objects ... ok
+test layer_names_round_trip_exactly ... ok
+test unique_ids_never_collide ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/import_details.rs (target/debug/deps/import_details-2f1ee3cfc6112a5c)
+
+running 6 tests
+test a_linked_png_resolves_against_the_svg_folder_and_stays_linked ... ok
+test svg_images_import_as_vector_art ... ok
+test undisplayed_objects_import_hidden ... ok
+test a_missing_link_warns_and_keeps_a_placeholder_in_its_box ... ok
+test nested_clips_intersect ... ok
+test reflect_and_repeat_match_resvg ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/import_live.rs (target/debug/deps/import_live-110f503079525c97)
+
+running 10 tests
+test other_filters_are_reported ... ok
+test a_gaussian_blur_becomes_the_effect_with_its_radius ... ok
+test drop_shadow_chains_become_drop_shadows ... ok
+test symbols_and_effects_export_import_export_is_stable ... ok
+test exported_effects_import_as_the_same_effects ... ok
+test two_uses_give_one_symbol_and_two_instances ... ok
+test a_checker_pattern_becomes_a_pattern_swatch ... ok
+test symbols_round_trip_through_export ... ok
+test a_filter_and_a_clip_on_one_object_filter_first ... ok
+test uses_the_symbol_cant_stand_for_stay_art ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/import_text.rs (target/debug/deps/import_text-8ad377578d2003fd)
+
+running 26 tests
+test a_viewbox_scale_becomes_the_size ... ok
+test css_selectors_reach_text ... ok
+test folded_sizes_stay_in_the_character_panels_range ... ok
+test hidden_text_is_skipped_and_use_instances_are_kept ... ok
+test a_stretch_or_skew_stays_the_transform ... ok
+test far_off_positions_stay_finite ... ok
+test gradients_on_scaled_text_stay_in_place ... ok
+test a_rotated_scale_scales_every_length_and_keeps_the_rotation ... ok
+test a_scale_above_text_becomes_its_size ... ok
+test gradient_fill_resolves_in_text_space ... ok
+test per_character_positions_rotation_and_shifts ... ok
+test placeholder_ids_never_clash_with_the_files ... ok
+test pattern_fill_on_text_and_shapes ... ok
+test linked_text_keeps_its_url_and_stroke_style ... ok
+test text_keeps_its_z_order_between_shapes ... ok
+test text_keeps_its_parent_group_clip_and_mask ... ok
+test per_character_positions_with_middle_anchor ... ok
+test weights_spacing_and_decoration ... ok
+test type_on_a_scaled_path_takes_the_scale ... ok
+test text_path_becomes_type_on_a_path ... ok
+test vertical_writing_mode_runs_down_a_path ... ok
+test unusable_text_path_falls_back_to_point_type_with_a_warning ... ok
+test plain_texts_among_siblings_stay_texts ... ok
+test top_level_text_joins_the_layer_below_it ... ok
+test tspan_lines_dx_and_baseline_shift ... ok
+test white_space_handling ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/import_units.rs (target/debug/deps/import_units-9ab5096129938e02)
+
+running 6 tests
+test a4_in_millimetres_opens_at_its_printed_size ... ok
+test absolute_lengths_in_a_pixel_document_keep_their_size ... ok
+test text_lengths_in_physical_units ... ok
+test physical_units_without_a_view_box ... ok
+test unitless_and_pixels_map_one_to_one ... ok
+test font_size_units_are_honoured ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/mask_options.rs (target/debug/deps/mask_options-2bd7bcfada90995b)
+
+running 2 tests
+test foreign_masks_keep_their_art ... ok
+test an_inverted_unclipped_mask_round_trips ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/non_scaling_stroke.rs (target/debug/deps/non_scaling_stroke-3da35106a47770b5)
+
+running 4 tests
+test a_reused_non_scaling_stroke_warns ... ok
+test a_non_scaling_stroke_keeps_its_width_under_a_scale ... ok
+test type_keeps_its_non_scaling_stroke_width ... ok
+test widths_and_dashes_are_in_screen_pixels_past_the_view_box ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/options.rs (target/debug/deps/options-258369e9798a9f8c)
+
+running 3 tests
+test linked_images_are_named_after_their_bytes ... ok
+test cmyk_tiffs_are_written_as_png ... ok
+test every_combination_reads_back ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/prop_svg.rs (target/debug/deps/prop_svg-89366214259bde4d)
+
+running 7 tests
+test import_garbage_never_panics ... ok
+test import_random_path_data ... ok
+test rect_survives_visually_with_stroke ... ok
+test path_bounds_survive ... ok
+test rich_fixture_exports_with_all_options ... ok
+test plain_art_survives_visually ... ok
+test random_documents_export_and_reimport ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.38s
+
+     Running tests/raster_paints.rs (target/debug/deps/raster_paints-c0e97b3d59d05d16)
+
+running 3 tests
+test linked_images_write_the_gradient_next_to_the_svg_and_characters_stay_linear ... ok
+test a_freeform_stroke_is_an_image_clipped_to_the_stroke_outline ... ok
+test a_freeform_fill_is_an_image_clipped_to_the_shape ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/roundtrip.rs (target/debug/deps/roundtrip-48f70d725a1c1bc7)
+
+running 43 tests
+test hidden_and_guides_omitted ... ok
+test fill_and_stroke_opacity_roundtrip ... ok
+test clip_group_roundtrip ... ok
+test curves_roundtrip ... ok
+test compound_evenodd_roundtrip ... ok
+test groups_and_names_roundtrip ... ok
+test full_document_roundtrip_is_stable ... ok
+test image_roundtrip ... ok
+test import_opacity_wrapper_folds_into_object ... ok
+test import_path_with_arcs ... ok
+test import_basic_shapes ... ok
+test import_absolute_units_keep_their_physical_size ... ok
+test import_invalid_is_error ... ok
+test import_tspan_far_below_is_bounded ... ok
+test import_gradient_with_transform ... ok
+test import_clip_mask_and_warnings ... ok
+test import_transforms_and_nested_groups ... ok
+test import_use_and_defs ... ok
+test import_text_tspans_and_css ... ok
+test multiple_layers_roundtrip ... ok
+test multiple_fills_stack_in_paint_order ... ok
+test opacity_and_blend_roundtrip ... ok
+test import_tspan_on_the_same_baseline_stays_on_the_line ... ok
+test import_viewbox_scaling ... ok
+test linear_gradient_roundtrip ... ok
+test options_decimals_minify_responsive_artboard ... ok
+test opentype_features_export_as_css ... ok
+test live_effects_export_as_geometry_and_filters ... ok
+test area_type_exports_its_wrapped_lines ... ok
+test rect_roundtrip_bounds_and_colours ... ok
+test opacity_mask_exports_as_svg_mask_and_imports_back ... ok
+test radial_gradient_and_fit_roundtrip ... ok
+test stroke_attributes_roundtrip ... ok
+test stroke_alignment_approximations ... ok
+test outline_text_writes_glyph_paths ... ok
+test unique_sanitized_ids ... ok
+test unclipped_inverted_mask_exports_backdrop_and_filter ... ok
+test text_roundtrip_and_escaping ... ok
+test text_on_path_roundtrip ... ok
+test text_on_path_options_svg_cannot_express_are_outlined ... ok
+test styling_modes_roundtrip ... ok
+test scaled_text_roundtrips_at_the_size_it_draws ... ok
+test bidirectional_svg_export_preserves_shaped_appearance_as_outlines ... ok
+
+test result: ok. 43 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/stroke_export.rs (target/debug/deps/stroke_export-a5dfb231779889ee)
+
+running 3 tests
+test an_open_path_with_inside_alignment_exports_a_plain_stroke ... ok
+test a_lens_profile_exports_a_fill ... ok
+test exported_strokes_render_like_the_canvas ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/symbols_layers.rs (target/debug/deps/symbols_layers-cf5ebf9547e43296)
+
+running 16 tests
+test hidden_groups_others_use_stay_hidden ... ok
+test editing_data_notices_edits_made_elsewhere ... ok
+test a_root_element_names_the_one_layer ... ok
+test marked_groups_are_sublayers_only_in_layers ... ok
+test text_joining_a_clipping_layer_stays_unclipped ... ok
+test top_level_groups_become_named_layers ... ok
+test symbols_inside_themselves_end ... ok
+test hidden_layers_are_kept_hidden_when_asked ... ok
+test hidden_objects_and_data_attributes_round_trip ... ok
+test three_instances_give_one_symbol_and_three_uses ... ok
+test clipped_layers_come_in_as_clipping_layers ... ok
+test pattern_paints_in_symbols_stay_on_the_page ... ok
+test masks_in_symbols_move_with_the_art_when_linked ... ok
+test instances_the_def_cant_stand_for_get_their_own_art ... ok
+test sublayers_round_trip ... ok
+test clipping_layers_round_trip ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/text_layout.rs (target/debug/deps/text_layout-905d01aea793766a)
+
+running 7 tests
+test rich_text_writes_spacing_shift_and_scale ... ok
+test justified_lines_place_each_word ... ok
+test vertically_aligned_area_type_exports_where_it_is_drawn ... ok
+test fewer_tspans_writes_one_per_line ... ok
+test wrapped_lines_get_one_tspan_each ... ok
+test paragraphs_aligned_differently_keep_their_alignment ... ok
+test a_viewer_draws_the_text_where_the_canvas_does ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+     Running tests/text_paint_order.rs (target/debug/deps/text_paint_order-be0a47bc2eb84be6)
+
+running 4 tests
+test characters_with_different_strokes_keep_them_and_warn ... ok
+test the_stroke_under_scales_with_the_text_and_keeps_its_gradient ... ok
+test a_stroke_first_text_strokes_under_its_characters ... ok
+test normal_paint_order_leaves_the_character_strokes ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/text_stroke.rs (target/debug/deps/text_stroke-126936ac06ff2bb8)
+
+running 3 tests
+test a_run_without_the_first_runs_stroke_resets_it ... ok
+test character_stroke_options_round_trip_through_live_text ... ok
+test an_object_stroke_on_type_is_written_with_its_dashes ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_testkit-cebb527d1576a06c)
+
+running 1 test
+test pdf::tests::md5_and_rc4_match_their_reference_vectors ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_text-514760eda40cc32d)
+
+running 204 tests
+test craft_fonts::tests::web_fonts_follow_the_list ... ok
+test fontdb::alias_tests::pick_native_label_prefers_a_non_english_name_record ... ok
+test fontdb::alias_tests::a_face_answers_to_its_names_in_every_language ... ok
+test fontdb::alias_tests::without_typographic_names_the_legacy_ones_are_the_familys ... ok
+test hyphen::tests::hyphenation_exceptions_override_the_pattern ... ok
+test hyphen::tests::set_hyphenation_exceptions_round_trips_the_source_string ... ok
+test fontdb::alias_tests::resolve_says_how_a_font_matched ... ok
+test layout::japanese_letters_for_the_latin_space_are_kana_kanji_and_marks_not_hangul_or_punctuation ... ok
+test features::tests::per_character_features_drive_shaping ... ok
+test layout::soft_kinsoku_lets_small_kana_and_the_prolonged_sound_mark_start_a_line ... ok
+test layout::kinsoku_keeps_closing_marks_off_line_starts_and_opening_ones_off_line_ends ... ok
+test layout::wrapping_tests::greedy_wrap_keeps_an_oversized_cluster_after_a_line_start_atomic ... ok
+test layout::wrapping_tests::greedy_wrap_keeps_an_oversized_first_cluster_and_its_source_range ... ok
+test tests::all_caps ... ok
+test tests::add_font_rejects_garbage_and_duplicates ... ok
+test tests::character_alignment_on_the_icf_lines_small_characters_up_with_the_largest_face ... ok
+test tests::bundled_families_and_styles ... ok
+test tests::caret_mapping_round_trip ... ok
+test tests::each_paragraph_has_its_own_attributes ... ok
+test tests::glyph_count_and_advances ... ok
+test tests::caret_inside_ligature_and_empty_text ... ok
+test tests::explicit_leading ... ok
+test tests::character_alignment_lines_small_characters_up_with_the_largest_em_box ... ok
+test tests::burasagari_leaves_latin_commas_and_full_stops_inside_the_line ... ok
+test tests::em_box_top_leading_hangs_lines_from_the_line_above ... ok
+test tests::japanese_text_uses_the_craft_fonts_mincho_after_the_bundled_fonts ... ok
+test tests::fallback_font_per_character ... ok
+test tests::japanese_text_lays_out_without_the_craft_fonts ... ok
+test tests::indents_and_paragraph_spacing ... ok
+test tests::area_line_breaking_within_frame ... ok
+test tests::ligatures_and_kerning ... ok
+test tests::justified_japanese_lines_spread_between_characters ... ok
+test tests::leading_model_is_per_paragraph ... ok
+test tests::area_overflow ... ok
+test tests::on_path_effects_orient_glyphs ... ok
+test tests::on_path_circle_and_overflow ... ok
+test tests::style_lookup_and_fallback ... ok
+test tests::multiple_runs_and_styles ... ok
+test tests::point_text_lines_and_auto_leading ... ok
+test tests::on_path_placement ... ok
+test tests::point_alignment ... ok
+test tests::tab_stops_position_text ... ok
+test tests_bidi::craft_arabic_fonts_load_and_noto_sans_arabic_is_the_arabic_fallback ... ok
+test tests::tracking_and_scale ... ok
+test tests::underline_and_strikethrough_bars ... ok
+test tests::area_alignment_and_justify ... ok
+test tests::vertical_area_type_wraps_into_columns_inside_the_frame ... ok
+test tests::vertical_japanese_columns_have_upright_ink_and_edit_geometry ... ok
+test tests_bidi::left_to_right_text_is_untouched ... ok
+test tests_bidi::paragraph_direction_is_per_paragraph ... ok
+test tests::non_rect_frame_narrows_lines ... ok
+test fontdb::race_tests::a_family_loaded_by_another_thread_meanwhile_is_still_found ... ok
+test tests_bidi::identical_style_arabic_run_splits_keep_joining_and_source_attribution ... ok
+test tests_bidi::shape_range_handles_empty_runs_and_selected_utf8_subranges ... ok
+test tests_bidi::different_style_arabic_boundary_receives_joining_context ... ok
+test tests_bidi::hebrew_marks_stay_with_base_clusters ... ok
+test tests_bidi::mixed_text_preserves_latin_and_number_order ... ok
+test tests_bidi::right_aligned_wrapped_rtl_keeps_trailing_spaces_outside_content ... ok
+test tests_bidi::wrapping_retains_logical_line_ranges_and_reorders_each_line ... ok
+test tests_bidi::rtl_hit_testing_arrows_and_selection_follow_visual_positions ... ok
+test tests_combos::composer_x_inline_graphics ... ok
+test tests_combos::composer_x_paragraph_attrs ... ok
+test tests_combos::composer_x_vertical_align ... ok
+test tests_combos::ligatures_x_inline_graphics ... ok
+test tests_combos::ligatures_x_paragraph_attrs ... ok
+test tests_combos::ligatures_x_composer ... ok
+test tests_combos::ligatures_x_vertical_align ... ok
+test tests_combos::paragraph_attrs_x_inline_graphics ... ok
+test tests_bidi::visual_arrows_cross_rtl_paragraph_boundaries ... ok
+test tests_bidi::visual_text_comes_back_in_logical_order ... ok
+test tests_combos::ligatures_x_shrink_text ... ok
+test tests_bidi::arabic_contextual_forms_and_lam_alef_use_the_shaper ... ok
+test tests::layout_is_fast ... ok
+test tests_embed::a_subset_holds_only_the_glyphs_used_and_maps_their_characters ... ok
+test tests_embed::cmaps_map_runs_and_characters_beyond_the_basic_plane ... ok
+test tests_embed::fonts_exports_may_not_embed_are_not_embeddable ... ok
+test tests_embed::fs_type_flags_decide_the_embedding ... ok
+test tests_combos::shrink_text_x_inline_graphics ... ok
+test tests_fit::point_type_and_type_on_a_path_ignore_fit ... ok
+test tests_combos::composer_x_shrink_text ... ok
+test tests_fit::shrink_text_fills_columns ... ok
+test tests_combos::vertical_align_x_paragraph_attrs ... ok
+test tests_fit::shrink_text_follows_top_to_top_leading_and_character_alignment ... ok
+test tests_fit::shrink_text_is_a_no_op_when_the_text_fits ... ok
+test tests_combos::vertical_align_x_inline_graphics ... ok
+test tests_fit::shrink_text_guards_degenerate_sizes ... ok
+test tests_inline::character_alignment_treats_inline_art_as_a_character_of_its_run_size ... ok
+test tests_inline::copying_keeps_the_graphic_and_plain_text_shows_the_replacement_character ... ok
+test tests_inline::editing_keeps_inline_runs_whole ... ok
+test tests_inline::inline_art_advances_by_its_scaled_width_and_centres_on_the_cap_height ... ok
+test tests_inline::inline_art_in_a_right_to_left_paragraph_is_placed_by_the_bidi_reordering ... ok
+test tests_inline::inline_art_moves_with_vertically_aligned_lines ... ok
+test tests_inline::inline_art_on_a_path_and_in_vertical_type_moves_with_the_text ... ok
+test tests_inline::line_breaking_moves_an_inline_graphic_like_a_word ... ok
+test tests_inline::malformed_inline_runs_are_plain_text ... ok
+test tests_inline::snapping_moves_inline_art_with_its_glyph ... ok
+test tests_inline::shift_tracking_and_missing_symbols ... ok
+test tests_fit::shrink_text_respects_its_minimum ... ok
+test tests_inline::tall_inline_art_opens_up_its_line ... ok
+test tests_scripts::superscript_and_subscript_scale_and_shift_glyphs ... ok
+test tests_inline::top_to_top_leading_spaces_inline_art_by_its_run ... ok
+test tests_snap::glyph_starts_land_on_whole_device_pixels ... ok
+test tests_scripts::small_caps_draw_lowercase_as_smaller_capitals ... ok
+test tests_snap::rotated_text_is_left_alone ... ok
+test tests_combos::every_feature_at_once ... ok
+test tests_fit::shrink_text_scales_leading_and_baseline_shift_not_paragraph_spacing ... ok
+test tests_sysfonts::a_font_file_named_by_itself_is_scanned ... ok
+test tests_sysfonts::family_display_name_follows_show_font_names_in_english ... ok
+test tests_sysfonts::font_files_are_told_by_their_extension ... ok
+test tests_sysfonts::a_background_scan_serves_the_first_lookup ... ok
+test tests_sysfonts::a_resource_fork_gives_up_its_font_files ... ok
+test tests_sysfonts::every_lookup_by_name_finds_installed_fonts_in_a_fresh_database ... ok
+test tests_fit::shrink_text_makes_overflowing_text_fit ... ok
+test tests_sysfonts::a_search_reads_at_most_its_share_of_a_font_file ... ok
+test tests_sysfonts::registered_fonts_outside_the_font_folders_are_their_full_paths ... ok
+test tests_sysfonts::fonts_the_platform_lists_outside_the_font_folders_are_cataloged ... ok
+test tests_sysfonts::the_app_font_folder_is_read_by_the_scan ... ok
+test tests_sysfonts::font_lists_leave_out_hidden_system_families_which_still_resolve ... ok
+test tests_combos::vertical_align_x_shrink_text ... ok
+test tests_sysfonts::fonts_without_outlines_the_engine_draws_are_left_out ... ok
+test tests_sysfonts::installed_faces_are_found_by_postscript_name ... ok
+test tests_typo::area_flow_inside_circle_keeps_glyphs_inside ... ok
+test tests_sysfonts::rescanning_finds_fonts_installed_since ... ok
+test tests_sysfonts::the_family_list_is_shared_until_fonts_change ... ok
+test tests_sysfonts::installed_styles_of_a_loaded_family_load_when_asked_for ... ok
+test tests_typo::burasagari_keeps_the_every_line_composer_for_latin_text ... ok
+test tests_typo::caret_up_down_keeps_column ... ok
+test tests_typo::every_line_composer_balances_ragged_lines ... ok
+test tests_typo::face_charmap_for_glyphs_panel ... ok
+test tests_typo::every_line_composer_is_more_even ... ok
+test tests_typo::hit_testing_picks_the_right_column ... ok
+test tests_typo::composer_lines_never_exceed_frame ... ok
+test tests_typo::home_end_on_wrapped_lines ... ok
+test tests_typo::hyphenation_exceptions_keep_listed_words_whole_in_layout ... ok
+test tests_typo::hyphenated_layout_adds_hyphens ... ok
+test tests_typo::hyphenation_rules ... ok
+test tests_typo::justify_all_line_widths_equal ... ok
+test tests_typo::opentype_ligature_switches ... ok
+test tests_typo::range_style_across_run_boundaries ... ok
+test tests_typo::range_style_splits_runs ... ok
+test tests_typo::replace_range_takes_replaced_style_and_normalizes ... ok
+test tests_typo::replace_respects_char_boundaries_and_slices ... ok
+test tests_sysfonts::the_scan_reads_collections_and_loads_fonts_only_when_used ... ok
+test tests_typo::selection_quads_cover_lines ... ok
+test tests_typo::rows_and_columns_flow_in_order ... ok
+test tests_typo::soft_hyphen_is_invisible_mid_line ... ok
+test tests_typo::single_line_composer_is_greedy ... ok
+test tests_typo::inset_and_first_baseline_options ... ok
+test tests_combos::shrink_text_x_paragraph_attrs ... ok
+test tests_typo::vertical_align_acts_on_each_column_on_its_own ... ok
+test tests_typo::vertical_align_center_bottom_and_justify_in_a_rectangle ... ok
+test tests_typo::every_line_composer_evens_the_rag ... ok
+test tests_typo::vertical_align_in_a_circle_reflows_and_stays_inside ... ok
+test tests_typo::vertical_align_on_vertical_type_moves_columns_along_the_block_axis ... ok
+test tests_typo::word_and_paragraph_navigation ... ok
+test tests_variable::an_embedded_instance_is_a_static_font_of_that_instance ... ok
+test tests_sysfonts::wanted_fonts_match_as_resolve_finds_them ... ok
+test tests_variable::an_instance_draws_and_measures_its_own_glyphs ... ok
+test tests_typo::vertical_align_with_top_to_top_leading ... ok
+test tests_variable::an_instance_is_found_by_its_names_and_by_weight ... ok
+test tests_typo::vertical_align_leaves_overflowing_text_where_it_is ... ok
+test tests_variable::installed_variable_fonts_list_their_instances_before_loading ... ok
+test tests_typo::vertical_align_with_text_wrap_flows_again_around_the_object ... ok
+test tests_variable::named_instances_are_styles_of_the_family ... ok
+test tests_versions::a_version_is_found_by_its_version_string ... ok
+test tests_vertical::area_type_starts_at_the_right_edge_and_wraps_to_the_left ... ok
+test tests_versions::type_naming_a_version_is_set_in_it ... ok
+test tests_vertical::baselines_run_along_lines_and_down_column_centres ... ok
+test tests_vertical::caret_and_selection_turn_with_the_columns ... ok
+test tests_vertical::burasagari_hangs_a_comma_or_full_stop_outside_the_line ... ok
+test tests_vertical::columns_run_down_and_follow_each_other_to_the_left ... ok
+test tests_vertical::japanese_numbers_keep_their_own_cells_down_the_column ... ok
+test tests_vertical::justified_columns_keep_tate_chu_yoko_blocks_whole_and_marks_centred ... ok
+test tests_vertical::kinsoku_keeps_closing_marks_off_line_starts_and_opening_brackets_off_line_ends ... ok
+test tests_vertical::kinsoku_set_decides_whether_a_small_kana_may_start_a_line ... ok
+test tests_vertical::mojikumi_halves_line_end_and_consecutive_punctuation ... ok
+test tests_vertical::mojikumi_sets_an_opening_bracket_flush_at_the_start_of_a_wrapped_line ... ok
+test tests_vertical::numbers_keep_their_own_cells_down_the_column ... ok
+test tests_vertical::mojikumi_spaces_japanese_from_latin_by_a_quarter_em ... ok
+test tests_vertical::three_digits_stand_across_the_column_squeezed_into_one_em ... ok
+test tests_vertical::two_digits_stand_across_the_column_and_longer_numbers_lie_on_their_side ... ok
+test tests_vertical::tracking_spaces_upright_marks_without_moving_them_off_the_centre_line ... ok
+test tests_vertical::type_on_a_path_stays_horizontal ... ok
+test tests_vertical::upright_marks_stand_and_letters_lie_on_their_side ... ok
+test thread::tests::paragraph_styles_flow_with_their_paragraphs ... ok
+test tests_variable::bahnschrift_lists_and_draws_its_instances ... ok
+test tests_vertical::upright_glyphs_follow_the_fonts_vertical_metrics ... ok
+test thread::tests::short_story_leaves_later_frames_empty_with_a_style ... ok
+test web_fonts_build::tests::base64_matches_rfc_4648_vectors ... ok
+test web_fonts_build::tests::list_parsing ... ok
+test web_fonts_build::tests::sri_of_the_empty_files_sha256 ... ok
+test web_fonts_build::tests::url_is_relative_and_content_addressed ... ok
+test thread::tests::story_flows_across_frames_and_rejoins ... ok
+test tests_variable::segoe_ui_variable_lists_its_instances ... ok
+test tests_bidi::bidi_isolates_numbers_and_brackets_keep_valid_clusters ... ok
+test tests_bidi::automatic_alignment_follows_each_paragraph_and_explicit_choices_win ... ok
+test tests_sysfonts::the_database_tells_when_fonts_were_installed_or_removed_since_its_scan ... ok
+test tests_variable::damaged_variation_tables_never_panic ... ok
+test tests_bidi::paragraph_direction_overrides_the_first_strong_character ... ok
+test tests_typo::uncovered_characters_do_not_break_layout ... ok
+test tests_bidi::paragraph_direction_is_independent_and_neutrals_do_not_force_ltr ... ok
+test tests_bidi::hebrew_and_arabic_are_visually_rtl_with_exact_source_clusters ... ok
+test layout::wrapping_tests::narrow_arabic_area_wrap_keeps_base_and_mark_together_when_supported ... ok
+test tests_typo::layout_10k_area_text_is_fast ... ok
+
+test result: ok. 204 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.69s
+
+     Running tests/system_fonts.rs (target/debug/deps/system_fonts-0cecb296ba7381b0)
+
+running 1 test
+test a_fresh_session_finds_installed_fonts_by_name ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_tools-c284a461566d3011)
+
+running 287 tests
+test bbox::tests::rotate_snaps ... ok
+test bbox::tests::scale_corner_free_and_proportional ... ok
+test bbox::tests::handle_positions ... ok
+test bbox::tests::scale_side_and_center ... ok
+test builder::tests::hatch_stays_inside_region ... ok
+test builder::tests::create_builds_the_three_tools ... ok
+test builder::tests::bucket_click_fills_face_and_shift_click_strokes_edge ... ok
+test builder::tests::live_paint_selection_selects_faces ... ok
+test catalog::tests::lookups ... ok
+test builder::tests::bucket_on_plain_selection_makes_live_paint ... ok
+test builder::tests::shape_builder_drag_emits_merge ... ok
+test builder::tests::shape_builder_hover_highlights_region ... ok
+test catalog::tests::unique_ids_and_shortcuts ... ok
+test builder::tests::shape_builder_alt_drag_erases_and_empty_drag_does_nothing ... ok
+test builder::tests::shape_builder_alt_on_an_edge_highlights_and_deletes_it ... ok
+test corners::tests::corners_wider_than_the_preference_hide_their_widgets ... ok
+test builder::tests::shape_builder_alt_switches_to_erase_mode_while_held ... ok
+test corners::tests::drag_follows_a_rotated_shape_and_a_click_does_nothing ... ok
+test corners::tests::dragging_a_widget_inward_rounds_all_corners_in_one_step ... ok
+test corners::tests::direct_selected_corners_show_their_widgets_alone_and_round_alone ... ok
+test corners::tests::a_star_shows_widgets_in_every_corner_with_direct_selection ... ok
+test corners::tests::star_corners_follow_the_anchors_and_the_angle_preference ... ok
+test corners::tests::widgets_of_a_non_square_rectangle_follow_the_drawn_corners ... ok
+test corners::tests::a_pen_path_shows_widgets_on_its_corners_only ... ok
+test builder::tests::shape_builder_erase_drag_into_regions_shows_the_regions_not_the_edges_it_crosses ... ok
+test corners::tests::a_stretched_rectangle_drags_its_radius_in_document_units ... ok
+test corners::tests::widgets_off_or_elsewhere_keep_the_tools_behaviour ... ok
+test cropimage::tests::the_tool_is_made_by_its_id ... ok
+test corners::tests::alt_click_cycles_the_kind_and_double_click_opens_the_dialog ... ok
+test corners::tests::widgets_sit_inside_each_corner ... ok
+test corners::tests::a_live_polygon_rounds_with_either_tool ... ok
+test cut::tests::line_cut_previews_and_commits_once ... ok
+test cropimage::tests::the_box_starts_on_the_part_over_the_artboard_and_escape_cancels ... ok
+test cropimage::tests::the_box_is_dragged_by_its_handles_and_inside_within_the_image ... ok
+test cut::tests::escape_cancels_the_preview ... ok
+test cut::tests::mirror_cut_axis_options_and_alt ... ok
+test direct::tests::anchors_are_picked_before_the_segments_through_them ... ok
+test direct::tests::a_short_handle_leaves_its_anchor_to_be_picked ... ok
+test cut::tests::needs_a_selection_and_a_drag ... ok
+test direct::tests::click_anchor_selects_it ... ok
+test direct::tests::direct_and_group_selection_pick_blend_keys ... ok
+test direct::tests::dragging_a_curved_segment_reshapes_it_and_a_straight_one_moves_its_anchors ... ok
+test direct::tests::shift_marquee_toggles_anchors ... ok
+test direct::tests::dragging_a_spine_point_moves_it ... ok
+test direct::tests::direct_and_group_selection_pick_ruler_guides ... ok
+test direct::tests::dragging_a_frame_corner_or_edge_reshapes_area_type ... ok
+test direct::tests::dragged_anchors_snap_to_points_segments_and_smart_guides ... ok
+test direct::tests::marquee_selects_anchors ... ok
+test direct::tests::the_anchor_under_the_pointer_is_highlighted ... ok
+test direct::tests::moved_objects_snap_with_smart_guides ... ok
+test distort::liquify::tests::dabs_are_evenly_spaced ... ok
+test direct::tests::the_handles_shown_are_the_handles_dragged ... ok
+test distort::arap::tests::unmap_and_turn_read_a_warped_mesh_back ... ok
+test distort::arap::tests::band_cholesky_solves_spd_systems ... ok
+test distort::arap::tests::auto_pins_are_spread_inside_the_shape ... ok
+test distort::arap::tests::mesh_covers_shape_and_locates_points ... ok
+test distort::liquify::tests::params_round_trip_through_json ... ok
+test distort::pathutil::tests::fractions_round_trip_on_a_polyline ... ok
+test distort::liquify::tests::pucker_and_bloat_move_toward_and_away_from_centre ... ok
+test distort::perspective::define::tests::definition_round_trips_and_unchanged_fields_change_nothing ... ok
+test distort::liquify::tests::twirl_rotates_about_the_brush_centre ... ok
+test distort::perspective::define::tests::rgb_parses_hex ... ok
+test distort::liquify::tests::warp_is_deterministic_and_localized ... ok
+test distort::liquify::tests::noisy_tools_are_reproducible ... ok
+test distort::perspective::define::tests::the_station_point_places_the_vanishing_points ... ok
+test distort::perspective::define::tests::set_moves_the_vanishing_points_for_a_new_angle_or_distance ... ok
+test distort::perspective::tests::attach_map_keeps_the_dragged_corners ... ok
+test distort::perspective::define::tests::receding_axes_keep_true_lengths_at_the_picture_plane ... ok
+test distort::perspective::tests::attachments_live_on_objects_and_legacy_ones_are_adopted ... ok
+test distort::perspective::tests::depth_moves_along_the_plane_normal ... ok
+test distort::perspective::define::tests::definition_fields_map_to_the_grid ... ok
+test distort::perspective::tests::grid_serde_and_merge ... ok
+test distort::perspective::tests::grid_tool_widget_and_handles ... ok
+test distort::perspective::tests::move_map_slides_within_the_plane ... ok
+test distort::perspective::tests::homography_round_trips ... ok
+test distort::perspective::tests::homography_maps_plane_corners_to_the_vanishing_points ... ok
+test distort::perspective::tests::resize_cursors_follow_the_handle_on_screen ... ok
+test distort::perspective::view::tests::snapping_lands_within_a_quarter_cell_on_gridlines ... ok
+test distort::arap::tests::rigid_motion_is_reproduced_exactly ... ok
+test distort::perspective::tests::selection_tool_scales_with_handles_and_5_moves_perpendicular ... ok
+test distort::perspective::widget::tests::the_widget_stays_put_on_screen ... ok
+test distort::arap::tests::pins_are_satisfied_and_free_regions_stay_rigid ... ok
+test distort::perspective::view::tests::colours_and_rulers_come_from_the_definition ... ok
+test distort::tests::create_covers_all_distort_tools ... ok
+test distort::tests::warp_node_maps_all_points_and_drops_live_shape ... ok
+test distort::tests::warp_pins_and_maps_gradients_once ... ok
+test distort::puppet::tests::show_mesh_is_on_by_default_and_expand_may_be_zero ... ok
+test distort::width::tests::alt_drag_changes_one_side_and_move_slides ... ok
+test distort::arap::tests::pins_at_rest_leave_the_mesh_unchanged ... ok
+test distort::tests::affine_near_recovers_affine_maps ... ok
+test distort::width::tests::alt_drag_copies_and_dropping_onto_a_point_snaps_to_it ... ok
+test distort::width::tests::compound_path_strokes_are_edited_through_the_compound ... ok
+test draw2::anchor::tests::add_and_delete_anchor_clicks ... ok
+test draw2::anchor::tests::anchor_point_drag_pulls_handles_click_converts ... ok
+test distort::width::tests::double_click_on_a_width_point_opens_width_point_edit ... ok
+test distort::width::tests::drag_outward_creates_symmetric_width_point ... ok
+test distort::width::tests::the_cursor_says_what_a_drag_does ... ok
+test distort::width::tests::shift_click_selects_several_points_that_drag_together ... ok
+test distort::width::tests::width_points_show_on_every_subpath ... ok
+test draw2::anchor::tests::anchor_point_picks_within_the_tolerance_and_drags_shown_handles ... ok
+test draw2::anchor::tests::scissors_splits_at_segment ... ok
+test draw2::curvature::tests::a_press_on_a_point_selects_it_and_a_drag_moves_it ... ok
+test draw2::curvature::tests::a_press_on_a_segment_adds_a_point_and_a_drag_moves_it_in_one_step ... ok
+test draw2::curvature::tests::closing_keeps_the_old_segments ... ok
+test draw2::curvature::tests::alt_click_or_double_click_toggles_and_delete_removes ... ok
+test draw2::curvature::tests::clicks_go_on_from_a_current_end_and_the_other_end_closes ... ok
+test draw2::curvature::tests::going_on_from_an_end_keeps_the_old_segments ... ok
+test draw2::curvature::tests::moving_a_corner_without_handles_keeps_its_sides_straight ... ok
+test draw2::curvature::tests::moving_a_point_recurves_only_its_two_segments ... ok
+test draw2::curvature::tests::first_click_creates_then_notify_tracks_path ... ok
+test distort::arap::tests::a_held_rotation_turns_the_art_around_its_pin ... ok
+test draw2::family::tests::click_opens_dialog_and_arc_shift ... ok
+test draw2::curvature::tests::points_snap_to_smart_guides ... ok
+test draw2::family::tests::corners_snap_to_smart_guides ... ok
+test draw2::family::tests::grid_drag_and_arrows ... ok
+test draw2::gesture::tests::eraser_and_knife_exec_on_release ... ok
+test draw2::gesture::tests::pencil_alt_closes_and_continues_selected_path ... ok
+test draw2::gesture::tests::pencil_ends_snap_to_smart_guides ... ok
+test draw2::gesture::tests::paintbrush_sends_pen_pressure ... ok
+test draw2::gesture::tests::pencil_previews_and_commits ... ok
+test draw2::curvature::tests::inserting_a_point_keeps_the_shape ... ok
+test draw2::gesture::tests::smooth_needs_selection_and_brackets_resize ... ok
+test draw2::tests::all_tools_exist ... ok
+test draw2::tests::catmull_rom_passes_through_points ... ok
+test distort::arap::tests::default_pins_go_at_the_centre_and_the_end_of_each_limb ... ok
+test extra::tests::create_covers_both ... ok
+test guides::tests::anchor_drag_targets_leave_out_what_moves ... ok
+test guides::tests::artboard_bleed_is_a_target ... ok
+test extra::tests::flare_options_last_and_draw_the_next_flare ... ok
+test guides::tests::construction_angle_sets ... ok
+test guides::tests::display_options_colour_and_hide_the_guides_but_keep_the_snap ... ok
+test guides::tests::drawn_points_land_on_anchors_paths_alignments_and_construction_guides ... ok
+test guides::tests::draw_snap_gathers_once_per_document_state ... ok
+test guides::tests::rect_snap_aligns_edges ... ok
+test guides::tests::drawn_points_snap_to_ruler_guides_with_smart_guides_on ... ok
+test guides::tests::scale_snap_lands_the_moved_edges_on_targets ... ok
+test guides::tests::scale_snap_lands_the_handle_on_anchors ... ok
+test guides::tests::snaps_to_anchor_and_alignment ... ok
+test meshblend::tests::blend_tool_anchor_clicks_and_options ... ok
+test meshblend::tests::blend_tool_next_click_adds_to_the_blend_just_made ... ok
+test params::tests::gradient_params_carry_placement_only_when_placed ... ok
+test meshedit::tests::direct_selection_drags_a_selected_envelopes_points ... ok
+test meshedit::tests::the_mesh_tool_drags_envelope_points_and_adds_lines ... ok
+test meshblend::tests::blend_tool_two_clicks_make_blend ... ok
+test guides::tests::spacing_guides_space_a_moved_selection_evenly ... ok
+test meshblend::tests::mesh_tool_click_path_creates_mesh ... ok
+test pathtype::tests::dragging_the_start_and_end_brackets_moves_them ... ok
+test pathtype::tests::dragging_the_centre_bracket_slides_the_type_and_across_the_path_flips_it ... ok
+test pathtype::tests::brackets_stand_at_the_start_the_middle_and_the_end_of_the_span ... ok
+test pen::tests::a_drag_from_the_first_anchor_always_closes ... ok
+test pen::tests::a_one_anchor_path_does_not_close_on_itself ... ok
+test pen::tests::alt_over_a_shown_handle_or_an_anchor_converts ... ok
+test pen::tests::alt_pressed_mid_drag_keeps_the_incoming_handle ... ok
+test pen::tests::anchors_snap_to_smart_guides ... ok
+test pen::tests::clicking_the_last_anchor_retracts_its_handle_and_dragging_pulls_a_new_one ... ok
+test pen::tests::first_click_creates_path ... ok
+test pen::tests::alt_over_a_segment_reshapes_it ... ok
+test pen::tests::clicking_a_selected_blend_spine_adds_a_point ... ok
+test pen::tests::clicking_a_selected_path_adds_or_deletes_an_anchor ... ok
+test pen::tests::space_moves_the_anchor_being_placed ... ok
+test place::tests::click_places_at_100_percent_and_drag_keeps_the_aspect ... ok
+test printtiling::tests::a_drag_previews_the_origin_and_commits_once ... ok
+test pen::tests::the_pen_draws_on_the_path_it_began_only ... ok
+test rulerguide::tests::a_new_guide_follows_the_smart_guide_preferences ... ok
+test place::tests::arrows_cycle_and_escape_discards ... ok
+test rulerguide::tests::an_artboard_guide_is_picked_and_snapped_to_across_its_artboard_only ... ok
+test rulerguide::tests::a_drag_moves_the_selected_guides_in_one_step ... ok
+test rulerguide::tests::a_new_guide_is_made_on_release_over_the_canvas_only ... ok
+test distort::puppet::tests::a_click_off_the_mesh_places_no_pin_and_says_so ... ok
+test rulerguide::tests::picks_the_guide_within_the_tolerance_unless_hidden_or_locked ... ok
+test rulerguide::tests::shift_click_toggles_and_alt_drag_copies ... ok
+test rulerguide::tests::dropped_on_its_ruler_the_guide_is_deleted ... ok
+test rulerguide::tests::a_new_guide_snaps_to_the_art_and_the_artboard ... ok
+test rulerguide::tests::the_dragged_guide_snaps_to_art_ruler_ticks_and_the_grid ... ok
+test rulerguide::tests::with_smart_guides_off_snap_to_point_pulls_guides_onto_anchors ... ok
+test select::tests::a_click_on_a_selected_object_makes_it_the_key ... ok
+test select::tests::drag_moves_with_single_undo ... ok
+test select::tests::a_move_lands_the_nearest_edge_or_centre_on_the_grid ... ok
+test select::tests::a_press_on_a_ruler_guide_picks_it_over_the_art ... ok
+test select::tests::click_selects_object ... ok
+test select::tests::click_empty_deselects ... ok
+test select::tests::handle_drag_of_a_turned_box_snaps_on_the_page ... ok
+test select::tests::hovering_labels_the_centre_and_anchors_and_a_press_grabs_by_them ... ok
+test select::tests::handle_drag_on_area_type_resizes_its_frame ... ok
+test select::tests::handle_drag_snaps_to_the_other_objects_with_smart_guides ... ok
+test select::tests::marquee_selects ... ok
+test select::tests::shift_click_toggles_an_object_on_release ... ok
+test select::tests::handle_drag_scales ... ok
+test select::tests::shift_drag_on_a_selected_object_moves_it_constrained ... ok
+test select::tests::shift_marquee_toggles ... ok
+test select::tests::smart_guide_display_preferences_drive_the_readouts_and_the_pull ... ok
+test shape::tests::arrow_keys_change_sides ... ok
+test settings::tests::every_listed_option_is_one_the_tool_reports ... ok
+test shape::tests::click_opens_dialog ... ok
+test select::tests::turned_box_handles_turn_and_scale_along_the_object ... ok
+test settings::tests::liquify_tools_share_the_global_brush ... ok
+test shape::tests::shift_square_alt_center ... ok
+test shape::tests::rect_drag ... ok
+test shape::tests::corners_snap_to_smart_guides ... ok
+test shape::tests::space_moves_the_shape_being_drawn ... ok
+test slice::tests::the_slice_selection_tool_selects_moves_resizes_and_deletes ... ok
+test slice::tests::the_slice_tool_drags_out_a_slice_in_one_undo_step ... ok
+test symbolism::tests::brackets_change_diameter_and_intensity ... ok
+test symbolism::tests::paintbrush_rewrites_freehand_to_brush_freehand ... ok
+test symbolism::tests::adjust_tools_map_to_symbol_adjust ... ok
+test text::tests::common_affixes_are_char_safe ... ok
+test symbolism::tests::sprayer_previews_all_points_and_commits ... ok
+test text::tests::area_and_path_tools_convert_clicked_paths ... ok
+test text::tests::ime_ranges_convert_characters_to_bytes ... ok
+test text::tests::arrows_follow_the_columns_of_vertical_type ... ok
+test text::tests::backspace_deletes_selection_or_word ... ok
+test text::tests::double_and_triple_click_select_word_and_paragraph ... ok
+test text::tests::new_type_snaps_to_smart_guides ... ok
+test text::tests::drag_selects_and_overlay_highlights ... ok
+test text::tests::a_drag_across_type_not_being_edited_selects_its_text ... ok
+test text::tests::vertical_tools_preserve_their_ids_and_create_vertical_text ... ok
+test text::tests::shift_arrows_select_and_typing_replaces ... ok
+test text::tests::up_down_move_between_lines ... ok
+test text::tests::word_and_line_navigation_keys ... ok
+test text::tests::select_all_and_styled_paste ... ok
+test xform::artboard::tests::a_proportional_resize_keeps_its_proportions_at_the_smallest_size ... ok
+test typewidget::tests::the_widget_sits_right_of_the_box_and_a_double_click_converts ... ok
+test xform::artboard::tests::an_alt_drag_copy_snaps_to_the_artboard_it_leaves_behind ... ok
+test text::tests::typing_is_one_coalesced_preview ... ok
+test xform::artboard::tests::bleed_edges_snap_to_bleed_edges ... ok
+test xform::artboard::tests::alt_drag_moves_a_copy_of_the_artboard ... ok
+test xform::artboard::tests::bounds_follow_the_artboard_while_the_document_shows_the_preview ... ok
+test xform::artboard::tests::moving_never_snaps_to_itself_or_the_art_it_carries ... ok
+test xform::artboard::tests::moving_snaps_to_other_artboards_with_smart_guides ... ok
+test xform::artboard::tests::moving_snaps_to_grid_and_pixels ... ok
+test xform::artboard::tests::move_resize_create_delete ... ok
+test text::tests::layout_cache_follows_fonts_added_later ... ok
+test xform::artboard::tests::resizing_snaps_the_dragged_handle ... ok
+test xform::artboard::tests::scale_art_resizes_proportionally_without_snapping_to_its_art ... ok
+test xform::eyedropper::tests::alt_sends_reverse_and_shift_alt_append ... ok
+test xform::eyedropper::tests::gradient_sampled_along_vector ... ok
+test xform::eyedropper::tests::radial_sample_honours_aspect ... ok
+test xform::eyedropper::tests::click_copies_appearance_shift_samples_color ... ok
+test xform::eyedropper::tests::sampling_keeps_the_colour_model ... ok
+test xform::eyedropper::tests::type_gradients_are_sampled_in_text_space ... ok
+test xform::eyedropper::tests::the_stop_option_samples_into_the_selected_stop_then_switches_back ... ok
+test xform::eyedropper::tests::clicking_an_image_samples_its_pixels ... ok
+test xform::free::tests::cmd_side_handle_shears ... ok
+test xform::free::tests::corner_scales_and_inside_moves ... ok
+test xform::free::tests::distort_modes_emit_corners ... ok
+test xform::freeform::tests::a_point_dragged_out_of_the_object_is_removed ... ok
+test xform::free::tests::modifiers_pressed_during_a_handle_drag_change_what_it_does ... ok
+test xform::freeform::tests::clicks_select_points_add_points_and_split_lines ... ok
+test xform::freeform::tests::double_clicking_a_point_opens_its_popover ... ok
+test xform::freeform::tests::lines_mode_joins_new_points_and_drags_move_points ... ok
+test xform::freeform::tests::successive_clicks_draw_a_line_until_escape ... ok
+test xform::gradient::tests::a_bar_click_adds_a_stop_and_selects_it ... ok
+test xform::gradient::tests::a_click_inside_the_art_applies_the_gradient_from_there ... ok
+test xform::freeform::tests::the_spread_ring_drags_the_spread ... ok
+test xform::gradient::tests::annotator_follows_the_active_appearance_item ... ok
+test xform::gradient::tests::diamonds_move_midpoints ... ok
+test xform::gradient::tests::delete_and_arrows_act_on_the_selected_stop ... ok
+test xform::gradient::tests::a_radial_shows_its_extent_ellipse_aspect_handle_and_focal_dot ... ok
+test xform::gradient::tests::drag_sets_gradient_vector_and_constrains ... ok
+test xform::gradient::tests::empty_selection_targets_hit_object ... ok
+test xform::gradient::tests::double_click_on_a_stop_opens_its_popover ... ok
+test xform::gradient::tests::past_the_end_rotates_and_shift_snaps ... ok
+test xform::gradient::tests::handles_snap_to_anchors_and_shift_uses_the_constrain_angle ... ok
+test xform::gradient::tests::stroke_proxy_drags_and_annotates_the_stroke ... ok
+test xform::gradient::tests::stops_drag_along_the_bar_off_it_to_delete_and_alt_copies ... ok
+test xform::measure::tests::drag_reports_distance_and_angle ... ok
+test xform::transform::tests::alt_click_and_click_snap_the_reference_point_to_anchors_and_centres ... ok
+test xform::gradient::tests::overlays_draw_a_chip_per_stop_marking_the_selected_one ... ok
+test xform::gradient::tests::the_end_handle_changes_only_the_end_and_the_start_moves_both ... ok
+test xform::transform::tests::alt_click_opens_dialog_and_alt_release_copies ... ok
+test xform::transform::tests::alt_drag_transforms_a_copy_and_leaves_the_dialog_shut ... ok
+test xform::transform::tests::nothing_selected_does_nothing ... ok
+test xform::transform::tests::click_sets_reference_point_then_drag_uses_it ... ok
+test xform::transform::tests::reflect_vertical_axis_mirrors_x ... ok
+test xform::transform::tests::rotate_drag_about_center_single_undo ... ok
+test xform::transform::tests::scale_shift_is_uniform ... ok
+test xform::transform::tests::shear_horizontal_keeps_origin_row ... ok
+test xform::transform::tests::scale_drag_snaps_from_an_anchor_onto_another_objects_anchor ... ok
+test xform::wand::tests::magic_wand_emits_the_engine_command ... ok
+test xform::wand::tests::lasso_selects_anchors_inside ... ok
+test distort::puppet::tests::shift_click_selects_several_pins_that_move_together ... ok
+test guides::tests::bisection_finds_what_a_scan_finds ... ok
+test distort::puppet::tests::puppet_tool_autopins_adds_and_drags ... ok
+test distort::puppet::tests::warps_start_from_the_rest_shape ... ok
+test text::tests::hebrew_typing_and_visual_arrows_keep_logical_text ... ok
+test distort::puppet::tests::alt_drag_near_a_selected_pin_turns_the_art_around_it ... ok
+test text::tests::marked_text_is_underlined_with_the_converting_clause_thick ... ok
+
+test result: ok. 287 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_trace-899ce3dcc7a3be31)
+
+running 95 tests
+test logo::bezier::tests::degenerate_input_gives_nothing_or_a_line_not_a_panic ... ok
+test logo::field::tests::a_blurred_step_crosses_half_where_the_edge_is ... ok
+test logo::field::tests::degenerate_input_is_empty_not_a_panic ... ok
+test logo::field::tests::interpolation_passes_through_the_samples ... ok
+test logo::field::tests::a_constant_plane_stays_constant ... ok
+test logo::geom::tests::a_circle_has_no_corners ... ok
+test logo::geom::tests::a_square_has_four_corners ... ok
+test logo::geom::tests::arcs_stay_on_the_circle ... ok
+test logo::geom::tests::line_and_circle_fits_recover_their_shapes ... ok
+test logo::geom::tests::open_smoothing_pins_the_ends ... ok
+test logo::bezier::tests::pieces_join_end_to_end ... ok
+test logo::geom::tests::resampling_makes_even_spacing ... ok
+test logo::geom::tests::resampling_refuses_degenerate_input ... ok
+test logo::march::tests::a_disc_gives_one_loop_of_the_right_size ... ok
+test logo::march::tests::outer_boundaries_and_holes_wind_in_opposite_directions ... ok
+test logo::geom::tests::within_checks_both_near_and_far ... ok
+test logo::geom::tests::smoothing_a_circle_keeps_its_radius ... ok
+test logo::march::tests::saddles_and_degenerate_grids_do_not_panic ... ok
+test logo::march::tests::two_separate_blobs_give_two_loops ... ok
+test logo::outline::tests::a_disc_becomes_a_true_circle ... ok
+test logo::palette::tests::hex_parsing ... ok
+test logo::palette::tests::nothing_to_find_in_empty_or_blank_images ... ok
+test logo::bezier::tests::a_circle_arc_is_one_cubic ... ok
+test logo::restore::tests::a_gentle_bend_is_not_a_corner ... ok
+test logo::restore::tests::a_rounded_square_gets_its_four_corners_back ... ok
+test logo::restore::tests::a_smooth_circle_restores_nothing ... ok
+test logo::restore::tests::degenerate_input_is_returned_unchanged ... ok
+test logo::outline::tests::the_guard_puts_back_a_plain_fit_when_the_clever_one_strays ... ok
+test logo::outline::tests::a_rounded_square_becomes_a_sharp_square_with_straight_sides ... ok
+test logo::palette::tests::white_is_never_in_the_palette_and_transparency_is_ignored ... ok
+test logo::outline::tests::without_snapping_a_circle_is_still_smooth_and_close ... ok
+test logo::outline::tests::a_snapped_circle_keeps_the_direction_of_its_loop ... ok
+test logo::palette::tests::a_gradient_is_not_flat ... ok
+test logo::palette::tests::three_flat_colours_are_found_exactly ... ok
+test logo::tests::degenerate_images_are_fine ... ok
+test logo::bezier::tests::a_wavy_curve_is_fitted_within_tolerance ... ok
+test logo::tests::a_gradient_is_refused_not_posterised ... ok
+test logo::tests::a_blurred_disc_becomes_a_true_circle_within_a_tenth_of_a_pixel ... ok
+test logo::tests::nested_rings_keep_their_own_holes_under_ignore_white ... ok
+test logo::tests::a_blurred_rectangle_keeps_square_corners_and_four_anchors ... ok
+test logo::bezier::tests::a_full_circle_stays_within_tolerance_with_few_pieces ... ok
+test logo::tests::a_hard_edged_source_still_gets_smooth_circles ... ok
+test logo::unmix::tests::a_blend_of_two_colours_recovers_its_proportions ... ok
+test logo::unmix::tests::a_colour_no_class_can_explain_leaves_a_large_residual ... ok
+test logo::unmix::tests::a_half_transparent_edge_is_half_covered ... ok
+test logo::unmix::tests::pure_pixels_are_exact ... ok
+test logo::unmix::tests::weights_sum_to_one ... ok
+test mosaic::tests::averages_each_tile ... ok
+test tests::a_thin_line_traces_as_one_stroked_centre_line ... ok
+test tests::a_thin_ring_traces_as_a_closed_centre_line ... ok
+test logo::tests::a_large_odd_sized_image_never_overshoots_its_edges ... ok
+test logo::tests::noise_specks_are_dropped ... ok
+test tests::a_trace_past_its_anchor_budget_is_refused ... ok
+test tests::an_image_too_large_to_trace_is_refused_before_decoding ... ok
+test logo::tests::letters_knocked_out_of_a_badge_become_white_or_holes ... ok
+test tests::color_mode_gradient_uses_at_most_n_colors ... ok
+test tests::color_mode_palette_size_matches_request ... ok
+test tests::contour_loops_are_consistent ... ok
+test tests::create_settings_parse_with_defaults ... ok
+test tests::black_disc_is_one_closed_path_with_disc_area ... ok
+test tests::decode_png ... ok
+test tests::diagonal_pixels_stay_separate ... ok
+test logo::tests::a_white_background_logo_drops_the_white_when_asked ... ok
+test tests::fidelity_changes_anchor_count ... ok
+test logo::tests::the_named_palette_is_used_exactly_and_a_bad_one_is_an_error ... ok
+test tests::document_library_uses_the_most_used_swatches_exactly ... ok
+test tests::grayscale_levels ... ok
+test tests::noise_removal_fills_pinholes ... ok
+test tests::noise_removal_drops_speckles ... ok
+test tests::automatic_traces_flat_art_with_its_colours_and_photos_in_full_tone ... ok
+test tests::palettes_parse_from_their_ids_and_names ... ok
+test tests::params_json_roundtrip_and_partial ... ok
+test tests::presets_resolve ... ok
+test logo::tests::touching_colours_leave_no_gap_between_them ... ok
+test tests::small_disc_area_within_tolerance ... ok
+test tests::overlapping_layers_stack ... ok
+test tests::ring_has_outer_and_hole ... ok
+test tests::snap_curves_to_lines_straightens_near_lines ... ok
+test tests::timing_1000x1000_bw_under_300ms ... ignored, timing; run with --release --ignored
+test tests::transparent_pixels_are_not_traced ... ok
+test tests::stripes_give_one_path_per_stripe ... ok
+test tests::threshold_controls_black_and_white ... ok
+test tests::wide_areas_stay_filled_and_lines_cross_at_junctions ... ok
+test tests::all_presets_trace_a_colour_image ... ok
+test tests::two_colour_stripes_without_ignore_white_trace_both_colours ... ok
+test tests::full_tone_follows_the_tones_the_image_has ... ok
+test tests::parallel_layers_keep_their_order ... ok
+test logo::tests::a_small_accent_colour_is_not_lost ... ok
+test tests::create_strokes_survives_noise_and_tiny_images ... ok
+test logo::tests::a_hostile_palette_is_bounded_and_near_duplicates_merge ... ok
+test logo::tests::random_small_images_and_settings_never_panic ... ok
+test logo::outline::tests::degenerate_outlines_give_none_not_a_panic ... ok
+test logo::tests::too_many_outlines_are_refused_not_silently_truncated ... ok
+test logo::tests::a_large_image_is_traced_at_reduced_size_and_scaled_back ... ok
+test logo::tests::extreme_parameters_never_panic ... ok
+
+test result: ok. 94 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.35s
+
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_ui_egui-b38a5801b33a6d68)
+
+running 874 tests
+test brand::tests::the_icon_decodes_to_a_rounded_128_px_tile ... ok
+test canvas::tests::a_brush_dropped_on_a_path_is_applied_to_it ... ok
+test canvas::tests::anchor_size_scales_anchors_and_handles ... ok
+test canvas::tests::artboard_labels_name_the_artboard ... ok
+test canvas::tests::a_drag_from_a_ruler_onto_the_canvas_makes_a_guide ... ok
+test canvas::tests::a_pen_tap_within_one_frame_clicks_where_it_tapped ... ok
+test canvas::tests::a_symbol_dropped_on_the_canvas_is_placed_there ... ok
+test canvas::tests::a_click_just_outside_the_canvas_does_not_reach_the_tool ... ok
+test canvas::tests::a_star_shows_corner_widgets_with_direct_selection ... ok
+test canvas::tests::animated_zoom_scrubs_and_holds_else_the_zoom_tool_zooms_to_an_area ... ok
+test canvas::tests::a_click_activates_its_artboard_and_paste_in_place_goes_onto_it ... ok
+test canvas::tests::art_moved_off_the_canvas_becomes_a_panel_drag_and_stays_put ... ok
+test canvas::tests::a_graphic_style_dropped_on_art_applies_to_the_object_hit ... ok
+test canvas::tests::cmd_space_zooms_and_space_pans_whatever_the_tool ... ok
+test canvas::tests::grid_and_guides_take_their_preferences ... ok
+test canvas::tests::anti_aliased_artwork_preference_smooths_the_canvas ... ok
+test canvas::tests::cmd_with_another_tool_drags_with_the_selection_tool_used_last ... ok
+test canvas::tests::large_tabs_make_the_document_tabs_taller ... ok
+test canvas::tests::double_clicking_type_with_the_selection_tool_puts_the_caret_there ... ok
+test canvas::tests::guides_from_the_rulers_snap_and_artboard_guides_span_their_artboard ... ok
+test canvas::tests::corner_widgets_hide_above_the_preference_angle ... ok
+test canvas::tests::handle_style_and_handles_of_multiple_anchors ... ok
+test canvas::tests::pixel_preview_smooths_bitmaps_only_when_asked ... ok
+test canvas::tests::dropping_the_appearance_thumbnail_on_art_copies_the_appearance ... ok
+test canvas::tests::middle_drag_pans_the_view_with_any_tool ... ok
+test canvas::tests::rulers_cover_their_length_at_any_rotation ... ok
+test canvas::tests::pixel_preview_shows_the_document_pixels ... ok
+test canvas::tests::swatches_and_proxy_paints_dropped_on_art_fill_the_object_hit ... ok
+test canvas::tests::the_key_object_has_a_thicker_outline ... ok
+test canvas::tests::object_highlighting_preference_hides_the_hover_outline ... ok
+test canvas::tests::pen_and_touch_input_drive_the_tools_with_their_pressure ... ok
+test canvas::tests::the_selection_tool_moves_and_deletes_ruler_guides ... ok
+test canvas::tests::view_actual_size_follows_display_print_size ... ok
+test canvas::tests::space_pressed_mid_drag_moves_what_the_tool_draws ... ok
+test canvas::tests::pixel_grid_shows_in_pixel_preview_from_600_percent ... ok
+test chrome::tests::hints_name_keys_as_the_menus_do ... ok
+test chrome::tests::a_tabs_close_box_sits_where_the_platform_puts_it ... ok
+test chrome::tests::the_active_tab_stays_in_view ... ok
+test chrome::tests::the_tab_title_names_the_opacity_mask_while_it_is_edited ... ok
+test canvas::tests::wheel_notches_zoom_in_a_glide ... ok
+test chrome::tests::the_artboard_navigator_goes_to_artboards_and_fitting_shows_the_current_one ... ok
+test credits::tests::alphabetical_ignores_at_and_case ... ok
+test community::tests::link_clicks_open_the_right_urls ... ok
+test canvas::tests::the_type_widget_shows_which_kind_the_type_is ... ok
+test credits::tests::delta_and_dates ... ok
+test credits::tests::formatting ... ok
+test cursors::tests::arrow_hotspot_is_tip ... ok
+test credits::tests::names_fall_back_to_the_username ... ok
+test cursors::tests::the_arrow_bitmap_is_black_in_a_white_halo_with_the_tip_on_the_hotspot ... ok
+test cursors::tests::each_bitmap_is_made_once_so_the_os_cursor_is_kept ... ok
+test canvas::tests::two_fingers_dragged_together_pan_the_canvas ... ok
+test brand::tests::the_app_bar_paints_the_icon_from_one_cached_texture ... ok
+test dialogs::all_tools::tests::every_tool_is_listed_once_under_a_heading ... ok
+test canvas::tests::shaper_selection_highlights_only_the_visible_result ... ok
+test canvas::tests::two_finger_tap_undoes_and_three_finger_tap_redoes ... ok
+test dialogs::brush_options::tests::a_taken_name_keeps_the_dialog_open ... ok
+test chrome::tests::the_zoom_hint_follows_animated_zoom ... ok
+test dialogs::blend_options::tests::with_nothing_selected_it_sets_what_new_blends_start_with ... ok
+test dialogs::color_balance::tests::global_mode_shifts_the_tints_of_global_colours ... ok
+test canvas::tests::the_task_bar_is_dragged_by_its_handle_pinned_and_reset ... ok
+test cursors::tests::every_glyph_becomes_a_bitmap_with_its_hotspot_inside ... ok
+test dialogs::color_picker::tests::field_and_slider_map_back_per_channel ... ok
+test dialogs::color_guide_options::tests::ok_sets_the_panel_options ... ok
+test dialogs::color_picker::tests::gamut_correction_gives_a_printable_colour ... ok
+test dialogs::color_picker::tests::only_web_colors_snaps ... ok
+test dialogs::brush_options::tests::calligraphic_options_show_each_value_with_its_variation_and_ok_applies_them ... ok
+test dialogs::command::tests::area_type_options_choices_match_the_params_doc ... ok
+test dialogs::corners::tests::corners_edits_a_star ... ok
+test dialogs::blend_options::tests::opens_on_the_blend_previews_and_keeps_smooth_color ... ok
+test dialogs::color_balance::tests::previews_live_and_commits_one_undo_step ... ok
+test dialogs::corners::tests::ui_corners_opens_on_the_selection_and_leaves_mixed_values_alone ... ok
+test dialogs::corners::tests::double_clicking_a_direct_selected_corner_edits_it_alone ... ok
+test dialogs::dxf_import::tests::bad_options_keep_the_dialog_open ... ok
+test dialogs::brush_options::tests::bristle_options_and_brushes_without_a_dialog ... ok
+test dialogs::command::tests::area_type_options_dialog_sets_the_vertical_alignment ... ok
+test dialogs::edit_selection::tests::cancel_leaves_them_and_a_shared_name_keeps_the_dialog_open ... ok
+test dialogs::color_picker::tests::open_set_hex_and_confirm_fills ... ok
+test dialogs::edit_selection::tests::nothing_changes_until_ok_and_all_edits_are_one_undo_step ... ok
+test dialogs::edit_selection::tests::it_needs_a_saved_selection ... ok
+test dialogs::effect::tests::fields_that_pick_a_value_are_dropdowns_of_its_values ... ok
+test dialogs::envelope::tests::edit_contents_reads_edit_envelope_while_editing ... ok
+test dialogs::dxf_import::tests::placing_a_drawing_asks_then_places_one_group ... ok
+test dialogs::envelope::tests::reset_items_take_the_make_items_place_while_an_envelope_is_selected ... ok
+test cursors::tests::the_canvas_hands_the_tool_cursor_to_the_os_and_idles_while_the_pointer_rests ... ok
+test cursors::tests::tool_cursors_scale_with_the_ui_only_when_asked ... ok
+test dialogs::dxf_import::tests::opening_a_drawing_asks_for_the_import_options ... ok
+test dialogs::envelope::tests::options_dialog_starts_from_the_envelope_and_without_one_sets_the_defaults ... ok
+test dialogs::expand::tests::the_command_palette_opens_it_and_ui_expand_dialog_too ... ok
+test dialogs::flare_options::tests::a_click_fills_in_the_options_and_draws_a_flare_there ... ok
+test canvas::tests::zoom_with_mouse_wheel_preference ... ok
+test dialogs::expand::tests::opens_with_what_applies_and_ok_expands_the_gradient_to_a_mesh ... ok
+test dialogs::document_setup::tests::every_tab_draws_and_ok_is_one_undo_step ... ok
+test dialogs::envelope::tests::the_control_bar_switches_to_edit_contents_and_back ... ok
+test dialogs::color_picker::tests::every_mode_draws_and_cmyk_documents_get_cmyk ... ok
+test dialogs::flatten::tests::built_in_presets_are_known_by_name ... ok
+test dialogs::flattener_presets::tests::import_and_export_go_through_files ... ok
+test dialogs::flattener_presets::tests::saved_presets_persist_with_the_ui_state_and_preferences_still_apply ... ok
+test dialogs::envelope::tests::reset_mesh_dialog_switches_the_kind_and_cancel_rolls_back ... ok
+test dialogs::envelope::tests::warp_dialog_previews_and_ok_keeps_one_step ... ok
+test dialogs::freehand::tests::the_other_tools_have_no_freehand_options ... ok
+test dialogs::flare_options::tests::the_toolbar_opens_the_options_and_ok_keeps_them_for_the_next_drag ... ok
+test dialogs::file_info::tests::file_info_draws_and_ok_is_one_undo_step ... ok
+test dialogs::gradient_stop::tests::confirm_applies_colour_opacity_and_location ... ok
+test dialogs::gradient_stop::tests::delete_removes_the_selected_stop_instead_of_the_object ... ok
+test dialogs::freehand::tests::a_new_fidelity_changes_what_the_pencil_draws ... ok
+test dialogs::gradient_stop::tests::double_clicking_a_stop_opens_the_popover_which_draws_both_tabs ... ok
+test dialogs::flatten::tests::bad_values_report_and_keep_the_dialog_open ... ok
+test dialogs::gradient_stop::tests::on_a_freeform_gradient_it_edits_the_selected_point ... ok
+test dialogs::gradient_stop::tests::the_popover_goes_beside_the_art_it_edits ... ok
+test dialogs::flatten::tests::save_preset_keeps_the_options_and_lists_them ... ok
+test dialogs::gradient_stop::tests::the_popover_closes_when_its_stop_goes_away ... ok
+test dialogs::gradient_stop::tests::the_click_that_opens_it_from_the_panel_keeps_it_open ... ok
+test dialogs::graphic_style_options::tests::names_a_new_style_then_renames_it ... ok
+test dialogs::eyedropper::tests::the_trees_set_the_options ... ok
+test dialogs::layer_options::tests::layer_options_edit_the_layer_and_ok_is_one_undo_step ... ok
+test dialogs::liquify::tests::type_under_the_brush_is_reported_in_the_status_bar ... ok
+test dialogs::layers_panel_options::tests::panel_options_round_trip_and_apply ... ok
+test dialogs::missing_fonts::tests::a_search_folder_that_fails_is_not_tried_again ... ok
+test dialogs::layer_options::tests::new_layer_options_make_a_layer_and_objects_get_name_show_and_lock ... ok
+test dialogs::gradient_stop::tests::the_opening_double_click_keeps_it_open_and_a_later_click_elsewhere_closes_it ... ok
+test dialogs::missing_fonts::tests::files_go_with_their_fonts_by_name ... ok
+test dialogs::liquify::tests::each_tool_shows_its_options_and_ok_sets_them ... ok
+test dialogs::missing_fonts::tests::edit_original_asks_about_the_placed_documents_fonts ... ok
+test dialogs::freehand::tests::each_tool_shows_its_options_and_ok_sets_them ... ok
+test dialogs::missing_fonts::tests::generic_families_are_not_asked_about ... ok
+test dialogs::missing_fonts::tests::find_fonts_opens_find_font_on_the_missing_font ... ok
+test dialogs::missing_fonts::tests::find_fonts_works_on_the_dialog_s_own_document ... ok
+test dialogs::missing_fonts::tests::the_web_says_how_many_fonts_are_missing ... ok
+test dialogs::missing_fonts::tests::one_dialog_at_a_time_document_by_document ... ok
+test dialogs::missing_fonts::tests::missing_fonts_are_asked_about_after_the_missing_links ... ok
+test dialogs::missing_links::tests::a_link_changed_in_the_background_follows_update_links_on_focus ... ok
+test dialogs::liquify::tests::scallop_crystallize_and_wrinkle_have_brush_affects_and_no_simplify ... ok
+test dialogs::modal::tests::a_moved_window_stays_on_screen ... ok
+test dialogs::missing_fonts::tests::closing_the_dialog_stops_its_search ... ok
+test dialogs::missing_fonts::tests::the_question_comes_back_after_a_dialog_that_took_its_place ... ok
+test dialogs::missing_links::tests::modified_links_are_offered_for_update_when_the_preference_asks ... ok
+test dialogs::missing_links::tests::apply_to_all_replaces_the_others_from_the_same_folder ... ok
+test dialogs::new_document::tests::only_built_in_preset_names_are_translated ... ok
+test dialogs::new_swatch::tests::a_tint_opens_as_a_named_tint_swatch ... ok
+test dialogs::new_swatch::tests::params_carry_the_colour_or_the_paint ... ok
+test dialogs::missing_fonts::tests::the_status_lines_read_in_the_interface_language ... ok
+test canvas::tests::ime_edge_orders_never_eat_committed_text_or_lose_the_composition ... ok
+test dialogs::perspective_plane::tests::a_click_to_size_rectangle_goes_on_the_active_plane ... ok
+test canvas::tests::japanese_ime_composes_on_the_canvas_with_its_window_at_the_caret ... ok
+test canvas::tests::clicking_away_mid_composition_keeps_the_text_and_interrupts_the_ime ... ok
+test dialogs::missing_links::tests::opening_without_linked_files_asks_to_replace_or_ignore_each ... ok
+test dialogs::missing_fonts::tests::the_documents_fonts_folder_is_offered_and_searched_off_the_ui_thread ... ok
+test dialogs::pdf_presets::tests::import_and_export_go_through_files ... ok
+test dialogs::recolor::tests::harmony_rules_fill_the_rows_from_the_base ... ok
+test dialogs::recolor::tests::linked_handles_move_together ... ok
+test dialogs::recolor::tests::merge_and_separate_rows ... ok
+test dialogs::perspective_plane::tests::double_clicking_a_plane_widget_opens_its_options_and_ok_moves_it ... ok
+test dialogs::saturate::tests::commits_without_a_drawn_frame_as_one_step ... ok
+test dialogs::save_options::tests::save_a_copy_and_template_suggest_their_names ... ok
+test dialogs::new_document::tests::a_double_clicked_preset_creates_the_document ... ok
+test dialogs::save_pdf::tests::built_in_presets_are_known_by_name ... ok
+test dialogs::save_options::tests::save_as_pdf_asks_with_the_save_pdf_dialog_and_remembers_its_options ... ok
+test dialogs::save_pdf::tests::confirm_runs_export_pdf_with_the_dialog_options ... ok
+test dialogs::rearrange_artboards::tests::the_toggles_set_layout_and_order ... ok
+test dialogs::save_options::tests::web_save_as_names_the_file_and_picks_the_format ... ok
+test dialogs::rearrange_artboards::tests::opens_from_the_menu_and_rearranges_by_layout_and_order ... ok
+test dialogs::save_pdf::tests::option_labels_read_well ... ok
+test dialogs::flattener_presets::tests::edits_save_saved_presets_and_leave_built_in_ones ... ok
+test dialogs::save_pdf::tests::presets_reset_the_settings_and_fields_fall_back_to_defaults ... ok
+test dialogs::save_options::tests::save_as_svg_opens_svg_options_then_writes_svg ... ok
+test dialogs::new_document::tests::a_preset_fills_the_details_and_create_makes_the_document ... ok
+test dialogs::save_pdf::tests::create_layers_writes_pdf_layers ... ok
+test dialogs::save_pdf::tests::warnings_reach_the_status_and_errors_keep_the_dialog_open ... ok
+test dialogs::slices::tests::divide_slices_cuts_by_count_or_size ... ok
+test dialogs::svg_options::tests::all_artboards_export_one_file_each ... ok
+test dialogs::save_pdf::tests::marks_and_bleeds_reach_the_pdf ... ok
+test dialogs::raster_effects::tests::raster_effects_settings_draw_and_ok_is_one_undo_step ... ok
+test dialogs::pdf_presets::tests::save_pdf_saves_its_settings_as_a_preset ... ok
+test dialogs::swatch_options::tests::fields_round_trip_modes_and_colours ... ok
+test dialogs::spot_colors::tests::the_dialog_switches_lab_spots_to_cmyk_and_back ... ok
+test dialogs::slices::tests::slice_options_opens_on_the_selection_and_ok_sets_them ... ok
+test dialogs::swatch_options::tests::lab_mode_defines_a_spot_colour_in_lab ... ok
+test dialogs::save_pdf::tests::the_security_section_takes_passwords_that_presets_drop ... ok
+test dialogs::tests::a_form_dialog_is_as_wide_as_its_fields_not_the_window ... ok
+test dialogs::tests::a_dialog_opens_with_its_first_field_focused_so_typing_and_enter_apply ... ok
+test dialogs::flatten::tests::cancel_rolls_the_preview_back_and_ok_flattens_as_one_step ... ok
+test dialogs::tests::artboard_options_lists_name_then_width_and_height ... ok
+test dialogs::symbolism_options::tests::the_symbolism_tools_share_the_options_ok_sets ... ok
+test dialogs::tests::confirm_runs_each_dialogs_command ... ok
+test dialogs::save_pdf::tests::pdf_1_3_takes_a_flattener_preset_in_advanced ... ok
+test dialogs::svg_options::tests::profile_encoding_and_embedded_fonts_reach_the_file ... ok
+test dialogs::svg_options::tests::save_as_svg_asks_for_options_then_save_reuses_them ... ok
+test dialogs::tests::artboard_options_position_moves_art_only_with_the_tool_option_on ... ok
+test dialogs::tests::kinds_map_to_their_dialogs ... ok
+test dialogs::tests::given_headings_are_shown_as_they_are ... ok
+test dialogs::tests::effect_preview_is_kept_as_one_undo_step ... ok
+test dialogs::tests::mixed_lists_translate_only_their_built_in_entries ... ok
+test dialogs::tests::effect_dialog_applies_to_its_appearance_item ... ok
+test dialogs::tests::dialogs_are_as_tall_as_their_content ... ok
+test dialogs::tests_dxf::dwg_is_listed_but_points_to_dxf ... ok
+test dialogs::svg_options::tests::export_as_svg_opens_the_options_and_remembers_them ... ok
+test dialogs::tests_dxf::the_dxf_options_dialog_needs_a_document ... ok
+test dialogs::tests_dxf::bad_dxf_options_keep_the_dialog_open ... ok
+test dialogs::tests::menu_parameter_dialogs_are_compact ... ok
+test dialogs::tests_eps::opening_an_eps_that_reads_partly_says_why ... ok
+test dialogs::tests_eps::the_eps_options_dialog_needs_a_document ... ok
+test dialogs::tests_export::a_bad_range_keeps_export_as_open ... ok
+test dialogs::tests_eps::eps_options_take_saved_flattener_presets_and_refuse_bad_ones ... ok
+test dialogs::tests_export::export_as_png_picks_the_file_then_shows_png_options ... ok
+test dialogs::tests::enter_confirms_through_the_dialog_spec ... ok
+test dialogs::tests_dxf::export_as_dxf_shows_dxf_options_then_writes_and_remembers_them ... ok
+test dialogs::tests_export::nothing_to_export_keeps_export_as_open_before_the_save_dialog ... ok
+test dialogs::save_pdf::tests::every_section_draws ... ok
+test dialogs::tests::raster_filter_dialogs_preview_and_apply ... ok
+test dialogs::tests::the_transform_effect_dialog_has_its_controls_previews_them_and_shows_them_again ... ok
+test dialogs::tests_eps::export_as_eps_shows_eps_options_then_writes_and_remembers_them ... ok
+test dialogs::tests_export::old_ids_and_agents_export_directly_with_a_path ... ok
+test dialogs::tests_import_pdf::all_pages_and_a_crop_box ... ok
+test dialogs::tests_export::export_as_with_a_range_then_png_options_writes_one_file_per_artboard ... ok
+test dialogs::tests_import_pdf::opening_a_saved_ai_with_several_artboards_restores_it_without_asking ... ok
+test dialogs::tests_import_pdf::a_password_protected_pdf_asks_for_its_password ... ok
+test dialogs::tests_export::svg_continues_in_svg_options_and_pdf_art_is_written_directly ... ok
+test dialogs::tests_import_pdf::placing_a_saved_ai_still_asks_for_the_page ... ok
+test dialogs::tests_import_pdf::single_page_pdfs_open_directly ... ok
+test dialogs::tests_import_pdf::placing_a_pdf_page_asks_for_the_page_and_crop_box ... ok
+test dialogs::tests_export::pdf_artboards_continue_in_the_save_pdf_dialog ... ok
+test dialogs::tests_import_pdf::opening_a_multi_page_pdf_asks_for_the_pages ... ok
+test dialogs::tests_modal::axis_choices_read_as_axes_in_every_complete_language ... ok
+test dialogs::tests_metafile::export_as_lists_emf_and_wmf_and_writes_them ... ok
+test dialogs::tests_package::an_unsaved_document_is_offered_save_as_first ... ok
+test dialogs::tests_export::jpeg_and_webp_options_draw_and_export ... ok
+test dialogs::tests_modal::offset_path_joins_is_a_dropdown ... ok
+test dialogs::tests_modal::offset_path_previews ... ok
+test dialogs::tests_package::package_without_a_location_says_so ... ok
+test dialogs::pdf_presets::tests::new_edit_and_delete_go_through_the_preset_editor ... ok
+test dialogs::tests_perspective::define_grid_is_a_view_menu_item ... ok
+test dialogs::tests_modal::form_dialog_axes_are_dropdowns ... ok
+test dialogs::tests_package::the_web_downloads_a_zip ... ok
+test dialogs::tests_package::package_writes_the_folder_then_offers_to_show_it ... ok
+test dialogs::tests_perspective::digit_keys_switch_planes_and_the_widget_follows_the_window ... ok
+test dialogs::tests_export::png_options_draw_and_export_with_the_chosen_options ... ok
+test dialogs::tests_perspective::perspective_grid_view_toggles_flip_their_labels_and_checks ... ok
+test dialogs::tests_print::done_keeps_the_settings_without_printing_and_bad_settings_keep_the_dialog ... ok
+test dialogs::tests_print::dragging_the_preview_moves_the_placement_on_the_paper ... ok
+test dialogs::tests_perspective::perspective_preset_menus_list_the_views_of_each_type ... ok
+test dialogs::tests_perspective::double_clicking_the_tool_opens_perspective_grid_options ... ok
+test dialogs::tests_print::the_control_channel_fills_and_confirms_the_dialog ... ok
+test dialogs::tests_print::print_sends_every_page_to_the_chosen_printer_and_keeps_the_settings ... ok
+test dialogs::tests_package::fonts_left_out_of_the_package_are_named ... ok
+test dialogs::new_document::tests::every_category_and_more_settings_draw_and_save_preset_saves ... ok
+test dialogs::tests_print_advanced::dragging_the_preview_moves_the_print_tiling_tools_pages ... ok
+test dialogs::tests_print::without_a_print_service_print_saves_a_pdf ... ok
+test dialogs::tests_print_presets::presets_files_import_and_export ... ok
+test dialogs::tests_export::export_as_writes_only_the_chosen_artboard_in_every_format ... ok
+test dialogs::tests_perspective::the_presets_manager_creates_edits_and_deletes_presets ... ok
+test dialogs::tests_perspective::define_grid_loads_and_saves_presets ... ok
+test dialogs::tests_perspective::define_grid_opens_on_the_grid_and_applies_its_fields ... ok
+test dialogs::tests_raster_formats::jpeg_options_pick_the_colour_model_method_and_profile ... ok
+test dialogs::tests_raster_formats::text_export_options_write_the_stories ... ok
+test dialogs::tests_raster_formats::save_for_office_documents_picks_the_resolution ... ok
+test dialogs::tests_save_for_web::colour_table_buttons_edit_the_lists ... ok
+test dialogs::tests_psd::psd_options_pick_flat_or_layers_and_the_colour_model ... ok
+test dialogs::save_pdf::tests::choosing_a_pdfx_standard_sets_its_version_and_writes_the_standard ... ok
+test dialogs::tests_raster_formats::webp_options_say_the_file_is_lossless ... ok
+test dialogs::tests_raster_formats::palette_options_reduce_the_colours ... ok
+test dialogs::tests_save_for_web::preview_in_browser_opens_the_page ... ok
+test dialogs::tests_save_for_web::the_web_downloads_and_has_no_browser_preview ... ok
+test dialogs::tests_screen_assets::export_selection_as_one_asset ... ok
+test dialogs::tests::every_dialog_draws ... ok
+test dialogs::tests_screen_assets::export_selection_collects_the_selection_and_opens_the_assets_tab ... ok
+test dialogs::tests_print_presets::the_print_dialog_saves_and_loads_presets ... ok
+test dialogs::tests_screen_assets::an_empty_assets_tab_says_how_to_collect_art ... ok
+test dialogs::tests_screen_assets::the_assets_tab_exports_the_checked_assets_into_the_folder ... ok
+test dialogs::tests_screen_assets::the_menus_reach_asset_export ... ok
+test dialogs::tests_save_for_web::save_remembers_and_writes_and_done_only_remembers ... ok
+test dialogs::tests_screens::exports_into_the_folder_and_shows_it ... ok
+test dialogs::tests_scale::the_save_prompt_fits_its_content_and_the_window_at_every_ui_scale ... ok
+test dialogs::tests_screens::checked_artboards_read_as_a_range ... ok
+test canvas::tests::a_huge_selection_shows_its_bounds_instead_of_every_outline ... ok
+test dialogs::tests_modal::dialogs_move_by_their_heading_stay_on_screen_and_where_they_were_moved ... ok
+test dialogs::tests_tiff_bmp_tga::targa_options_pick_the_depth ... ok
+test dialogs::text_import::tests::placing_a_text_file_asks_for_the_import_options_then_places_area_type ... ok
+test dialogs::tests_save_for_web::html_output_with_slices_saves_the_page_and_images ... ok
+test dialogs::tests_screens::a_preset_export_reopens_on_its_rows ... ok
+test dialogs::tile_edge_color::tests::presets_or_custom_colours_set_the_preference ... ok
+test dialogs::width_point::tests::delete_removes_the_point ... ok
+test dialogs::transform::tests::scale_options_start_from_and_update_the_preferences ... ok
+test dialogs::transform_each::tests::ok_transforms_each_and_keeps_the_scale_options ... ok
+test dialogs::transform::tests::transform_patterns_starts_from_the_preference ... ok
+test dialogs::width_point::tests::double_click_opens_it_and_ok_sets_the_widths ... ok
+test dock::tests::the_collapse_command_sets_or_toggles_the_dock ... ok
+test dialogs::tests_print_presets::the_manager_adds_edits_and_deletes_presets_through_the_editor ... ok
+test dialogs::tests_screens::the_web_downloads_one_zip_or_the_file ... ok
+test dialogs::tests_tiff_bmp_tga::bmp_options_keep_their_choices_writable ... ok
+test dialogs::tests_tiff_bmp_tga::tiff_options_pick_the_model_byte_order_and_compression ... ok
+test dialogs::width_point::tests::it_does_not_stretch_to_the_screen ... ok
+test find_font::tests::rows_flag_missing_fonts_substituted_styles_and_lacking_characters ... ok
+test find_font::tests::dialog_draws_and_changes_all ... ok
+test find_font::tests::find_in_folder_puts_the_missing_fonts_dialog_in_find_fonts_place ... ok
+test floating::tests::float_and_dock_commands_check_their_params ... ok
+test dialogs::tests::dialogs_do_not_stretch_to_the_screen ... ok
+test dock::tests::the_double_arrow_collapses_the_dock_to_icons_and_back ... ok
+test dock::tests::a_collapsed_panel_pops_out_left_of_the_column ... ok
+test dock::tests::auto_collapse_puts_a_flyout_away_on_a_click_elsewhere ... ok
+test dock::tests::the_icon_column_scrolls_in_a_short_window ... ok
+test graphics::tests::a_loss_is_reported_once_from_any_thread ... ok
+test graphics::tests::a_tex_cache_empties_when_the_ui_moves_to_a_new_context ... ok
+test graphics::tests::losing_the_graphics_keeps_recovery_copies_at_once ... ok
+test free_transform::tests::the_widget_sets_the_mode_and_a_corner_drag_then_distorts ... ok
+test i18n::tests::a_language_saved_by_an_older_version_carries_over ... ok
+test dialogs::tests_print_advanced::advanced_options_draw_label_and_save_with_the_document ... ok
+test i18n::tests::bundled_catalogs_are_consistent ... ok
+test i18n::tests::candidates_walk_from_specific_to_general ... ok
+test i18n::tests::catalog_kinds_are_parsed_and_looked_up ... ok
+test floating::tests::floating_panels_are_kept_in_workspaces_and_preferences_and_clamped_into_the_window ... ok
+test i18n::tests::bundled_fonts_cover_the_catalogs ... ok
+test i18n::tests::current_language_is_a_frame_setting ... ok
+test floating::tests::a_popped_out_panel_dragged_by_its_title_floats ... ok
+test i18n::tests::cyrillic_glyphs_are_available_without_system_fonts ... ok
+test i18n::tests::czech_plurals_have_three_forms ... ok
+test i18n::tests::dump_source_strings ... ok
+test i18n::tests::french_reads_as_french ... ok
+test i18n::tests::italian_reads_as_italian ... ok
+test i18n::tests::language_command_sets_the_preference ... ok
+test i18n::tests::every_tl_literal_is_translated ... ok
+test i18n::tests::complete_languages_translate_every_menu_string ... ok
+test i18n::tests::lookups_fall_back_to_english ... ok
+test i18n::tests::malformed_lines_are_reported_not_fatal ... ok
+test i18n::tests::messages_translate_by_template_and_their_parts ... ok
+test i18n::tests::os_language_lists_are_parsed ... ok
+test i18n::tests::latin_script_glyphs_are_available_without_system_fonts ... ok
+test i18n::tests::plurals_and_placeholders ... ok
+test i18n::tests::preferences_resolve_with_fallback ... ok
+test i18n::tests::russian_plurals_have_three_forms ... ok
+test i18n::tests::russian_reads_as_russian ... ok
+test i18n::tests::menu_catalogs_translate_every_menu_label ... ok
+test i18n::tests::spanish_reads_as_spanish ... ok
+test i18n::tests::tags_map_to_languages ... ok
+test i18n::tests::the_engine_follows_the_interface_language ... ok
+test i18n::tests::partial_catalogs_only_translate_strings_the_ui_shows ... ok
+test i18n::tests::ukrainian_reads_as_ukrainian ... ok
+test i18n::tests::ukrainian_plurals_have_three_forms ... ok
+test graphics::tests::the_app_uploads_everything_again_in_a_new_context ... ok
+test io::tests::a_file_the_user_cant_open_is_reported_in_a_dialog ... ok
+test i18n::tests::zh_hans_is_simplified_and_mainland ... ok
+test floating::tests::a_panel_dropped_on_the_dock_lights_up_and_pops_out_of_its_icon ... ok
+test io::tests::export_for_screens_with_params_runs_the_engine ... ok
+test io::tests::control_export_without_path_returns_bytes ... ok
+test i18n::tests::zh_hant_has_no_simplified_characters ... ok
+test i18n::tests::spaced_catalogs_keep_the_spaces_around_fragments ... ok
+test io::tests::export_selection_takes_its_format_from_the_picked_path ... ok
+test io::tests::written_files_open_as_file_urls ... ok
+test menus::tests::a_popup_covering_a_title_does_not_switch_menus ... ok
+test io::tests::webp_opens_and_places_at_its_pixel_size ... ok
+test menus::tests::edit_selection_opens_its_dialog_on_the_saved_selections ... ok
+test io::tests::templates_open_untitled ... ok
+test menus::tests::every_bound_menu_command_exists ... ok
+test menus::tests::last_effect_dialog_and_view_toggles ... ok
+test floating::tests::the_strip_right_of_the_tabs_floats_the_whole_group_and_its_close_box_docks_it ... ok
+test dialogs::tests_print::print_opens_the_dialog_and_every_section_draws ... ok
+test menus::tests::expand_appearance_is_an_object_menu_item_only ... ok
+test menus::tests::names_in_menus_are_not_interface_labels ... ok
+test io::tests::export_uses_the_engine_options_and_keeps_the_path ... ok
+test menus::tests::panel_ids_are_case_insensitive_and_labels_work ... ok
+test menus::tests::number_of_recent_fonts_sets_how_many_are_listed ... ok
+test menus::tests::save_selection_asks_for_a_name ... ok
+test menus::tests::recent_fonts_and_corner_widget_toggle ... ok
+test menus::tests::recent_files_track_opens_and_saves ... ok
+test menus::tests::shortcut_pretty ... ok
+test menus::tests::image_trace_make_traces_with_the_default_preset ... ok
+test menus::tests::zoom_to_selection_centres_the_selection ... ok
+test panels::actions::tests::defaults_are_valid_commands ... ok
+test panels::align::tests::a_key_object_makes_align_align_to_it ... ok
+test panels::align::tests::single_object_aligns_to_artboard ... ok
+test panels::align::tests::the_other_align_buttons_align_to_the_align_to_choice ... ok
+test panels::appearance::tests::drops_move_items_across_the_contents_row_and_the_row_itself ... ok
+test panels::appearance::tests::drops_pick_the_command ... ok
+test menus::tests::saved_views_store_and_restore_the_view ... ok
+test panels::appearance::tests::labels ... ok
+test panels::appearance::tests::opacity_labels ... ok
+test menus::tests::menus_are_as_wide_as_their_items ... ok
+test palette::tests::entries_are_built_once_per_language_and_match_english_shown_text_and_ids ... ok
+test dialogs::tests_screens::opens_on_defaults_and_draws_every_view ... ok
+test menus::tests::saved_selections_are_listed_at_the_bottom_of_the_select_menu ... ok
+test panels::artboards::tests::clicking_a_row_makes_its_artboard_active ... ok
+test panels::appearance::tests::with_nothing_selected_it_lists_what_new_art_gets ... ok
+test panels::artboards::tests::double_clicks_go_to_or_rename_and_options_edits_the_rows_artboard ... ok
+test panels::appearance::tests::groups_show_a_contents_row_and_type_a_characters_row_in_their_slot ... ok
+test panels::character::tests::bold_and_italic_pick_the_familys_own_faces ... ok
+test menus::tests::long_menus_scroll_inside_a_short_window ... ok
+test panels::artboards::tests::dragging_a_row_onto_new_artboard_duplicates_it ... ok
+test panels::attributes::tests::panel_shows_the_selections_attributes ... ok
+test panels::color::tests::a_global_colour_shows_tint_mode_and_the_t_slider_sets_its_tint ... ok
+test panels::color::tests::a_mixed_selection_has_no_colour_to_edit ... ok
+test panels::color::tests::a_recent_colour_recolours_the_selected_gradient_stop ... ok
+test panels::character::tests::character_alignment_shows_with_the_east_asian_options ... ok
+test i18n::tests::complete_languages_translate_every_message ... ok
+test panels::color::tests::cmyk_and_gray_keep_model ... ok
+test menus::tests::hovering_another_title_switches_the_open_menu ... ok
+test panels::color::tests::hsb_roundtrip_and_ranges ... ok
+test panels::color::tests::double_clicking_a_proxy_opens_the_color_picker_for_it ... ok
+test panels::color::tests::rgb_roundtrip ... ok
+test panels::color::tests::slider_tracks_vary_one_component ... ok
+test panels::color::tests::spectrum_and_hex ... ok
+test panels::color::tests::tandem_keeps_ratios ... ok
+test panels::color::tests::hide_options_leaves_the_proxy_and_spectrum ... ok
+test panels::color::tests::lab_colours_show_lab_sliders_with_signed_ranges ... ok
+test panels::color::tests::web_safe_snaps ... ok
+test floating::tests::the_tools_panel_floats_by_its_title_bar_and_docks_on_the_left_edge ... ok
+test panels::color::tests::pure_blue_is_out_of_gamut_in_rgb ... ok
+test dock::tests::every_flyout_stays_left_of_the_icon_column ... ok
+test panels::color::tests::alt_click_on_the_spectrum_paints_the_stroke ... ok
+test panels::color_guide::tests::base_stays_until_set_and_the_grid_follows_the_options ... ok
+test panels::color::tests::the_mode_follows_the_colours_model ... ok
+test panels::color_guide::tests::save_colors_as_swatches_saves_each_selected_cell ... ok
+test panels::doc_info::tests::names_in_rows_are_told_from_labels ... ok
+test panels::color_guide::tests::limit_to_library_snaps_the_panel_and_follows_the_document_swatches ... ok
+test panels::color_themes::tests::create_save_edit_and_resave_a_theme ... ok
+test panels::flattener_preview::tests::zoom_and_pan_stay_inside_the_document ... ok
+test panels::color_guide::tests::edit_or_apply_without_art_saves_the_limited_colours_as_a_group ... ok
+test panels::doc_info::tests::draws_headless ... ok
+test floating::tests::a_dock_tab_dragged_out_floats_and_dropped_on_the_dock_docks_again ... ok
+test panels::brushes::tests::double_clicking_a_brush_opens_its_options ... ok
+test panels::gradient::tests::a_dropped_swatch_adds_or_recolours_a_stop ... ok
+test panels::gradient::tests::dragged_stops_move_copy_or_swap ... ok
+test panels::gradient::tests::dropped_colours_recolour_or_add_an_opaque_stop ... ok
+test panels::gradient::tests::offsets_and_json ... ok
+test panels::color::tests::shift_click_on_the_spectrum_cycles_modes ... ok
+test panels::color_themes::tests::my_themes_edit_add_to_swatches_and_delete ... ok
+test panels::gradient::tests::double_clicking_a_stop_opens_the_shared_popover_beside_it ... ok
+test panels::gradient::tests::a_selected_diamond_shows_and_sets_its_midpoint_in_location ... ok
+test panels::gradient::tests::the_stop_eyedropper_arms_the_eyedropper_for_the_stop ... ok
+test panels::gradient::tests::alt_drag_copies_a_stop_and_alt_dropping_on_a_stop_swaps_colours ... ok
+test panels::doc_info::tests::categories_filter_the_panel_and_save_writes_the_report ... ok
+test panels::history::tests::steps ... ok
+test panels::gradient::tests::the_stroke_buttons_lay_the_gradient_within_along_or_across_the_stroke ... ok
+test panels::flattener_preview::tests::the_panel_takes_a_snapshot_and_highlights_in_red ... ok
+test panels::gradient::tests::the_proxy_toggles_fill_and_stroke_and_stays_with_options_hidden ... ok
+test panels::gradient::tests::the_thumbnail_menu_applies_gradient_swatches_and_saves_one ... ok
+test panels::graphic_styles::tests::merge_asks_for_a_name_and_drops_move_styles_or_make_new_ones ... ok
+test panels::info::tests::values_follow_model ... ok
+test panels::graphic_styles::tests::thumbnails_are_cached_by_look_and_rerendered_when_a_style_changes ... ok
+test panels::graphic_styles::tests::the_right_button_shows_a_large_preview_and_the_picker_applies_styles ... ok
+test panels::graphic_styles::tests::list_view_names_the_styles_and_deletes_the_selected_ones_after_asking ... ok
+test panels::image_trace::tests::advanced_is_a_section_that_stays_as_it_was_left ... ok
+test panels::layers::tests::a_layer_clipping_mask_underlines_its_clipping_path ... ok
+test panels::layers::tests::alt_clicking_an_eye_or_lock_toggles_the_other_layers ... ok
+test panels::layers::tests::an_open_rename_does_not_follow_into_another_document ... ok
+test panels::flattener_preview::tests::edits_wait_for_refresh_and_settings_drive_the_report ... ok
+test panels::layers::tests::clicking_a_target_circle_targets_the_layer ... ok
+test panels::layers::tests::dragging_rows_onto_the_trash_deletes_them ... ok
+test panels::layers::tests::only_generated_names_are_translated ... ok
+test panels::layers::tests::dragging_rows_moves_them_into_other_layers_and_alt_copies ... ok
+test panels::layers::tests::dragging_a_target_circle_moves_or_copies_the_appearance_and_the_trash_clears_it ... ok
+test panels::image_trace::tests::create_strokes_traces_again_and_keeps_one_kind_on ... ok
+test panels::layers::tests::renaming_a_layer_commits_on_enter_and_escape_cancels ... ok
+test panels::image_trace::tests::the_view_dropdown_shows_and_sets_the_objects_view ... ok
+test panels::layers::tests::masks_underline_dashed_and_mask_editing_lists_only_the_mask ... ok
+test panels::layers::tests::dropping_rows_on_new_layer_duplicates_them ... ok
+test panels::brushes::tests::art_dropped_on_the_panel_becomes_an_art_brush_and_a_brush_drags_out ... ok
+test panels::image_trace::tests::the_palette_shows_in_color_mode_and_traces_again ... ok
+test panels::layers::tests::rows_at_every_depth_are_clickable ... ok
+test panels::layers::tests::eye_and_lock_toggle_nested_rows_and_drag_down_the_column ... ok
+test panels::layers::tests::the_selected_art_square_drags_the_selection_to_another_layer ... ok
+test panels::layers::tests::selection_squares_show_and_select_a_rows_art ... ok
+test panels::image_trace::tests::panel_and_menu_draw_headless ... ok
+test panels::library_panel::tests::clicking_a_library_swatch_adds_and_applies_it_in_one_step ... ok
+test panels::library_panel::tests::saving_to_a_file_and_opening_a_palette_file ... ok
+test panels::library_panel::tests::swatch_exchange_files_without_a_path_open_in_the_library_panel ... ok
+test panels::layers::tests::triangles_open_and_close_rows_and_alt_does_everything_inside ... ok
+test panels::layers::tests::target_circle_fills_for_non_default_transparency ... ok
+test panels::navigator::tests::thumb_mapping_roundtrip ... ok
+test panels::navigator::tests::zoom_slider_roundtrip ... ok
+test panels::library_panel::tests::find_filters_list_view_and_arrows_step_through_the_libraries ... ok
+test panels::layers::tests::rows_work_in_the_floating_flyout ... ok
+test panels::library_panel::tests::modifier_clicks_select_and_add_to_swatches_adds_the_selection ... ok
+test panels::layers::tests::the_panel_menu_lists_every_operation ... ok
+test panels::opentype::tests::toggles_reach_the_text ... ok
+test panels::magic_wand::tests::panel_and_menu_draw_headless ... ok
+test panels::libraries::tests::the_panel_draws_its_libraries ... ok
+test panels::properties::tests::edit_artboards_shows_the_preset_and_flips_the_orientation ... ok
+test panels::properties::tests::edit_artboards_scales_the_art_with_scale_artwork_with_artboard ... ok
+test panels::library_panel::tests::the_window_submenu_lists_every_library ... ok
+test panels::paragraph::tests::alignment_buttons_show_the_resolved_alignment_and_direction_sets_it ... ok
+test panels::stroke::tests::arrow_align_buttons_need_a_head ... ok
+test panels::stroke::tests::dash_fields_roundtrip ... ok
+test panels::stroke::tests::dash_without_gap_repeats_dash ... ok
+test panels::library_panel::tests::the_save_dialog_writes_swatch_exchange_files ... ok
+test panels::stroke::tests::profile_silhouettes_and_arrow_labels ... ok
+test panels::properties::tests::the_number_fields_are_all_as_wide ... ok
+test panels::stroke::tests::wide_profiles_fit_their_preview ... ok
+test panels::properties::tests::artboard_coordinate_fields_move_art_in_properties_and_transform ... ok
+test panels::swatches::tests::a_proxy_dropped_on_the_panel_becomes_a_swatch ... ok
+test panels::swatches::tests::alt_dropping_a_gradient_on_a_gradient_swatch_replaces_it ... ok
+test panels::stroke::tests::while_typing_the_panel_strokes_the_selected_characters ... ok
+test panels::library_panel::tests::save_dialog_writes_user_libraries_that_the_window_menu_lists ... ok
+test panels::pattern_options::tests::show_swatch_bounds_toggles_the_pattern_option ... ok
+test panels::swatches::tests::art_dropped_on_the_panel_becomes_a_pattern_swatch ... ok
+test panels::properties::tests::the_gradient_tool_shows_the_gradient_type_and_draw ... ok
+test panels::swatches::tests::kind_filter ... ok
+test panels::properties::tests::edit_artboards_adds_artboards_and_exits ... ok
+test dialogs::tests_save_for_web::every_view_and_format_draws ... ok
+test panels::swatches::tests::medium_tiles_match_measured_metrics ... ok
+test panels::swatches::tests::menu_targets_follow_the_panel_selection ... ok
+test panels::swatches::tests::lab_spot_tiles_show_the_colour_the_spot_colors_options_pick ... ok
+test panels::properties::tests::rearrange_all_opens_the_dialog ... ok
+test panels::properties::tests::type_paragraph_section_hyphenates ... ok
+test panels::swatches::tests::the_active_tint_or_gradient_swatch_is_highlighted_and_a_tint_edits_its_base ... ok
+test panels::swatches::tests::modifier_clicks_select_several_swatches_and_groups ... ok
+test panels::swatches::tests::find_field_filters_and_shift_extends_over_what_is_shown ... ok
+test panels::swatches::tests::delete_asks_then_removes_the_selection_and_unlinks_art ... ok
+test panels::tabs::tests::above_text_puts_the_ruler_over_the_text_at_the_zoom ... ok
+test panels::tests::paint_params_roundtrip_shapes ... ok
+test panels::tests_appearance::blend_separators_follow_the_groups ... ok
+test panels::swatches::tests::dragging_tiles_reorders_and_moves_into_groups_as_one_undo_step_each ... ok
+test panels::swatches::tests::double_click_opens_swatch_options_and_ok_edits_linked_art ... ok
+test panels::swatches::tests::cancel_rolls_the_preview_back_and_other_kinds_open_their_editors ... ok
+test panels::symbols::tests::art_dropped_on_the_panel_becomes_a_symbol_and_a_symbol_drags_out ... ok
+test panels::swatches::tests::new_color_group_dialog_makes_a_group_from_swatches_or_artwork ... ok
+test panels::tabs::tests::leader_and_align_on_keep_what_is_typed_until_enter ... ok
+test floating::tests::icons_dragged_out_float_stack_onto_another_group_and_tear_out_of_it ... ok
+test panels::tests_appearance::item_effect_rows_toggle_their_eye ... ok
+test panels::tests_appearance::item_opacity_popup_sets_the_items_opacity ... ok
+test panels::tests_appearance::transparency_panel_reads_the_active_item ... ok
+test panels::layers::tests::only_the_rows_in_view_are_laid_out ... ok
+test panels::tests_appearance::object_row_names_the_selection_like_the_control_bar ... ok
+test panels::tests_appearance::opacity_popup_blend_dropdown_sets_the_blend_mode ... ok
+test panels::tabs::tests::panel_draws_empty_with_text_and_with_stops ... ok
+test panels::tests_asset_export::art_dropped_on_the_panel_becomes_assets ... ok
+test panels::swatches::tests::list_view_rows_take_double_clicks_and_folder_clicks_select_the_group ... ok
+test panels::swatches::tests::new_swatch_dialog_prefills_the_active_colour_and_saves_into_the_selected_group ... ok
+test panels::tests_constrain::the_link_is_a_preference_agents_can_read_and_set ... ok
+test panels::stroke::tests::panel_draws_for_lines_with_and_without_heads ... ok
+test panels::tests_asset_export::renaming_an_asset_runs_assets_rename ... ok
+test panels::tests_asset_export::an_empty_panel_says_how_to_add_assets_and_shows_the_export_settings ... ok
+test panels::tests_effectedit::choosing_an_applied_effect_asks_to_edit_it_or_add_another ... ok
+test panels::tests_css_properties::copy_and_export_go_through_the_ui_commands ... ok
+test panels::tests_asset_export::export_writes_into_the_picked_folder ... ok
+test panels::tests_effectedit::alt_dragging_an_item_duplicates_it_and_several_items_delete_together ... ok
+test panels::tests_asset_export::the_plus_button_collects_the_selection_and_the_bin_removes_selected_assets ... ok
+test panels::tests_effectedit::shift_clicking_a_chip_opens_the_mixer_on_that_row ... ok
+test panels::tests_fontsize::a_picked_font_size_preset_applies_in_one_undo_step ... ok
+test panels::tests_fontsize::font_size_presets_show_in_the_type_unit ... ok
+test panels::tests_effectedit::an_effect_name_opens_its_dialog_prefilled_and_ok_edits_it_in_place ... ok
+test panels::tests_css_properties::the_panel_menu_lists_the_actions_and_options ... ok
+test panels::tests_effectedit::stroke_rows_note_dashes_brushes_and_show_all_hidden_attributes ... ok
+test panels::tests_css_properties::generate_css_shows_the_document_while_nothing_is_selected ... ok
+test panels::tests_appearance::stroke_panel_shows_the_active_rows_weight ... ok
+test panels::tests_asset_export::the_rows_are_the_shared_export_settings ... ok
+test panels::tests_links::edit_original_and_show_in_folder_hand_the_file_to_the_system ... ok
+test panels::tests_effectedit::effect_rows_drag_to_reorder_and_into_an_item ... ok
+test panels::tests_css_properties::the_code_view_shows_the_selections_css_with_the_options ... ok
+test panels::tests_links::the_links_menu_items_run_commands ... ok
+test panels::tests_freeform::the_color_panel_recolours_the_selected_point ... ok
+test panels::tests_links::an_empty_document_shows_how_to_add_images ... ok
+test panels::tests_fontsize::sizes_that_differ_show_blank ... ok
+test panels::tests_freeform::the_freeform_section_replaces_the_slider_and_sets_the_draw_mode ... ok
+test panels::tests_freeform::the_selected_points_opacity_spread_and_delete ... ok
+test panels::tests_links::placement_options_dialog_sets_the_options ... ok
+test panels::tests_maskview::alt_clicking_the_mask_thumbnail_views_only_the_mask ... ok
+test panels::tests_fontsize::the_control_bar_shows_the_font_size_of_selected_type ... ok
+test panels::tests_effectedit::the_thumbnail_drags_the_appearance_and_the_properties_fx_button_opens_the_effects ... ok
+test panels::tests_stroke::turning_dashes_on_fits_them_to_corners_and_turning_back_on_restores_the_last_ones ... ok
+test panels::tests_strokeux::weight_presets_display_cleanly_in_their_native_unit ... ok
+test panels::tests_strokeux::inside_and_outside_are_off_for_open_paths_and_type ... ok
+test panels::tests_strokedepth::menu_saves_deletes_and_resets_profiles ... ok
+test panels::tests_fontsize::leading_lists_auto_first ... ok
+test panels::tests_style_libraries::saving_to_a_file_and_opening_a_vcstyles_file ... ok
+test panels::tests_strokeux::mixed_weights_show_blank ... ok
+test panels::tests_strokedepth::dropdown_lists_saved_profiles_and_applies_them ... ok
+test panels::tests_links::the_panel_lists_the_images_with_link_info_for_the_selected_one ... ok
+test panels::tests_strokeux::the_weight_presets_run_from_a_quarter_point_to_a_hundred ... ok
+test panels::tests_constrain::the_link_keeps_proportions_in_every_size_field ... ok
+test panels::color::tests::a_drag_on_the_spectrum_holds_still_near_white ... ok
+test panels::tests_units::ruler_labels_have_the_steps_decimals ... ok
+test panels::tests_links::properties_shows_the_selected_image_and_its_link_actions ... ok
+test panels::tests_strokeux::the_properties_stroke_link_and_weight_presets ... ok
+test panels::transform::tests::artboard_fields_keep_the_reference_point ... ok
+test panels::transform::tests::constrain_proportions ... ok
+test panels::text_styles::tests::panels_draw_and_apply_headless ... ok
+test panels::transform::tests::rotation_field_shows_the_angle_the_box_keeps ... ok
+test panels::tests_style_libraries::clicking_a_library_style_adds_and_applies_it_in_one_step ... ok
+test panels::tests_units::dialog_lengths_show_in_the_general_unit ... ok
+test panels::transform::tests::the_artboard_tool_shows_the_active_artboard ... ok
+test panels::tests_style_libraries::the_window_menu_and_the_panel_open_every_library ... ok
+test panels::tests_strokeux::weights_and_dashes_show_in_the_stroke_unit_everywhere ... ok
+test prefs_dialog::tests::a_graphics_processor_this_version_does_not_offer_reads_as_automatic ... ok
+test panels::tests_style_libraries::save_dialog_writes_user_libraries_that_the_window_menu_lists ... ok
+test prefs_dialog::tests::canvas_color_choices_paint_the_pasteboard ... ok
+test prefs_dialog::tests::dialog_ok_applies_prefs_and_ui_fields ... ok
+test prefs_dialog::tests::every_category_renders_fields ... ok
+test prefs_dialog::tests::dialog_ok_with_invalid_value_keeps_dialog_and_prefs ... ok
+test panels::transform::tests::a_polygon_shows_its_polygon_properties ... ok
+test panels::transform::tests::use_preview_bounds_shows_the_visual_size_and_checks_the_align_flyout ... ok
+test panels::transparency::tests::mixed_values_show_blank ... ok
+test prefs_dialog::tests::hyphenation_exceptions_dialog_ok_reaches_the_hyphenator ... ok
+test prefs_dialog::tests::old_pref_files_keep_their_brightness ... ok
+test prefs_dialog::tests::prefs_persist_through_ui_state ... ok
+test prefs_dialog::tests::show_font_names_in_english_dialog_ok_stores_the_flag ... ok
+test prefs_dialog::tests::numbers_without_units_are_points_reaches_the_fields_and_dims_without_picas ... ok
+test panels::transparency::tests::knockout_states_and_page_group_items ... ok
+test shortcut_editor::tests::another_tests_frames_leave_this_tests_mirror_alone ... ok
+test prefs_dialog::tests::show_tool_tips_off_hides_tool_tips ... ok
+test shortcut_editor::tests::chord_from_recorded_event ... ok
+test shortcut_editor::tests::entries_cover_tools_and_menu_commands ... ok
+test shortcut_editor::tests::export_import_round_trip ... ok
+test shortcut_editor::tests::assigning_the_default_drops_the_override ... ok
+test panels::tests_units::type_sizes_follow_units_type ... ok
+test panels::transparency::tests::panel_in_mask_editing_mode_shows_and_edits_the_masked_object ... ok
+test shortcut_editor::tests::assign_detects_conflicts ... ok
+test shortcut_editor::tests::forced_assign_moves_the_chord ... ok
+test shortcut_editor::tests::normalize_is_order_insensitive ... ok
+test shortcut_editor::tests::format_parse_round_trip_for_every_default ... ok
+test shortcut_editor::tests::override_beats_default_and_empty_removes ... ok
+test shortcut_editor::tests::presets_are_the_defaults ... ok
+test shortcut_editor::tests::global_override_reaches_shortcut_of_and_tools ... ok
+test shortcut_editor::tests::saved_modifier_only_overrides_give_the_default_back ... ok
+test shortcut_editor::tests::tool_shortcuts_must_be_single_keys ... ok
+test shortcuts::tests::cmd_comma_opens_settings_on_a_mac ... ok
+test shortcuts::tests::all_registered_shortcuts_parse ... ok
+test panels::transparency::tests::panel_draws_with_and_without_a_mask ... ok
+test shortcuts::tests::digit_keys_reach_a_dragging_tool_once_per_press ... ok
+test panels::tests_units::new_documents_start_in_the_general_preference ... ok
+test shortcuts::tests::comma_and_period_reapply_the_last_colour_and_gradient ... ok
+test panels::tests_units::the_preferences_dialog_shows_the_documents_units ... ok
+test shortcuts::tests::parses ... ok
+test state::tests::dialog_fields ... ok
+test shortcuts::tests::cmd_shift_b_while_typing_is_bold_not_the_bounding_box ... ok
+test state::tests::zoom_steps ... ok
+test prefs_dialog::tests::graphics_processor_preference_shows_and_persists ... ok
+test shortcuts::tests::arrows_while_dragging_a_grid_change_its_rows_and_columns ... ok
+test panels::tests_units::panels_show_millimetres_after_the_preference_changes ... ok
+test tests_adjust::the_effect_menu_lists_the_adjustments_and_the_object_menu_the_halftone ... ok
+test tests_aisave::save_a_copy_as_ai_keeps_the_path ... ok
+test shortcuts::tests::copy_and_paste_events_use_the_system_clipboard ... ok
+test shortcuts::tests::one_key_shortcuts_follow_the_key_on_layouts_without_latin_letters ... ok
+test tests_automation::frames_with_injected_input_are_confined ... ok
+test shortcuts::tests::shifted_punctuation_shortcuts_work_as_typed ... ok
+test tests_aisave::save_as_ai_writes_a_pdf_that_reopens_editable ... ok
+test shortcuts::tests::plus_typed_any_way_zooms_in ... ok
+test tests_background::bad_options_fail_before_going_to_the_background ... ok
+test tests_background::exports_run_in_the_background_and_the_preference_turns_both_off ... ok
+test shortcut_editor::tests::a_modifier_pressed_while_recording_waits_for_the_key ... ok
+test tests_background::the_dirty_state_follows_the_snapshot ... ok
+test tests_adjust::dragging_on_the_curves_graph_adds_and_moves_a_point ... ok
+test tests_clipboard::paste_goes_to_the_centre_of_the_view ... ok
+test tests_background::the_status_bar_shows_progress ... ok
+test tests_clipboard::apply_to_all_answers_the_rest_and_cancel_pastes_nothing ... ok
+test tests_adjust::levels_and_curves_show_their_channel_and_values ... ok
+test tests_adjust::an_adjustment_dialog_has_sliders_and_previews_live ... ok
+test tests_clipboard::paste_menu_items_are_enabled_by_svg_on_the_system_clipboard ... ok
+test tests_contextmenu::every_context_label_is_a_menu_string ... ok
+test tests_contextmenu::the_menu_follows_the_selection ... ok
+test tests_clipboard::the_layers_panel_menu_toggles_paste_remembers_layers ... ok
+test tests_contextmenu::right_click_on_empty_canvas_offers_the_view_and_a_dismissing_click_does_nothing ... ok
+test tests_clipboard::the_swatch_conflict_dialog_asks_about_each_swatch_then_pastes ... ok
+test panels::tests_strokedepth::arrowhead_dropdown_offers_the_new_heads ... ok
+test tests_contextmenu::right_click_selects_the_object_and_lists_its_commands ... ok
+test tests_automation::control_requests_stay_inside_the_roots ... ok
+test tests_contextmenu::right_clicking_a_ruler_swaps_the_document_units ... ok
+test tests_cut::the_cut_tools_have_their_own_icons_and_toolbar_slot ... ok
+test tests_background::quitting_waits_for_background_saves ... ok
+test tests_font_menu::a_preview_left_open_by_a_menu_that_is_gone_is_undone ... ok
+test tests_distortkeys::delete_and_backspace_remove_the_selected_width_point_then_clear ... ok
+test tests_cut::the_control_bar_shows_mirror_and_cut_options ... ok
+test tests_font_menu::bundled_families_are_classified ... ok
+test tests_font_menu::menus_that_only_pick_a_font_leave_the_document_alone ... ok
+test tests_font_menu::preview_changes_the_text_live_and_only_a_choice_is_a_step ... ok
+test tests_docsetup::the_grid_takes_the_document_colours_also_rotated ... ok
+test tests_docsetup::the_bleed_draws_as_a_red_outline_around_each_artboard ... ok
+test tests_font_menu::samples_show_the_text_in_the_family_or_a_generic_sample ... ok
+test tests_docsetup::white_background_hides_the_grid_and_paper_tints_the_artboard ... ok
+test tests_font_menu::stars_mark_favourites_and_the_preferences_size_the_rows ... ok
+test tests_distortkeys::delete_and_backspace_remove_the_selected_pin_then_clear ... ok
+test tests_fonts::the_character_panel_menu_refreshes_the_font_list ... ok
+test tests_home::cmd_n_opens_the_new_document_dialog ... ok
+test tests_font_menu::arrows_preview_the_next_family_and_enter_applies_it ... ok
+test tests_font_menu::escape_closes_the_menu_and_ends_the_preview ... ok
+test tests_labels::clipboard_preferences_name_the_legacy_format_neutrally ... ok
+test tests_fonts::type_font_menu_lists_every_available_family ... ok
+test tests_labels::edit_menu_lists_pdf_presets ... ok
+test tests_home::home_lists_recent_files_and_a_click_opens_one ... ok
+test tests_adjust::the_halftone_menu_item_opens_a_previewing_dialog ... ok
+test tests_labels::effect_menu_has_a_vector_effects_section ... ok
+test tests_labels::stroke_profiles_have_descriptive_names ... ok
+test tests_labels::effect_menu_lists_the_pixelate_filters_between_blur_and_sharpen ... ok
+test tests_labels::library_submenus_are_disabled_placeholders ... ok
+test tests_labels::shortcut_set_old_name_is_accepted ... ok
+test tests_home::home_shows_over_open_documents_until_a_document_is_chosen ... ok
+test tests_font_menu::right_arrow_lists_a_familys_styles_and_they_preview ... ok
+test tests_nativemenu::a_command_keeps_a_system_key_it_is_bound_to ... ok
+test tests_nativemenu::key_equivalents_are_command_and_function_keys_only ... ok
+test tests_nativemenu::key_equivalents_become_the_input_their_keys_make ... ok
+test tests_labels::swatches_menu_offers_save_swatch_library ... ok
+test tests_nativemenu::every_in_window_item_is_in_the_mac_menu_bar_once ... ok
+test tests_nativemenu::settings_lists_every_preferences_page ... ok
+test tests_nativemenu::language_and_appearance_are_in_the_app_menu ... ok
+test tests_home::home_screen_without_documents_follows_its_preference ... ok
+test tests_font_menu::the_search_field_stays_put_while_the_list_scrolls ... ok
+test shortcuts::tests::tab_leaves_the_keyboard_to_the_shortcuts_and_the_type_tool ... ok
+test tests_nativemenu::documents_and_selections_change_state_not_structure ... ok
+test tests_nativemenu::the_window_menu_has_the_system_items ... ok
+test tests_nativeoptions::save_a_copy_and_save_dont_ask_and_options_reach_the_file ... ok
+test tests_nativemenu::vectorcraft_gets_a_mac_app_menu ... ok
+test tests_numfields::bare_numbers_in_picas_fields_are_points_when_the_preference_says_so ... ok
+test tests_nativeoptions::the_web_save_as_dialog_shows_the_native_options ... ok
+test tests_numfields::arrow_keys_step_plain_fields ... ok
+test tests_numfields::math_before_the_unit_suffix_evaluates_in_every_unit ... ok
+test tests_numfields::arrow_keys_step_a_focused_field ... ok
+test tests_numfields::double_click_selects_the_whole_field ... ok
+test tests_numfields::focus_selects_the_whole_field_so_typing_replaces_it ... ok
+test tests_nativeoptions::save_as_native_asks_for_its_options_and_writes_every_artboard ... ok
+test panels::tests_strokedepth::every_arrowhead_preview_draws_its_head ... ok
+test tests_numfields::plain_fields_do_math_with_their_suffix ... ok
+test tests_numfields::the_wheel_scrolls_the_panel_unless_over_the_focused_field ... ok
+test tests_paintchips::red_text_shows_a_red_toolbar_fill ... ok
+test tests_overprint::overprint_black_menu_opens_the_dialog ... ok
+test tests_numfields::the_wheel_steps_a_focused_field_under_the_pointer ... ok
+test tests_paintchips::a_popover_tile_click_sets_the_fill ... ok
+test shortcuts::tests::enter_opens_the_tools_dialog_and_leaves_it_open ... ok
+test tests_paintchips::the_shortcut_table_maps_f6_to_color ... ok
+test tests_pastechords::a_paste_takes_the_command_of_the_v_chord_held ... ok
+test tests_pastechords::cmd_shift_v_pastes_in_place ... ok
+test tests_paintchips::recolor_is_a_quick_action_for_multicolour_selections ... ok
+test tests_pastechords::no_two_commands_tools_or_panels_share_a_default_shortcut ... ok
+test tests_paintchips::the_transform_link_opens_the_transform_panel ... ok
+test tests_paintchips::the_popover_swatch_libraries_button_opens_the_libraries_menu ... ok
+test tests_picks::a_dialogs_folder_button_fills_its_field_when_the_picker_answers ... ok
+test tests_picks::file_open_opens_what_its_dialog_picks_when_it_answers ... ok
+test tests_picks::save_as_goes_on_with_the_path_picked ... ok
+test tests_paintchips::the_chips_show_a_question_mark_for_mixed_fills ... ok
+test tests_paintchips::the_window_menu_panel_keys ... ok
+test tests_nativemenu::clicks_run_their_command_and_the_menus_follow ... ok
+test tests_nativemenu::a_focused_field_keeps_select_all_and_copy ... ok
+test tests_pathtype::type_on_a_path_options_keep_the_type_where_it_is ... ok
+test tests_nativemenu::key_equivalents_run_through_the_normal_shortcut_path_once ... ok
+test tests_font_menu::a_press_outside_the_menu_ends_the_preview_at_once ... ok
+test tests_paintchips::the_properties_panel_has_the_control_bars_fill_and_stroke ... ok
+test tests_font_menu::a_preview_stays_put_while_the_menu_is_still ... ok
+test tests_place::a_vectorcraft_document_places_linked_and_edit_original_opens_it ... ok
+test tests_place::crop_image_shows_a_box_that_apply_crops_to ... ok
+test tests_place::a_drop_without_a_position_opens_documents_and_places_pictures ... ok
+test tests_place::a_drop_with_a_position_places_on_the_canvas_and_opens_off_it ... ok
+test tests_place::one_file_places_centred_in_the_view_and_replace_swaps_the_selection ... ok
+test tests_place::the_control_bars_mask_clips_the_image_and_selects_the_clipping_path ... ok
+test tests_place::a_dropped_document_opens_as_a_tab_of_its_own ... ok
+test tests_place::the_place_dialog_lists_the_files_and_loads_the_cursor_with_several ... ok
+test tests_nativemenu::the_app_bar_hides_its_menus_with_the_mac_menu_bar ... ok
+test tests_place::the_control_bar_shows_the_image_file_link_colour_mode_and_ppi ... ok
+test tests_printps::postscript_is_saved_not_printed ... ok
+test tests_place::a_file_read_after_another_document_became_active_lands_where_it_was_dropped ... ok
+test tests_plugins::plugins_are_listed_in_the_object_and_effect_menus ... ok
+test tests_plugins::plugin_effects_open_the_effect_dialog_with_their_schema ... ok
+test tests_place::a_native_svg_drop_uses_file_open_even_with_a_path_only_handle ... ok
+test tests_place::a_dropped_png_is_placed_in_the_middle_of_the_view ... ok
+test tests_puppetwarp::the_hint_bar_explains_puppet_warp ... ok
+test tests_place::files_dropped_with_no_document_open_open_and_are_recent ... ok
+test tests_printtiling::the_canvas_numbers_the_print_tiles_of_print_preview ... ok
+test tests_plugins::filter_dialog_previews_and_commits_one_undo_step ... ok
+test tests_recolor::double_clicking_a_colour_group_opens_it_and_ok_rewrites_it ... ok
+test tests_recovery::a_resumed_tab_writes_again_the_copies_another_tab_discarded ... ok
+test tests_recovery::a_second_app_never_asks_about_a_running_apps_copies ... ok
+test tests_recovery::copies_are_written_in_the_background_and_go_on_save ... ok
+test tests_recovery::quitting_with_nothing_unsaved_leaves_no_copies ... ok
+test tests_recovery::the_timer_asks_for_frames_while_idle ... ok
+test tests_place::multiple_svg_drops_open_individually ... ok
+test tests_recovery::discard_at_launch_deletes_the_copies_and_cancel_keeps_them ... ok
+test tests_recovery::the_timer_writes_modified_documents_every_interval ... ok
+test tests_place::an_svg_drop_without_a_path_is_detected_from_its_bytes ... ok
+test tests_recolor::a_group_keeps_the_colours_no_art_row_took ... ok
+test tests_save::a_document_reopens_at_its_saved_view ... ok
+test tests_recolor::the_dialog_reduces_previews_and_applies_as_one_undo_step ... ok
+test tests_save::new_from_template_takes_bytes_from_agents ... ok
+test tests_place::the_control_bar_and_properties_trace_a_selected_image ... ok
+test tests_recovery::launching_after_a_crash_offers_the_copies ... ok
+test tests_recolor::the_options_button_edits_a_selected_group_and_applies_it_to_the_art ... ok
+test tests_save::show_in_folder_needs_a_saved_document_and_a_file_manager ... ok
+test tests_recolor::presets_open_colour_jobs_and_libraries_and_both_tabs_draw ... ok
+test tests_save::recent_files_show_as_many_as_the_preference_keeps ... ok
+test tests_saveext::saves_add_the_format_extension_to_a_bare_name ... ok
+test tests_removeanchors::the_control_bar_and_properties_hide_it_without_anchors ... ok
+test tests_screenmode::f_cycles_the_screen_modes_and_leaves_presentation_mode ... ok
+test tests_screenmode::the_screen_mode_is_not_saved ... ok
+test tests_saveext::exports_add_the_format_extension_to_a_bare_name ... ok
+test tests_saveext::typed_extensions_are_kept ... ok
+test tests_puppetwarp::the_control_bar_shows_puppet_warp_options ... ok
+test tests_save::revert_asks_then_reloads_in_the_same_tab_keeping_every_zoom ... ok
+test tests_save::the_palette_lists_document_color_mode_once ... ok
+test tests_removeanchors::the_control_bar_converts_connects_and_cuts_selected_anchors ... ok
+test tests_scrub::a_field_without_a_label_does_not_scrub ... ok
+test tests_scrub::dragging_the_text_box_does_not_scrub ... ok
+test tests_scrub::escape_puts_the_value_back_and_the_preference_turns_scrubbing_off ... ok
+test tests_scrub::hovering_the_label_shows_the_resize_cursor_and_clicking_it_focuses_the_field ... ok
+test tests_save::replacing_a_file_that_opening_left_things_out_of_asks_first ... ok
+test tests_scrub::scrubbing_respects_limits_and_precision ... ok
+test tests_slices::slice_menu_items_follow_the_state ... ok
+test tests_slices::slice_tool_cursors_are_drawn_in_code ... ok
+test tests_scrub::dragging_the_label_steps_the_field_with_shift_and_ctrl ... ok
+test tests_slices::the_slice_tools_are_real_tools ... ok
+test tests_svg::a_svgz_name_writes_compressed_svg ... ok
+test tests_svg::svgz_places_like_svg ... ok
+test tests_pdfoutput::output_and_advanced_choices_reach_the_pdf ... ok
+test tests_place::unsupported_and_unreadable_drops_leave_the_document_open ... ok
+test tests_synthetic::a_drag_holds_its_modifiers_from_the_press_to_the_release ... ok
+test tests_svgsave::save_as_svg_keeps_hidden_layers_and_export_as_leaves_them_out ... ok
+test tests_synthetic::a_shift_click_on_a_layers_selection_square_adds_to_the_selection ... ok
+test tests_synthetic::shift_arrow_nudges_ten_points_and_alt_arrow_copies ... ok
+test tests_sysclip::a_bitmap_from_another_app_pastes_as_an_embedded_image_at_the_view_centre ... ok
+test tests_sysclip::a_bitmap_on_the_system_clipboard_enables_paste ... ok
+test tests_synthetic::a_typed_key_holds_its_modifiers_for_its_text ... ok
+test tests_sysclip::an_image_copied_in_a_browser_pastes_as_the_picture_not_its_address ... ok
+test tests_sysclip::a_pdf_from_another_app_pastes_as_vectors_ahead_of_its_bitmap ... ok
+test tests_sysclip::a_picture_the_host_read_from_a_paste_pastes_without_the_service ... ok
+test tests_sysclip::copy_publishes_pdf_to_the_service_only_with_the_preference_on ... ok
+test tests_sysclip::text_from_another_app_pastes_as_point_text_and_svg_text_as_art ... ok
+test tests_sysclip::our_own_copy_pastes_the_lossless_internal_clipboard ... ok
+test tests_slices::the_canvas_numbers_slices_until_they_are_hidden ... ok
+test tests_sysclip_emf::an_emf_from_another_app_pastes_as_vectors_ahead_of_its_bitmap ... ok
+test tests_sysclip::keyboard_paste_of_a_bitmap_without_a_paste_event ... ok
+test tests_sysclip::without_the_service_plain_text_is_still_not_pasted ... ok
+test tests_transparencygrid::the_canvas_shows_the_grid_only_for_documents_that_turn_it_on ... ok
+test tests_removeanchors::the_path_menu_and_bars_run_it_for_direct_selected_anchors ... ok
+test tests_sysclip_probe::without_its_thread_the_check_runs_in_line_again ... ok
+test tests_widthtool::the_width_tool_has_its_own_cursors ... ok
+test theme::tests::brightness_roundtrip ... ok
+test tests_removeanchors::a_whole_path_converts_with_the_tools_that_edit_anchors ... ok
+test tests_screenmode::escape_leaves_presentation_mode ... ok
+test tests_widthtool::the_hint_bar_explains_the_width_tool ... ok
+test titlebar::tests::close_runs_the_quit_flow_instead_of_closing_the_window ... ok
+test toolbar::tests::a_click_on_a_flyouts_bar_tears_it_off ... ok
+test titlebar::tests::empty_bar_space_drags_and_double_click_maximizes ... ok
+test titlebar::tests::caption_buttons_take_the_right_end_and_nothing_overlaps_down_to_800_pt ... ok
+test titlebar::tests::minimize_and_maximize_follow_the_window_state ... ok
+test toolbar::tests::a_held_press_asks_for_the_frame_that_opens_the_flyout ... ok
+test toolbar::tests::double_clicking_a_selection_tool_opens_the_move_dialog ... ok
+test toolbar::tests::double_clicking_the_hand_zoom_and_transform_tools ... ok
+test toolbar::tests::double_clicking_a_tool_button_opens_its_options ... ok
+test titlebar::tests::edge_zones_resize_unless_maximized ... ok
+test toolbar::tests::loaded_floating_flyouts_keep_known_tools_one_strip_per_group ... ok
+test toolbar::tests::floating_flyouts_survive_saved_preferences_and_stay_on_screen ... ok
+test tests_selectall::cmd_a_on_the_canvas_selects_all_objects ... ok
+test toolbar::tests::a_flyout_dragged_by_its_bar_floats_until_its_close_box_puts_it_back ... ok
+test toolbar::tests::more_tools_open_their_options ... ok
+test toolbar::tests::the_columns_command_toggles_or_sets_the_toolbar_columns ... ok
+test tests_selectall::cmd_a_in_a_panel_field_selects_its_text_and_leaves_the_art ... ok
+test toolbar::tests::the_double_arrow_toggles_one_and_two_columns_in_a_short_window ... ok
+test toolbar::tests::a_floating_flyouts_buttons_have_tool_tips_when_tool_tips_are_on ... ok
+test toolbar::tests::releasing_a_long_press_over_the_flyouts_bar_tears_it_off ... ok
+test toolbar::tests::window_float_tools_floats_and_puts_back_a_group ... ok
+test toolbar::tests::pressing_the_corner_triangle_opens_the_flyout_at_once ... ok
+test toolbar::tests::workspaces_keep_floating_flyouts_and_reset_puts_them_back ... ok
+test touch::tests::a_pinch_a_long_press_a_cancel_or_one_finger_is_no_tap ... ok
+test touch::tests::two_and_three_finger_taps ... ok
+test ui_fonts::tests::japanese_renders_with_the_craft_fonts_without_installed_fonts ... ok
+test ui_fonts::tests::latin_text_loads_no_fonts ... ok
+test ui_fonts::tests::cjk_names_get_an_installed_fallback_font ... ok
+test toolbar::tests::right_clicking_a_tool_group_opens_its_flyout ... ok
+test toolbar::tests::tool_group_labels_can_be_hidden ... ok
+test unsaved::tests::a_cancelled_save_as_keeps_the_document_open ... ok
+test unsaved::tests::clean_documents_close_at_once_keeping_views_aligned ... ok
+test unsaved::tests::close_all_and_quit_ask_once_per_modified_document ... ok
+test unsaved::tests::the_control_channels_quit_says_when_it_asks_first ... ok
+test workspaces::tests::all_requested_workspaces_exist ... ok
+test ui_fonts::tests::the_ui_works_without_the_craft_fonts ... ok
+test workspaces::tests::builtin_names_are_protected ... ok
+test workspaces::tests::essentials_is_the_default_layout ... ok
+test workspaces::tests::apply_classic_then_reset_to_essentials_keeps_brightness ... ok
+test unsaved::tests::closing_a_modified_document_asks_and_cancel_keeps_it ... ok
+test tests_selectall::cmd_a_while_editing_type_selects_all_of_its_text ... ok
+test toolbar::tests::the_flyout_opens_on_the_right_press_even_when_its_tool_is_active ... ok
+test workspaces::tests::save_apply_round_trip ... ok
+test tests_selectall::the_clipboard_keys_in_a_focused_field_edit_its_text ... ok
+test toolbar::tests::type_button_long_press_selects_vertical_type_in_both_layouts ... ok
+test toolbar::tests::the_toolbar_scrolls_in_a_short_window ... ok
+test tests_selectall::the_in_window_edit_menu_acts_on_the_field_it_was_opened_from ... ok
+test tests_scrub::scrubbing_w_in_the_app_is_one_undo_step ... ok
+test tests_sysclip_probe::the_probe_rests_after_a_copy_and_stops_with_the_app ... ok
+test tests_sysclip_probe::a_slow_clipboard_is_read_off_the_ui_thread ... ok
+test tests_background::a_50k_path_save_returns_at_once_and_the_file_appears_later ... ok
+
+test result: ok. 874 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.57s
+
+     Running unittests src/main.rs (target/debug/deps/vectorcraft_web-077c0314fdb3aa9a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/xtask-ab85b16ea4f27a1d)
+
+running 35 tests
+test assets::tests::detects_unattributed_assets ... ok
+test brands::tests::docs_packaging_and_manifests ... ok
+test brands::tests::rust_literals_skip_comments_identifiers_tests_and_marked_lines ... ok
+test brands::tests::scope ... ok
+test brands::tests::whole_words_only ... ok
+test bundle::tests::dev_bundle_plist_is_the_release_one ... ok
+test ico::tests::rejects_non_png ... ok
+test layers::tests::clean_downward_graph_passes ... ok
+test layers::tests::l0_foundation_chain_allowed_one_way ... ok
+test layers::tests::sideways_dependency_flagged ... ok
+test layers::tests::metadata_parsing ... ok
+test layers::tests::unregistered_crate_is_error ... ok
+test layers::tests::testkit_only_as_dev_dependency ... ok
+test layers::tests::upward_dependency_flagged ... ok
+test brands::tests::injected_strings_fail_the_gate ... ok
+test layers::tests::ui_crates_below_l6_flagged ... ok
+test layers::tests::self_dev_dependency_ignored ... ok
+test layers::tests::apps_and_xtask_exempt ... ok
+test version::tests::keeps_crlf_line_endings ... ok
+test layers::tests::upward_dev_dependency_flagged ... ok
+test version::tests::reads_the_workspace_version ... ok
+test web_fonts::list::tests::base64_matches_rfc_4648_vectors ... ok
+test web_fonts::list::tests::list_parsing ... ok
+test web_fonts::list::tests::url_is_relative_and_content_addressed ... ok
+test version::tests::the_real_manifest_has_a_valid_version ... ok
+test stats::tests::counts_attributes_and_proptest_blocks ... ok
+test version::tests::replaces_only_the_workspace_version ... ok
+test version::tests::validates_versions ... ok
+test web_fonts::list::tests::sri_of_the_empty_files_sha256 ... ok
+test web_fonts::tests::a_file_that_does_not_match_its_manifest_hash_is_an_error ... ok
+test web_fonts::tests::without_craft_fonts_the_hook_does_nothing ... ok
+test web_fonts::tests::copies_listed_faces_with_their_licence_to_their_urls ... ok
+test bundle::tests::packaging_describes_a_vector_app ... ok
+test sha256::tests::known_digests ... ok
+test brands::tests::the_tree_is_clean ... ok
+
+test result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+   Doc-tests vectorcraft_affinity
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_brush
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_cad
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_color
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_doc
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_effects
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_engine
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_eps
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_format
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_geom
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_mcp
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_metafile
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_pathops
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_pdf
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_plugins
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_render
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_svg
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_testkit
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_text
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_tools
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_trace
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_ui_egui
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+=== ci: assets ===
+assets: all 318 asset files attributed in ASSETS.md
+
+=== ci: brands ===
+brands: no vendor names in user-visible text
+
+=== ci: layers ===
+Dependency layering (plan/architecture.md §3)
+
+crate                        layer          workspace deps
+vectorcraft                  exempt         engine, text, ui-egui
+vectorcraft-affinity         L0 standalone  
+vectorcraft-brush            L2             color, doc, geom
+vectorcraft-cad              L3             brush, color, doc, effects, geom, pathops, text
+vectorcraft-cli              exempt         color, doc, engine, format, geom, mcp, render, svg, text, testkit (dev)
+vectorcraft-color            L0             
+vectorcraft-doc              L1             color, geom
+vectorcraft-effects          L2             doc, geom, pathops, plugins, text, color (dev)
+vectorcraft-engine           L5             affinity, brush, cad, color, doc, eps, format, geom, metafile, pathops, pdf, plugins, render, svg, text, tools, trace, affinity (dev), testkit (dev)
+vectorcraft-eps              L3             brush, color, doc, effects, geom, metafile, render, text, testkit (dev)
+vectorcraft-format           L3             doc, geom (dev), testkit (dev)
+vectorcraft-geom             L0             testkit (dev)
+vectorcraft-mcp              L6             doc, engine, format, geom, render, svg, tools, testkit (dev)
+vectorcraft-metafile         L3             brush, color, doc, effects, geom, text
+vectorcraft-pathops          L2             geom, testkit (dev)
+vectorcraft-pdf              L3             brush, color, doc, effects, geom, text, testkit (dev), text (dev)
+vectorcraft-plugins          L2             color, doc, geom
+vectorcraft-render           L3             brush, color, doc, effects, geom, text, testkit (dev)
+vectorcraft-svg              L3             brush, color, doc, effects, geom, text, testkit (dev), text (dev)
+vectorcraft-testkit          testkit        color, doc, engine, format, geom, render, svg
+vectorcraft-text             L2             doc, geom
+vectorcraft-tools            L4             color, doc, geom, pathops, text, text (dev)
+vectorcraft-trace            L2             geom, pathops
+vectorcraft-ui-egui          L6             brush, cad, color, doc, effects, engine, eps, format, geom, pdf, plugins, render, svg, text, tools, testkit (dev)
+vectorcraft-web              exempt         engine, format, text, ui-egui
+xtask                        exempt         
+
+OK: 26 crates, no layering violations.
+
+=== ci: wasm ===
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-affinity
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+    Checking simd-adler32 v0.3.10
+   Compiling crc32fast v1.5.2
+    Checking cfg-if v1.0.5
+    Checking adler2 v2.0.1
+   Compiling autocfg v1.5.1
+   Compiling zerocopy v0.8.59
+    Checking miniz_oxide v0.9.1
+    Checking flate2 v1.1.10
+   Compiling syn v2.0.119
+    Checking quick-error v2.0.1
+    Checking zune-core v0.5.3
+    Checking weezl v0.1.12
+   Compiling num-traits v0.2.19
+    Checking zune-jpeg v0.5.15
+    Checking miniz_oxide v0.8.9
+    Checking fdeflate v0.3.7
+    Checking fax v0.2.7
+    Checking pxfm v0.1.30
+    Checking color_quant v1.1.0
+    Checking byteorder-lite v0.1.0
+    Checking bitflags v2.13.2
+    Checking png v0.18.1
+    Checking image-webp v0.2.4
+    Checking gif v0.14.2
+    Checking twox-hash v2.1.5
+    Checking bytemuck v1.25.2
+    Checking ruzstd v0.9.0
+    Checking moxcms v0.8.1
+   Compiling zerocopy-derive v0.8.59
+    Checking half v2.7.1
+    Checking tiff v0.11.3
+    Checking image v0.25.10
+    Checking vectorcraft-affinity v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/affinity)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 41.30s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-brush
+   Compiling syn v3.0.6
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling zmij v1.0.23
+   Compiling thiserror v2.0.21
+    Checking arrayvec v0.7.8
+    Checking polycool v0.4.0
+   Compiling serde_json v1.0.151
+    Checking itoa v1.0.18
+    Checking memchr v2.8.3
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.21
+    Checking smallvec v1.16.2
+    Checking kurbo v0.13.1
+    Checking vectorcraft-color v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/color)
+    Checking vectorcraft-geom v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/geom)
+    Checking vectorcraft-doc v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/doc)
+    Checking vectorcraft-brush v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/brush)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 36.29s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-cad
+   Compiling bytemuck_derive v1.12.1
+    Checking arrayvec v0.7.8
+   Compiling libm v0.2.16
+    Checking once_cell v1.21.4
+    Checking hashbrown v0.17.1
+    Checking polycool v0.4.0
+    Checking kurbo v0.13.1
+    Checking equivalent v1.0.2
+   Compiling wasmi_ir v2.0.0
+   Compiling wasmparser v0.228.0
+    Checking rustc-hash v2.1.3
+    Checking wasmi_core v2.0.0
+    Checking vectorcraft-geom v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/geom)
+    Checking vectorcraft-color v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/color)
+    Checking indexmap v2.14.2
+   Compiling unicode-general-category v1.1.0
+    Checking log v0.4.34
+   Compiling wasmi v2.0.0
+   Compiling vectorcraft-text v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/text)
+    Checking spin v0.9.9
+    Checking wasmi_collections v2.0.0
+    Checking linesweeper v0.4.0
+    Checking unicode-bidi v0.3.18
+    Checking unicode-script v0.5.8
+    Checking vectorcraft-pathops v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/pathops)
+    Checking bytemuck v1.25.2
+    Checking font-types v0.11.3
+    Checking font-types v0.12.5
+    Checking image v0.25.10
+    Checking read-fonts v0.43.3
+    Checking read-fonts v0.39.2
+    Checking vectorcraft-doc v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/doc)
+    Checking read-fonts v0.44.0
+    Checking skrifa v0.42.1
+    Checking write-fonts v0.48.1
+    Checking harfrust v0.13.3
+    Checking vectorcraft-plugins v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/plugins)
+    Checking vectorcraft-brush v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/brush)
+    Checking subsetter v0.2.6
+    Checking skrifa v0.47.0
+    Checking vectorcraft-effects v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/effects)
+    Checking vectorcraft-cad v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/cad)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 36.29s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-color
+    Finished `dev` profile [optimized + debuginfo] target(s) in 0.24s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-doc
+    Finished `dev` profile [optimized + debuginfo] target(s) in 0.17s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-effects
+    Finished `dev` profile [optimized + debuginfo] target(s) in 0.19s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-engine
+   Compiling syn v3.0.6
+    Checking memchr v2.8.3
+    Checking log v0.4.34
+   Compiling version_check v0.9.5
+   Compiling libm v0.2.16
+    Checking foldhash v0.2.0
+    Checking hashbrown v0.17.1
+    Checking serde_json v1.0.151
+    Checking indexmap v2.14.2
+   Compiling generic-array v0.14.7
+    Checking typenum v1.20.1
+    Checking wasmi_core v2.0.0
+    Checking fearless_simd v0.4.1
+    Checking wasmi_ir v2.0.0
+    Checking siphasher v1.0.4
+   Compiling synstructure v0.14.0
+    Checking crypto-common v0.1.7
+    Checking euclid v0.22.14
+    Checking wasmi v2.0.0
+    Checking float-cmp v0.9.0
+    Checking linebender_resource_handle v0.1.1
+    Checking alloc-no-stdlib v2.0.4
+   Compiling phf_shared v0.13.1
+    Checking alloc-stdlib v0.2.4
+    Checking strict-num v0.1.1
+    Checking guillotiere v0.7.0
+   Compiling slotmap v1.1.1
+    Checking arrayref v0.3.9
+   Compiling fastrand v2.5.0
+   Compiling phf_generator v0.13.1
+    Checking brotli-decompressor v5.0.3
+    Checking block-buffer v0.10.4
+    Checking core_maths v0.1.1
+    Checking stable_deref_trait v1.2.1
+    Checking hayro-ccitt v0.3.0
+    Checking hayro-jbig2 v0.3.0
+    Checking ttf-parser v0.25.1
+    Checking digest v0.10.7
+    Checking brotli v8.0.4
+   Compiling phf_macros v0.13.1
+    Checking hayro-jpeg2000 v0.3.5
+    Checking inout v0.1.4
+    Checking tinyvec v1.13.3
+    Checking hayro-postscript v0.1.0
+    Checking ryu v1.0.23
+    Checking unicode-properties v0.1.4
+    Checking memmap2 v0.9.11
+    Checking unicode-ccc v0.4.0
+    Checking jpeg-encoder v0.6.1
+    Checking unicode-bidi-mirroring v0.4.0
+    Checking fontdb v0.24.0
+    Checking pdf-writer v0.15.0
+    Checking hayro-cmap v0.1.0
+    Checking cipher v0.4.4
+    Checking roxmltree v0.21.1
+    Checking simplecss v0.2.2
+    Checking base64 v0.23.1
+    Checking xmp-writer v0.3.3
+    Checking imagesize v0.15.0
+    Checking pico-args v0.5.0
+    Checking xmlwriter v0.1.0
+    Checking unicode-vo v0.1.0
+    Checking imagesize v0.14.0
+    Checking bumpalo v3.20.3
+    Checking base64 v0.22.1
+    Checking data-url v0.3.2
+    Checking aes v0.8.4
+    Checking sha2 v0.10.9
+    Checking md-5 v0.10.6
+    Checking phf v0.13.1
+   Compiling bytemuck_derive v1.12.1
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.21
+   Compiling zerofrom-derive v0.1.8
+    Checking bytemuck v1.25.2
+    Checking font-types v0.12.5
+    Checking image v0.25.10
+    Checking font-types v0.11.3
+    Checking read-fonts v0.39.2
+    Checking read-fonts v0.43.3
+    Checking thiserror v2.0.21
+    Checking read-fonts v0.44.0
+    Checking read-fonts v0.41.0
+    Checking skrifa v0.42.1
+    Checking serde v1.0.229
+    Checking skrifa v0.47.0
+    Checking smallvec v1.16.2
+    Checking arrayvec v0.7.8
+    Checking harfrust v0.13.3
+    Checking polycool v0.4.0
+    Checking kurbo v0.13.1
+    Checking color v0.3.3
+    Checking skrifa v0.44.0
+    Checking zerofrom v0.1.8
+    Checking tiny-skia-path v0.12.0
+    Checking vectorcraft-geom v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/geom)
+    Checking vectorcraft-color v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/color)
+    Checking write-fonts v0.48.1
+    Checking linesweeper v0.4.0
+    Checking peniko v0.6.1
+    Checking vello_common v0.2.0
+    Checking vectorcraft-pathops v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/pathops)
+    Checking vectorcraft-doc v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/doc)
+   Compiling yoke-derive v0.8.3
+    Checking glifo v0.3.0
+    Checking vello_cpu v0.2.0
+    Checking svgtypes v0.16.1
+    Checking harfrust v0.12.0
+    Checking subsetter v0.2.6
+    Checking rustybuzz v0.20.1
+    Checking vectorcraft-text v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/text)
+    Checking vectorcraft-plugins v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/plugins)
+    Checking vectorcraft-brush v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/brush)
+    Checking vectorcraft-effects v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/effects)
+    Checking hayro-syntax v0.7.2
+    Checking usvg v0.48.1
+    Checking vectorcraft-render v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/render)
+    Checking vectorcraft-metafile v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/metafile)
+    Checking vectorcraft-svg v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/svg)
+    Checking vectorcraft-cad v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/cad)
+    Checking vectorcraft-eps v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/eps)
+    Checking vectorcraft-tools v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/tools)
+    Checking vectorcraft-format v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/format)
+    Checking vectorcraft-trace v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/trace)
+    Checking vectorcraft-affinity v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/affinity)
+    Checking yoke v0.8.3
+    Checking hayro-interpret v0.7.0
+    Checking krilla v0.8.2
+    Checking vectorcraft-pdf v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/pdf)
+    Checking vectorcraft-engine v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/engine)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 1m 45s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-eps
+    Checking write-fonts v0.48.1
+    Checking color v0.3.3
+    Checking read-fonts v0.41.0
+    Checking fearless_simd v0.4.1
+    Checking peniko v0.6.1
+    Checking ruzstd v0.9.0
+    Checking vello_common v0.2.0
+    Checking subsetter v0.2.6
+    Checking vectorcraft-text v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/text)
+    Checking vectorcraft-effects v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/effects)
+    Checking skrifa v0.44.0
+    Checking vectorcraft-metafile v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/metafile)
+    Checking glifo v0.3.0
+    Checking vello_cpu v0.2.0
+    Checking vectorcraft-render v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/render)
+    Checking vectorcraft-eps v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/eps)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 15.67s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-format
+    Checking vectorcraft-format v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/format)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 0.48s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-geom
+    Finished `dev` profile [optimized + debuginfo] target(s) in 0.18s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-metafile
+    Checking vectorcraft-metafile v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/metafile)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 0.81s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-pathops
+    Finished `dev` profile [optimized + debuginfo] target(s) in 0.15s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-pdf
+    Checking write-fonts v0.48.1
+    Checking strict-num v0.1.1
+    Checking rustybuzz v0.20.1
+    Checking float-cmp v0.9.0
+    Checking tiny-skia-path v0.12.0
+    Checking subsetter v0.2.6
+    Checking vectorcraft-text v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/text)
+    Checking krilla v0.8.2
+    Checking vectorcraft-effects v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/effects)
+    Checking vectorcraft-pdf v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/pdf)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 11.87s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-plugins
+    Checking vectorcraft-plugins v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/plugins)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 0.72s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-render
+    Finished `dev` profile [optimized + debuginfo] target(s) in 0.18s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-svg
+    Checking write-fonts v0.48.1
+    Checking read-fonts v0.41.0
+    Checking float-cmp v0.9.0
+    Checking svgtypes v0.16.1
+    Checking strict-num v0.1.1
+    Checking tiny-skia-path v0.12.0
+    Checking roxmltree v0.21.1
+    Checking subsetter v0.2.6
+    Checking vectorcraft-text v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/text)
+    Checking vectorcraft-effects v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/effects)
+    Checking skrifa v0.44.0
+    Checking harfrust v0.12.0
+    Checking usvg v0.48.1
+    Checking vectorcraft-svg v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/svg)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 14.43s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-text
+    Checking write-fonts v0.48.1
+    Checking vectorcraft-doc v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/doc)
+    Checking subsetter v0.2.6
+    Checking vectorcraft-text v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/text)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 7.25s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-tools
+    Checking vectorcraft-tools v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/tools)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 3.44s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-trace
+    Checking vectorcraft-trace v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/trace)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 1.03s
+$ cargo check --target wasm32-unknown-unknown -p vectorcraft-ui-egui
+ Downloading crates ...
+  Downloaded wasm-bindgen-shared v0.2.129
+  Downloaded wasm-bindgen-macro v0.2.129
+  Downloaded rustversion v1.0.23
+  Downloaded js-sys v0.3.106
+  Downloaded wasm-bindgen v0.2.129
+  Downloaded wasm-bindgen-macro-support v0.2.129
+  Downloaded web-sys v0.3.106
+   Compiling syn v3.0.6
+   Compiling wasm-bindgen-shared v0.2.129
+   Compiling rustversion v1.0.23
+   Compiling serde_core v1.0.229
+    Checking unicode-ident v1.0.26
+   Compiling parking_lot_core v0.9.12
+   Compiling ahash v0.8.12
+    Checking futures-task v0.3.34
+    Checking slab v0.4.12
+    Checking futures-core v0.3.34
+    Checking scopeguard v1.2.0
+    Checking pin-project-lite v0.2.17
+    Checking futures-util v0.3.34
+   Compiling wasm-bindgen v0.2.129
+    Checking lock_api v0.4.14
+   Compiling zmij v1.0.23
+   Compiling winnow v1.0.4
+    Checking bitflags v1.3.2
+    Checking emath v0.36.2
+    Checking png v0.17.16
+    Checking ecolor v0.36.2
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_spanned v1.1.1
+   Compiling serde_json v1.0.151
+    Checking unicode-segmentation v1.13.3
+    Checking self_cell v1.3.0
+   Compiling toml_writer v1.1.2+spec-1.1.0
+    Checking epaint_default_fonts v0.36.2
+    Checking imagesize v0.13.0
+    Checking uuid v1.26.1
+    Checking roxmltree v0.20.0
+    Checking nohash-hasher v0.2.0
+    Checking profiling v1.0.18
+    Checking either v1.18.0
+    Checking itertools v0.15.0
+    Checking accesskit v0.24.1
+   Compiling synstructure v0.14.0
+   Compiling wasm-bindgen-macro-support v0.2.129
+   Compiling toml v1.1.6+spec-1.1.0
+   Compiling enum-map-derive v0.17.0
+   Compiling vectorcraft-ui-egui v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/ui-egui)
+    Checking enum-map v2.7.3
+   Compiling bytemuck_derive v1.12.1
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.21
+    Checking bytemuck v1.25.2
+    Checking font-types v0.12.5
+    Checking image v0.25.10
+    Checking font-types v0.11.3
+    Checking read-fonts v0.39.2
+    Checking read-fonts v0.41.0
+    Checking skrifa v0.42.1
+    Checking color v0.3.3
+    Checking read-fonts v0.43.3
+    Checking read-fonts v0.44.0
+    Checking skrifa v0.44.0
+    Checking skrifa v0.47.0
+   Compiling zerofrom-derive v0.1.8
+   Compiling wasm-bindgen-macro v0.2.129
+    Checking tiny-skia-path v0.12.0
+   Compiling yoke-derive v0.8.3
+    Checking thiserror v2.0.21
+    Checking tiny-skia-path v0.11.4
+    Checking js-sys v0.3.106
+    Checking serde v1.0.229
+    Checking smallvec v1.16.2
+    Checking arrayvec v0.7.8
+    Checking polycool v0.4.0
+    Checking kurbo v0.13.1
+    Checking vectorcraft-geom v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/geom)
+    Checking vectorcraft-color v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/color)
+    Checking vectorcraft-doc v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/doc)
+    Checking write-fonts v0.48.1
+    Checking subsetter v0.2.6
+    Checking linesweeper v0.4.0
+    Checking peniko v0.6.1
+    Checking vectorcraft-pathops v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/pathops)
+    Checking harfrust v0.13.3
+    Checking vectorcraft-plugins v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/plugins)
+    Checking vectorcraft-brush v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/brush)
+    Checking harfrust v0.12.0
+    Checking vectorcraft-text v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/text)
+    Checking vectorcraft-effects v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/effects)
+    Checking vello_common v0.2.0
+    Checking vello_common v0.1.0
+    Checking zerofrom v0.1.8
+    Checking kurbo v0.11.3
+    Checking yoke v0.8.3
+    Checking glifo v0.3.0
+    Checking vello_cpu v0.1.0
+    Checking parking_lot v0.12.5
+    Checking svgtypes v0.16.1
+    Checking vello_cpu v0.2.0
+    Checking hayro-syntax v0.7.2
+    Checking svgtypes v0.15.3
+    Checking rustybuzz v0.20.1
+    Checking usvg v0.45.1
+    Checking vectorcraft-render v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/render)
+    Checking hayro-interpret v0.7.0
+    Checking epaint v0.36.2
+    Checking krilla v0.8.2
+    Checking usvg v0.48.1
+    Checking vectorcraft-metafile v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/metafile)
+    Checking web-sys v0.3.106
+    Checking tiny-skia v0.11.4
+    Checking rgb v0.8.53
+    Checking egui v0.36.2
+    Checking vectorcraft-pdf v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/pdf)
+    Checking vectorcraft-svg v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/svg)
+    Checking resvg v0.45.1
+    Checking vectorcraft-eps v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/eps)
+    Checking vectorcraft-cad v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/cad)
+    Checking vectorcraft-tools v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/tools)
+    Checking vectorcraft-trace v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/trace)
+    Checking vectorcraft-format v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/format)
+    Checking vectorcraft-affinity v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/affinity)
+    Checking egui_extras v0.36.2
+    Checking vectorcraft-engine v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/engine)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 3m 01s
+
+wasm32-unknown-unknown check:
+  ok     vectorcraft-affinity
+  ok     vectorcraft-brush
+  ok     vectorcraft-cad
+  ok     vectorcraft-color
+  ok     vectorcraft-doc
+  ok     vectorcraft-effects
+  ok     vectorcraft-engine
+  ok     vectorcraft-eps
+  ok     vectorcraft-format
+  ok     vectorcraft-geom
+  ok     vectorcraft-metafile
+  ok     vectorcraft-pathops
+  ok     vectorcraft-pdf
+  ok     vectorcraft-plugins
+  ok     vectorcraft-render
+  ok     vectorcraft-svg
+  ok     vectorcraft-text
+  ok     vectorcraft-tools
+  ok     vectorcraft-trace
+  ok     vectorcraft-ui-egui
+
+CI summary: all 7 steps passed (fmt, clippy, test, assets, brands, layers, wasm)

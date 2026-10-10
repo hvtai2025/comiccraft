@@ -1,0 +1,23 @@
+[package]
+name = "vectorcraft-comic-ai"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "ComicCraft AI provider adapters: capability descriptors, request building and the generation job state machine"
+
+[lints]
+workspace = true
+
+# Only what the code uses. A declared-but-unused dependency makes `cargo xtask layers` report
+# an edge that does not exist, and it costs build time, so each dependency arrives with the
+# module that needs it:
+#   * vectorcraft-comic-model — with the job record that references `PanelId`/`AssetId` (M4)
+#   * thiserror               — with the provider error type (M4)
+# There is no HTTP client here yet, and adding one is a deliberate, gate-visible decision
+# (design ADR-015): licence-compatible, gated so `cargo xtask wasm` still passes, and
+# unreachable from `crates/doc` and `crates/format`.
+[dependencies]
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

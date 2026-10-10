@@ -4420,6 +4420,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "vectorcraft-comic-ai"
+version = "0.8.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "vectorcraft-comic-layout"
+version = "0.8.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "vectorcraft-comic-model"
+version = "0.8.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "vectorcraft-doc"
 version = "0.8.0"
 dependencies = [

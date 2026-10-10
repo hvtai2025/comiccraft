@@ -1,0 +1,23 @@
+[package]
+name = "vectorcraft-comic-layout"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "ComicCraft layout: deterministic page and panel layout, lettering fitting, validation and publishing assembly"
+
+[lints]
+workspace = true
+
+# Only what the code uses. A declared-but-unused dependency makes `cargo xtask layers` report
+# an edge that does not exist, and it costs real build time — `render`, `pdf`, `svg` and `text`
+# are heavy, and building them for this crate's tests before it calls them is pure waste. Each
+# dependency arrives with the module that needs it:
+#   * vectorcraft-doc, vectorcraft-geom, vectorcraft-comic-model — layout and validation (M1–M2)
+#   * vectorcraft-text  — lettering fitting, via `layout_with` and `LayoutOptions` (M2)
+#   * vectorcraft-render, vectorcraft-pdf, vectorcraft-svg — publishing assembly (M7)
+#   * thiserror         — with the validation error type (M2)
+[dependencies]
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

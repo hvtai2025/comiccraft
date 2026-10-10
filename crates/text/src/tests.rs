@@ -476,6 +476,67 @@ fn japanese_fonts() -> bool {
     built_in
 }
 
+/// Are the ComicCraft lettering faces built in? The comic tests skip (and say so) when they
+/// aren't, so the suite passes with `CRAFT_FONTS` empty — which `AGENTS.md` requires.
+fn comic_fonts() -> bool {
+    let built_in = CRAFT_FONTS.iter().any(|f| f.family == "Comic Neue");
+    if !built_in {
+        eprintln!("skipped: built without craft-fonts (set CRAFT_FONTS_DIR to a craft-fonts checkout to run it)");
+    }
+    built_in
+}
+
+#[test]
+fn the_comic_lettering_faces_are_loaded_and_pickable_by_name() {
+    // ComicCraft design ADR-017. These are Latin-only faces, so they are outside
+    // `document_fonts()` (the Japanese and Arabic fallbacks) and would be embedded but
+    // unreachable if nothing registered them.
+    if !comic_fonts() {
+        return;
+    }
+    // Every style the design names, resolved by name — the way a project asks for them.
+    for (family, face_style) in [("Comic Neue", "Regular"), ("Comic Neue", "Bold"), ("Comic Neue", "Italic"), ("Bangers", "Regular")] {
+        assert!(db().face(family, face_style).is_some(), "{family} {face_style} must resolve by name");
+        assert!(db().families().iter().any(|f| f == family), "{family} must be listed for the font menu");
+    }
+}
+
+#[test]
+fn the_comic_faces_do_not_steal_latin_text_from_the_bundled_family() {
+    // The point of appending them after the bundled fonts: adding comic lettering must not
+    // change how existing Latin text resolves. This is the guard against a silent regression
+    // in every document that was made before ComicCraft existed.
+    if !comic_fonts() {
+        return;
+    }
+    assert_eq!(db().face_covering('a').unwrap().family, FALLBACK_FAMILY);
+    assert_eq!(db().face_covering('Z').unwrap().family, FALLBACK_FAMILY);
+}
+
+#[test]
+fn comic_lettering_lays_out_in_the_comic_face_when_asked_for_it_by_name() {
+    if !comic_fonts() {
+        return;
+    }
+    // Dialogue and captions are set in Comic Neue.
+    let mut s = style(14.0);
+    s.font_family = "Comic Neue".to_string();
+    let l = layout(db(), &point("POW! The panel holds.", s));
+    assert_eq!(l.lines.len(), 1);
+    assert!(l.glyphs.iter().all(|g| g.gid != 0), "no tofu: every glyph resolves in Comic Neue");
+    // A space has a glyph id but draws nothing, so count the inked ones rather than all of them.
+    let inked = l.glyphs.iter().filter(|g| !g.outline.elements().is_empty()).count();
+    assert!(inked >= 15, "the letters draw: {inked} of {} glyphs have outlines", l.glyphs.len());
+
+    // Sound effects and titles are set in the display face.
+    let mut s = style(28.0);
+    s.font_family = "Bangers".to_string();
+    let l = layout(db(), &point("KRAKOOM", s));
+    assert_eq!(l.lines.len(), 1);
+    assert!(l.glyphs.iter().all(|g| g.gid != 0), "no tofu: every glyph resolves in Bangers");
+    assert!(l.glyphs.iter().all(|g| !g.outline.elements().is_empty()), "Bangers draws every glyph");
+}
+
 #[test]
 fn japanese_text_uses_the_craft_fonts_mincho_after_the_bundled_fonts() {
     if !japanese_fonts() {

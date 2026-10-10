@@ -1,0 +1,21 @@
+[package]
+name = "vectorcraft-comic-model"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "ComicCraft project model: the bundle schema, stable comic ids, narrative entities and provenance (pure data + serde)"
+
+[lints]
+workspace = true
+
+# Only what the code uses. A declared-but-unused dependency makes `cargo xtask layers` report
+# an edge that does not exist, and it costs build time, so each dependency arrives with the
+# module that needs it:
+#   * vectorcraft-doc  — with the entities that carry `NodeId` (M1)
+#   * vectorcraft-geom — with the page-size and rect types (M1)
+#   * thiserror        — with the bundle reader/writer's error type (M1)
+[dependencies]
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

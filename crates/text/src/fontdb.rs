@@ -1395,7 +1395,10 @@ impl FontDb {
         // The bundled fonts, then the craft-fonts faces (when built with them): Japanese, Mincho
         // first, then Arabic with Noto Sans Arabic first. They are fallbacks for those scripts
         // after the requested and bundled fonts, and families users can pick by name.
-        let craft = crate::craft_fonts::document_fonts().into_iter().map(|f| f.bytes);
+        // The ComicCraft lettering faces (Comic Neue, Bangers) come last for the same reason:
+        // they are picked by name, and being appended after the bundled fonts they never take
+        // Latin text away from the bundled fallback family.
+        let craft = crate::craft_fonts::document_fonts().into_iter().chain(crate::craft_fonts::comic_fonts()).map(|f| f.bytes);
         for data in BUNDLED.iter().copied().chain(craft) {
             for (i, spec) in enumerate_faces(data) {
                 if let Some(f) = make_face(FontBytes::Static(data), i, spec, None) {
