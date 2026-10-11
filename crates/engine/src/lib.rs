@@ -64,6 +64,12 @@ pub struct HistoryEntry {
     pub label: String,
     pub doc: Arc<Document>,
     pub selection: Selection,
+    /// The ComicCraft project *before* this step, for a step that changed the comic model (M1 W4).
+    ///
+    /// `None` means the step could not have changed it — every step an existing command records —
+    /// and leaves [`DocState::comic`] alone, so undoing a plain document edit never clears an open
+    /// project. `Some` is a snapshot shared behind the `Arc`, so recording one costs a pointer.
+    pub comic: Option<Arc<cmd::comic::OpenComic>>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -113,6 +119,11 @@ pub struct DocState {
     /// The document as last saved (or opened). Structural sharing makes "unchanged" a pointer
     /// comparison, and undoing back to the saved state counts as clean.
     saved_doc: Arc<Document>,
+    /// The comic model as last written by `comic.project.save` (M1 W4), else as created or opened.
+    /// The same pointer comparison as `saved_doc`: the model is a working copy the on-disk bundle
+    /// does not know about until a save, so a change to it alone is unsaved work (see
+    /// [`DocState::is_dirty`]).
+    saved_comic: Option<Arc<cmd::comic::OpenComic>>,
     /// The layer new art goes into (the "current layer" in the Layers panel).
     pub active_layer: Option<NodeId>,
     /// The rows highlighted in the Layers panel (layers, sublayers, groups or objects, in the order
@@ -166,6 +177,12 @@ pub struct DocState {
     /// Transform Again after a perspective move or scale (Perspective Selection tool): the
     /// `perspective.transform` params it repeats. `None` once an ordinary transform follows.
     pub last_perspective: Option<Value>,
+    /// The ComicCraft project open in this document (M1 W4), or `None` for a plain VectorCraft
+    /// document. Shared behind the `Arc` so an undo entry can snapshot it for a pointer.
+    ///
+    /// It lives here rather than on [`Session`] because it belongs to the document the bundle names
+    /// (ADR-011: one visual document per project), so closing the document closes the project.
+    pub comic: Option<Arc<cmd::comic::OpenComic>>,
 }
 
 static NEXT_DOC_UID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
@@ -217,6 +234,18 @@ impl OpenRows {
     }
 }
 
+/// Whether two `DocState::comic` slots hold the **same** project: both empty, or the same `Arc`.
+/// The comic model is snapshotted by pointer (see [`HistoryEntry::comic`]), so "unchanged" is the
+/// same comparison `Arc::ptr_eq` gives the document — and a model edited in place while a snapshot
+/// or the saved state still points at it is cloned by `Arc::make_mut` before it changes.
+fn same_comic(a: &Option<Arc<cmd::comic::OpenComic>>, b: &Option<Arc<cmd::comic::OpenComic>>) -> bool {
+    match (a, b) {
+        (None, None) => true,
+        (Some(a), Some(b)) => Arc::ptr_eq(a, b),
+        _ => false,
+    }
+}
+
 impl DocState {
     pub fn new(mut doc: Document, path: Option<String>) -> Self {
         let active_layer = doc.default_layer();
@@ -228,6 +257,7 @@ impl DocState {
         let doc = Arc::new(doc);
         Self {
             saved_doc: doc.clone(),
+            saved_comic: None,
             doc,
             selection: Selection::default(),
             history: History { limit: 500, ..Default::default() },
@@ -254,15 +284,31 @@ impl DocState {
             imported_from: None,
             import_losses: vec![],
             last_perspective: None,
+            comic: None,
         }
     }
-    /// Unsaved changes: the document differs from the saved one (selection changes don't count).
+    /// Unsaved changes: the document differs from the saved one, **or the open ComicCraft project
+    /// does** (selection changes don't count).
+    ///
+    /// The project half is M1 W4. A comic command changes the model — sometimes *only* the model,
+    /// as `comic.panel.set_shot` and `comic.reading_order.set` do — and the bundle on disk does not
+    /// know about it until `comic.project.save`. So the model is unsaved work exactly as a document
+    /// edit is, and it must be visible here: this is what the title bar's asterisk, Save's
+    /// enablement and the quit prompt read, and without it such an edit is discarded on close with
+    /// no asterisk and no prompt.
     pub fn is_dirty(&self) -> bool {
-        !Arc::ptr_eq(&self.doc, &self.saved_doc)
+        !Arc::ptr_eq(&self.doc, &self.saved_doc) || !same_comic(&self.comic, &self.saved_comic)
     }
     /// Record the current document as saved.
     pub fn mark_saved(&mut self) {
         self.saved_doc = self.doc.clone();
+    }
+    /// Record the open ComicCraft project as saved (M1 W4): `comic.project.save` wrote it.
+    ///
+    /// Deliberately **not** folded into [`DocState::mark_saved`]: a document save (`file.save`)
+    /// writes the visual document, not the bundle, so the model is still unsaved work afterwards.
+    pub fn mark_comic_saved(&mut self) {
+        self.saved_comic = self.comic.clone();
     }
     /// Record `snapshot` (the document as a background save took it) as saved: edits made since
     /// keep the document modified.
@@ -272,7 +318,7 @@ impl DocState {
     /// Keep what interaction `it` (taken from this document) changed, as one undo step.
     pub(crate) fn keep_interaction(&mut self, it: Interaction) {
         if !Arc::ptr_eq(&it.doc, &self.doc) {
-            self.push_undo(HistoryEntry { label: it.label, doc: it.doc, selection: it.selection });
+            self.push_undo(HistoryEntry { label: it.label, doc: it.doc, selection: it.selection, comic: None });
             self.revision += 1;
         }
     }
@@ -1227,7 +1273,7 @@ impl Session {
                 st.selection.prune(&st.doc);
                 st.revision += 1;
                 if st.interaction.is_none() {
-                    st.push_undo(HistoryEntry { label: label.to_string(), doc: before, selection: before_sel });
+                    st.push_undo(HistoryEntry { label: label.to_string(), doc: before, selection: before_sel, comic: None });
                 }
                 Ok(v)
             }

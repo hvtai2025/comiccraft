@@ -358,14 +358,14 @@ One entity for balloons, captions and sound effects; `kind` distinguishes them.
 ### 6.5 `ContinuityConstraints`
 
 `characters: [CharacterId]`, `wardrobe: Option<String>`, `time_of_day: Option<String>`,
-`callbacks: [String]`, `exceptions: [String]`, `unknown`.
+`callbacks: [String]`, `exceptions: [String]`. A **closed shape**: it carries no `unknown` (§12).
 
 ### 6.6 `TextLayoutSettings`
 
 `font: Option<String>` (a family name resolved through the font database),
 `size: Option<f64>` (points), `leading: Option<f64>`, `tracking: Option<f64>`,
 `align: Option<TextAlign>` (`left` \| `center` \| `right`),
-`padding: Option<f64>`, `fit_to_frame: bool`, `unknown`.
+`padding: Option<f64>`, `fit_to_frame: bool`. A **closed shape**: it carries no `unknown` (§12).
 
 These are **inputs to** `vectorcraft_text`; the measured result (`TextLayout.bounds`,
 `.overflow`, `.fit_scale`) is never persisted (design §8.3).
@@ -400,6 +400,11 @@ An enum, so the storage policy is explicit and one place changes:
   between the two bases; they must never be used interchangeably.
 - `Embedded { image_key: String }` — a key in the visual document's image map, for
   portability.
+
+All three are **externally tagged** on the wire, as serde derives by default:
+`{"linked": {"relative_path": "…"}}`, `{"embedded": {"image_key": "…"}}`,
+`{"package": {"relative_path": "…"}}`. The v1 fixture freezes that form; it is written down here so
+the fixture is not the only place it is defined.
 - `Package { relative_path: String }` — a file inside a packaged archive (design §7.5). Its
   base is the **archive root**, not the bundle root: a packaged archive is a different container,
   and rule 9 resolves it against that base.
@@ -617,7 +622,9 @@ deterministic rule from design §12.1.
 | 6 | `Page.reading_order` is a permutation of `Page.panel_ids`; each `Panel.reading_order_index` agrees with its position |
 | 7 | `Panel.frame_node_id`, every `ArtworkRef.node_id`, `Lettering.frame_node_id` / `.tail_node_id` / `.text_node_id` resolve to a node in the document |
 | 8 | `Lettering.dialogue_id` is present exactly for `speech`/`thought`/`shout`/`whisper`, and `Lettering.text` exactly for `narration`/`sound_effect` |
-| 9 | Every path is resolved against its **declared base**, then canonicalised, and only then checked to be inside that base. The bases are not one base: `Linked` resolves against the **bundle root**, `Package` against the **archive root** (design §7.5 — a packaged archive is a different container), and `LinkInfo.relative` against the **document folder** (§3). `Embedded` is a key in the document's image map, not a path at all. Canonicalising *before* the check defeats `..` and symlinks; a `..` denylist would not. A path that escapes is **never resolved**: that asset is reported unresolved (rule 1) and the rest of the load continues. `.save-tmp/` is never a source. A `Linked` file must exist and its sha256 must match `content_hash` |
+| 9 | Every path is resolved against its **declared base**, then canonicalised, and only then checked to be inside that base. The bases are not one base: `Linked` resolves against the **bundle root**, `Package` against the **archive root** (design §7.5 — a packaged archive is a different container), and `LinkInfo.relative` against the **document folder** (§3). `Embedded` is a key in the document's image map, not a path at all. Canonicalising *before* the check defeats `..` and symlinks; a `..` denylist would not. A path that escapes is **never resolved**: rule 9 reports that asset unresolved and the rest of the
+load continues. (It is rule 9's finding, not rule 1's: rule 1 walks *references*, and an escaped path
+is a property of the path itself.) `.save-tmp/` is never a source. A `Linked` file must exist and its sha256 must match `content_hash` |
 | 10 | Every `Asset.provenance` is present for `generated` and `edited`, and absent otherwise |
 | 11 | `Page.panel_ids` agrees with the panels in that page's file |
 | 12 | Every `Dialogue.speaker_character_id` that is **not `null`** resolves to a `Character`. `null` is legal and means narration (§6.3), so the rule checks the set values, not the field's presence |

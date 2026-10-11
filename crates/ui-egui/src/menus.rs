@@ -67,7 +67,7 @@ pub const UI_COMMANDS: &[(&str, &str, &str, &str)] = &[
         "file.save",
         "Save",
         "Cmd+S",
-        "{path?, format?, options?, svg?: {…SVG options}} = document.save, written through the app (a document saved as SVG, PDF or .ai, or opened from one Save can write back, saves as that again, with the same options); with no path known (never saved, converted) the Save As panel asks first",
+        "{path?, format?, options?, svg?: {…SVG options}} = document.save, written through the app (a document saved as SVG, PDF or .ai, or opened from one Save can write back, saves as that again, with the same options); with no path known (never saved, converted) the Save As panel asks first. With a ComicCraft project open and none of `path`/`format`/options, Save is comic.project.save instead — the whole bundle, comic model included, so a model-only comic edit (a shot brief) is written rather than left unsaved; naming a `path` or `format` is a document write, as before",
     ),
     (
         "file.place",

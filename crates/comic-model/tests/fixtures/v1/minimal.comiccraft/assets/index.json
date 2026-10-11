@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "id": 17,
+      "asset_type": "source",
+      "storage_reference": {
+        "linked": {
+          "relative_path": "assets/panels/panel-1.png"
+        }
+      },
+      "content_hash": {
+        "algorithm": "sha256",
+        "value": "c54af4e9162be74adff0711701a4f1f656dc6a49f8c6acd9f9120aef38476081"
+      },
+      "media_metadata": {
+        "mime": "image/png",
+        "width": 8,
+        "height": 8,
+        "color_profile": null,
+        "dpi": 72.0
+      },
+      "provenance": null,
+      "parent_asset_ids": [],
+      "approval_status": "approved"
+    }
+  ]
+}

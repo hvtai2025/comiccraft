@@ -3871,3 +3871,51 @@ axis	Both	Ambos
 @msg	the PSD file is cut short	el archivo PSD está incompleto
 @msg	the PSD file's header is damaged	el encabezado del archivo PSD está dañado
 @msg	the PSD file's image data can't be read: {e}	no se pueden leer los datos de imagen del archivo PSD: {e}
+	Add Lettering	Agregar rotulación
+	Add Panel	Agregar viñeta
+	Apply Page Template	Aplicar plantilla de página
+	Comic	Cómic
+	Delete Page	Eliminar página
+	Delete Panel	Eliminar viñeta
+	Move Panel	Mover viñeta
+	New Comic Page	Nueva página de cómic
+	New Comic Project	Nuevo proyecto de cómic
+	Open Comic Project	Abrir proyecto de cómic
+	Reorder Pages	Reordenar páginas
+	Replace Panel Artwork	Reemplazar el arte de la viñeta
+	Resize Panel	Cambiar el tamaño de la viñeta
+	Save Comic Project	Guardar proyecto de cómic
+	Set Lettering Style	Definir el estilo de rotulación
+	Set Lettering Text	Definir el texto de rotulación
+	Set Panel Shot	Definir el plano de la viñeta
+	Set Reading Order	Definir el orden de lectura
+	Update Dialogue	Actualizar diálogo
+	Validate Comic Project	Validar proyecto de cómic
+@msg	artboard {artboard_id} was not created	no se creó la mesa de trabajo {artboard_id}
+@msg	lettering {_1} is spoken but names no dialogue (schema rule 8)	la rotulación {_1} es hablada pero no nombra ningún diálogo (regla 8 del esquema)
+@msg	lettering {_1} names dialogue {_2}, which is not on page {_3}: comic.lettering.set_text edits the record in the balloon's own page, and a dialogue owned by another page's panel belongs to that page — use comic.dialogue.update {{dialogue}} to change its words	la rotulación {_1} nombra el diálogo {_2}, que no está en la página {_3}: comic.lettering.set_text edita el registro en la propia página del globo, y un diálogo que pertenece al panel de otra página es de esa página — usa comic.dialogue.update {{dialogue}} para cambiar sus palabras
+@msg	lettering {_1}'s frame {_2} has no geometry to re-fit	el marco {_2} de la rotulación {_1} no tiene geometría para reajustar
+@msg	no comic project open (comic.project.create or comic.project.open)	no hay ningún proyecto de cómic abierto (comic.project.create o comic.project.open)
+@msg	no lettering names frame {_1}	ninguna rotulación nombra el marco {_1}
+@msg	no such dialogue {_1}	no existe el diálogo {_1}
+@msg	no such lettering {_1}	no existe la rotulación {_1}
+@msg	no such page {_1}	no existe la página {_1}
+@msg	no such panel {_1}	no existe la viñeta {_1}
+@msg	no such panel {_1} on page {_2}	no existe la viñeta {_1} en la página {_2}
+@msg	no such scene {_1}	no existe la escena {_1}
+@msg	not saving {_1}: two files encode one id and the next load would read whichever sorts first — {_2} (repair the bundle by hand, then save)	no se guarda {_1}: dos archivos codifican un id y la próxima carga leerá el que ordene primero — {_2} (repara el paquete a mano y vuelve a guardar)
+@msg	page {_1} is in no scene, so a panel cannot record which scene it belongs to	la página {_1} no está en ninguna escena, así que una viñeta no puede registrar a qué escena pertenece
+@msg	page {_1} is in no scene, so it has no position to move within	la página {_1} no está en ninguna escena, así que no tiene posición dentro de la cual moverse
+@msg	page {_1} is not listed in scene {_2}	la página {_1} no aparece en la escena {_2}
+@msg	page {_1} names artboard {artboard}, which the document does not have	la página {_1} nombra la mesa de trabajo {artboard}, que el documento no tiene
+@msg	page {_1}: reading_order is not a permutation of panel_ids ({_2} panels, {_3} ordered) — schema rule 6, reported rather than repaired	página {_1}: reading_order no es una permutación de panel_ids ({_2} viñetas, {_3} ordenadas) — regla 6 del esquema, se informa en vez de repararse
+@msg	page {_1}: the artboard rectangle has no area ({r})	página {_1}: el rectángulo de la mesa de trabajo no tiene área ({r})
+@msg	page {_1}: the artboard rectangle is not finite ({r})	página {_1}: el rectángulo de la mesa de trabajo no es finito ({r})
+@msg	placing asset {_1} produced no object	colocar el recurso {_1} no produjo ningún objeto
+@msg	the frame object {_1} has no geometry to resize	el objeto de marco {_1} no tiene geometría que redimensionar
+@msg	the frame object {_1} is not a path	el objeto de marco {_1} no es un trazado
+@msg	the lettering's text object {_1} is not a type object	el objeto {_1} de la rotulación no es un objeto de texto
+@msg	the panel's frame {_1} has no geometry	el marco {_1} de la viñeta no tiene geometría
+@msg	the panel's frame {_1} has no geometry to place art in	el marco {_1} de la viñeta no tiene geometría donde colocar el arte
+@msg	the panel's frame {_1} has no geometry to resize	el marco {_1} de la viñeta no tiene geometría que redimensionar
+@msg	the panel's frame {_1} is not a path, so it cannot clip the artwork	el marco {_1} de la viñeta no es un trazado, así que no puede recortar el arte

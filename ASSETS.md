@@ -331,3 +331,5 @@ Generated-in-code art is original and has no file to list. This covers the defau
 | `examples/ribbons.vectorcraft` | VectorCraft contributors | Original artwork built through the VectorCraft command API | MIT OR Apache-2.0 |  |
 | `examples/feature-sheet.vectorcraft` | VectorCraft contributors | Original artwork built through the VectorCraft command API | MIT OR Apache-2.0 |  |
 | `examples/perspective-city.vectorcraft` | VectorCraft contributors | Original artwork built through the VectorCraft command API | MIT OR Apache-2.0 |  |
+| `crates/comic-model/tests/fixtures/v1/minimal.comiccraft/document/comic.vectorcraft` | ComicCraft contributors | Written by VectorCraft through its command API for the frozen v1 bundle fixture (schema §11.1) | MIT OR Apache-2.0 |  |
+| `crates/comic-model/tests/fixtures/v1/minimal.comiccraft/assets/panels/panel-1.png` | ComicCraft contributors | Original 8×8 test PNG, generated for the frozen v1 bundle fixture | MIT OR Apache-2.0 |  |

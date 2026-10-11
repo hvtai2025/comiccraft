@@ -3882,3 +3882,51 @@ axis	Both	Les deux
 @msg	the PSD file is cut short	le fichier PSD est tronqué
 @msg	the PSD file's header is damaged	l'en-tête du fichier PSD est endommagé
 @msg	the PSD file's image data can't be read: {e}	les données d'image du fichier PSD ne peuvent pas être lues : {e}
+	Add Lettering	Ajouter un lettrage
+	Add Panel	Ajouter une case
+	Apply Page Template	Appliquer un modèle de page
+	Comic	Bande dessinée
+	Delete Page	Supprimer la page
+	Delete Panel	Supprimer la case
+	Move Panel	Déplacer la case
+	New Comic Page	Nouvelle page de BD
+	New Comic Project	Nouveau projet de BD
+	Open Comic Project	Ouvrir un projet de BD
+	Reorder Pages	Réorganiser les pages
+	Replace Panel Artwork	Remplacer l’illustration de la case
+	Resize Panel	Redimensionner la case
+	Save Comic Project	Enregistrer le projet de BD
+	Set Lettering Style	Définir le style de lettrage
+	Set Lettering Text	Définir le texte du lettrage
+	Set Panel Shot	Définir le plan de la case
+	Set Reading Order	Définir l’ordre de lecture
+	Update Dialogue	Mettre à jour le dialogue
+	Validate Comic Project	Valider le projet de BD
+@msg	artboard {artboard_id} was not created	le plan de travail {artboard_id} n’a pas été créé
+@msg	lettering {_1} is spoken but names no dialogue (schema rule 8)	le lettrage {_1} est parlé mais ne nomme aucun dialogue (règle 8 du schéma)
+@msg	lettering {_1} names dialogue {_2}, which is not on page {_3}: comic.lettering.set_text edits the record in the balloon's own page, and a dialogue owned by another page's panel belongs to that page — use comic.dialogue.update {{dialogue}} to change its words	le lettrage {_1} nomme le dialogue {_2}, qui n’est pas sur la page {_3} : comic.lettering.set_text modifie l’enregistrement dans la page même de la bulle, et un dialogue qui appartient au panneau d’une autre page appartient à cette page — utilisez comic.dialogue.update {{dialogue}} pour en changer les mots
+@msg	lettering {_1}'s frame {_2} has no geometry to re-fit	le cadre {_2} du lettrage {_1} n’a pas de géométrie à réajuster
+@msg	no comic project open (comic.project.create or comic.project.open)	aucun projet de bande dessinée n’est ouvert (comic.project.create ou comic.project.open)
+@msg	no lettering names frame {_1}	aucun lettrage ne nomme le cadre {_1}
+@msg	no such dialogue {_1}	dialogue {_1} inexistant
+@msg	no such lettering {_1}	lettrage {_1} inexistant
+@msg	no such page {_1}	page {_1} inexistante
+@msg	no such panel {_1}	case {_1} inexistante
+@msg	no such panel {_1} on page {_2}	case {_1} inexistante sur la page {_2}
+@msg	no such scene {_1}	scène {_1} inexistante
+@msg	not saving {_1}: two files encode one id and the next load would read whichever sorts first — {_2} (repair the bundle by hand, then save)	enregistrement de {_1} refusé : deux fichiers encodent un même id et le prochain chargement lira celui qui vient en premier — {_2} (réparez le paquet à la main, puis enregistrez)
+@msg	page {_1} is in no scene, so a panel cannot record which scene it belongs to	la page {_1} n’est dans aucune scène, donc une case ne peut pas consigner à quelle scène elle appartient
+@msg	page {_1} is in no scene, so it has no position to move within	la page {_1} n’est dans aucune scène, elle n’a donc aucune position où être déplacée
+@msg	page {_1} is not listed in scene {_2}	la page {_1} n’est pas listée dans la scène {_2}
+@msg	page {_1} names artboard {artboard}, which the document does not have	la page {_1} nomme le plan de travail {artboard}, que le document ne possède pas
+@msg	page {_1}: reading_order is not a permutation of panel_ids ({_2} panels, {_3} ordered) — schema rule 6, reported rather than repaired	page {_1} : reading_order n’est pas une permutation de panel_ids ({_2} cases, {_3} ordonnées) — règle 6 du schéma, signalée plutôt que réparée
+@msg	page {_1}: the artboard rectangle has no area ({r})	page {_1} : le rectangle du plan de travail n’a aucune surface ({r})
+@msg	page {_1}: the artboard rectangle is not finite ({r})	page {_1} : le rectangle du plan de travail n’est pas fini ({r})
+@msg	placing asset {_1} produced no object	le placement de la ressource {_1} n’a produit aucun objet
+@msg	the frame object {_1} has no geometry to resize	l’objet cadre {_1} n’a pas de géométrie à redimensionner
+@msg	the frame object {_1} is not a path	l’objet cadre {_1} n’est pas un tracé
+@msg	the lettering's text object {_1} is not a type object	l’objet {_1} du lettrage n’est pas un objet texte
+@msg	the panel's frame {_1} has no geometry	le cadre {_1} de la case n’a pas de géométrie
+@msg	the panel's frame {_1} has no geometry to place art in	le cadre {_1} de la case n’a pas de géométrie où placer l’illustration
+@msg	the panel's frame {_1} has no geometry to resize	le cadre {_1} de la case n’a pas de géométrie à redimensionner
+@msg	the panel's frame {_1} is not a path, so it cannot clip the artwork	le cadre {_1} de la case n’est pas un tracé, il ne peut donc pas découper l’illustration

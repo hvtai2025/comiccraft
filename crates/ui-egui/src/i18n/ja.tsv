@@ -3863,3 +3863,51 @@ theme	Appearance	外観
 @msg	the PSD file is cut short	PSD ファイルが途中で切れています
 @msg	the PSD file's header is damaged	PSD ファイルのヘッダーが破損しています
 @msg	the PSD file's image data can't be read: {e}	PSD ファイルの画像データを読み込めません：{e}
+	Add Lettering	レタリングを追加
+	Add Panel	コマを追加
+	Apply Page Template	ページテンプレートを適用
+	Comic	コミック
+	Delete Page	ページを削除
+	Delete Panel	コマを削除
+	Move Panel	コマを移動
+	New Comic Page	新しいコミックページ
+	New Comic Project	新しいコミックプロジェクト
+	Open Comic Project	コミックプロジェクトを開く
+	Reorder Pages	ページを並べ替え
+	Replace Panel Artwork	コマのアートワークを置き換え
+	Resize Panel	コマのサイズ変更
+	Save Comic Project	コミックプロジェクトを保存
+	Set Lettering Style	レタリングスタイルを設定
+	Set Lettering Text	セリフを設定
+	Set Panel Shot	コマのショットを設定
+	Set Reading Order	読み順を設定
+	Update Dialogue	セリフを更新
+	Validate Comic Project	コミックプロジェクトを検証
+@msg	artboard {artboard_id} was not created	アートボード {artboard_id} が作成されませんでした
+@msg	lettering {_1} is spoken but names no dialogue (schema rule 8)	レタリング {_1} は発話ですがダイアログを指定していません（スキーマ規則 8）
+@msg	lettering {_1} names dialogue {_2}, which is not on page {_3}: comic.lettering.set_text edits the record in the balloon's own page, and a dialogue owned by another page's panel belongs to that page — use comic.dialogue.update {{dialogue}} to change its words	レタリング {_1} が指定するダイアログ {_2} はページ {_3} にありません: comic.lettering.set_text はバルーン自身のページにあるレコードを編集します。別のページのパネルに属するダイアログはそのページのものになります — 言葉を変えるには comic.dialogue.update {{dialogue}} を使ってください
+@msg	lettering {_1}'s frame {_2} has no geometry to re-fit	レタリング {_1} のフレーム {_2} には再調整できるジオメトリがありません
+@msg	no comic project open (comic.project.create or comic.project.open)	コミックプロジェクトが開かれていません（comic.project.create または comic.project.open）
+@msg	no lettering names frame {_1}	フレーム {_1} を指定するレタリングがありません
+@msg	no such dialogue {_1}	ダイアログ {_1} が見つかりません
+@msg	no such lettering {_1}	レタリング {_1} が見つかりません
+@msg	no such page {_1}	ページ {_1} が見つかりません
+@msg	no such panel {_1}	コマ {_1} が見つかりません
+@msg	no such panel {_1} on page {_2}	ページ {_2} にコマ {_1} が見つかりません
+@msg	no such scene {_1}	シーン {_1} が見つかりません
+@msg	not saving {_1}: two files encode one id and the next load would read whichever sorts first — {_2} (repair the bundle by hand, then save)	{_1} を保存しません: 2 つのファイルが同じ id を表しており、次回の読み込みでは並び順で先になる方だけが読まれます — {_2}（バンドルを手で修復してから保存してください）
+@msg	page {_1} is in no scene, so a panel cannot record which scene it belongs to	ページ {_1} はどのシーンにもないため、コマがどのシーンに属するかを記録できません
+@msg	page {_1} is in no scene, so it has no position to move within	ページ {_1} はどのシーンにもないため、移動できる位置がありません
+@msg	page {_1} is not listed in scene {_2}	ページ {_1} はシーン {_2} にありません
+@msg	page {_1} names artboard {artboard}, which the document does not have	ページ {_1} が指定するアートボード {artboard} はドキュメントにありません
+@msg	page {_1}: reading_order is not a permutation of panel_ids ({_2} panels, {_3} ordered) — schema rule 6, reported rather than repaired	ページ {_1}: reading_order が panel_ids の順列ではありません（コマ {_2}、順序 {_3}）— スキーマ規則 6、修復せずに報告します
+@msg	page {_1}: the artboard rectangle has no area ({r})	ページ {_1}: アートボードの矩形に面積がありません（{r}）
+@msg	page {_1}: the artboard rectangle is not finite ({r})	ページ {_1}: アートボードの矩形が有限ではありません（{r}）
+@msg	placing asset {_1} produced no object	アセット {_1} を配置してもオブジェクトができませんでした
+@msg	the frame object {_1} has no geometry to resize	フレームオブジェクト {_1} にはサイズ変更できるジオメトリがありません
+@msg	the frame object {_1} is not a path	フレームオブジェクト {_1} はパスではありません
+@msg	the lettering's text object {_1} is not a type object	レタリングのテキストオブジェクト {_1} はテキストオブジェクトではありません
+@msg	the panel's frame {_1} has no geometry	コマのフレーム {_1} にはジオメトリがありません
+@msg	the panel's frame {_1} has no geometry to place art in	コマのフレーム {_1} にはアートを配置できるジオメトリがありません
+@msg	the panel's frame {_1} has no geometry to resize	コマのフレーム {_1} にはサイズ変更できるジオメトリがありません
+@msg	the panel's frame {_1} is not a path, so it cannot clip the artwork	コマのフレーム {_1} はパスではないため、アートをクリップできません

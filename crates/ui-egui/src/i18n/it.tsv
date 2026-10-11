@@ -3871,3 +3871,51 @@ axis	Both	Entrambi
 @msg	the PSD file is cut short	il file PSD è troncato
 @msg	the PSD file's header is damaged	l'intestazione del file PSD è danneggiata
 @msg	the PSD file's image data can't be read: {e}	i dati immagine del file PSD non possono essere letti: {e}
+	Add Lettering	Aggiungi lettering
+	Add Panel	Aggiungi vignetta
+	Apply Page Template	Applica modello di pagina
+	Comic	Fumetto
+	Delete Page	Elimina pagina
+	Delete Panel	Elimina vignetta
+	Move Panel	Sposta vignetta
+	New Comic Page	Nuova pagina di fumetto
+	New Comic Project	Nuovo progetto di fumetto
+	Open Comic Project	Apri progetto di fumetto
+	Reorder Pages	Riordina pagine
+	Replace Panel Artwork	Sostituisci l’arte della vignetta
+	Resize Panel	Ridimensiona vignetta
+	Save Comic Project	Salva progetto di fumetto
+	Set Lettering Style	Imposta stile del lettering
+	Set Lettering Text	Imposta testo del lettering
+	Set Panel Shot	Imposta inquadratura della vignetta
+	Set Reading Order	Imposta ordine di lettura
+	Update Dialogue	Aggiorna dialogo
+	Validate Comic Project	Convalida progetto di fumetto
+@msg	artboard {artboard_id} was not created	la tavola da disegno {artboard_id} non è stata creata
+@msg	lettering {_1} is spoken but names no dialogue (schema rule 8)	il lettering {_1} è parlato ma non nomina alcun dialogo (regola 8 dello schema)
+@msg	lettering {_1} names dialogue {_2}, which is not on page {_3}: comic.lettering.set_text edits the record in the balloon's own page, and a dialogue owned by another page's panel belongs to that page — use comic.dialogue.update {{dialogue}} to change its words	il lettering {_1} nomina il dialogo {_2}, che non è sulla pagina {_3}: comic.lettering.set_text modifica il record nella pagina del balloon stesso, e un dialogo che appartiene al pannello di un’altra pagina appartiene a quella pagina — usa comic.dialogue.update {{dialogue}} per cambiarne le parole
+@msg	lettering {_1}'s frame {_2} has no geometry to re-fit	la cornice {_2} del lettering {_1} non ha geometria da riadattare
+@msg	no comic project open (comic.project.create or comic.project.open)	nessun progetto di fumetto è aperto (comic.project.create o comic.project.open)
+@msg	no lettering names frame {_1}	nessun lettering nomina la cornice {_1}
+@msg	no such dialogue {_1}	dialogo {_1} inesistente
+@msg	no such lettering {_1}	lettering {_1} inesistente
+@msg	no such page {_1}	pagina {_1} inesistente
+@msg	no such panel {_1}	vignetta {_1} inesistente
+@msg	no such panel {_1} on page {_2}	vignetta {_1} inesistente sulla pagina {_2}
+@msg	no such scene {_1}	scena {_1} inesistente
+@msg	not saving {_1}: two files encode one id and the next load would read whichever sorts first — {_2} (repair the bundle by hand, then save)	salvataggio di {_1} rifiutato: due file codificano un solo id e il prossimo caricamento leggerà quello che viene prima — {_2} (ripara il pacchetto a mano, poi salva)
+@msg	page {_1} is in no scene, so a panel cannot record which scene it belongs to	la pagina {_1} non è in nessuna scena, quindi una vignetta non può registrare a quale scena appartiene
+@msg	page {_1} is in no scene, so it has no position to move within	la pagina {_1} non è in nessuna scena, quindi non ha una posizione entro cui spostarsi
+@msg	page {_1} is not listed in scene {_2}	la pagina {_1} non è elencata nella scena {_2}
+@msg	page {_1} names artboard {artboard}, which the document does not have	la pagina {_1} nomina la tavola da disegno {artboard}, che il documento non ha
+@msg	page {_1}: reading_order is not a permutation of panel_ids ({_2} panels, {_3} ordered) — schema rule 6, reported rather than repaired	pagina {_1}: reading_order non è una permutazione di panel_ids ({_2} vignette, {_3} ordinate) — regola 6 dello schema, segnalata invece che riparata
+@msg	page {_1}: the artboard rectangle has no area ({r})	pagina {_1}: il rettangolo della tavola da disegno non ha area ({r})
+@msg	page {_1}: the artboard rectangle is not finite ({r})	pagina {_1}: il rettangolo della tavola da disegno non è finito ({r})
+@msg	placing asset {_1} produced no object	il posizionamento della risorsa {_1} non ha prodotto alcun oggetto
+@msg	the frame object {_1} has no geometry to resize	l’oggetto cornice {_1} non ha geometria da ridimensionare
+@msg	the frame object {_1} is not a path	l’oggetto cornice {_1} non è un tracciato
+@msg	the lettering's text object {_1} is not a type object	l’oggetto {_1} del lettering non è un oggetto di testo
+@msg	the panel's frame {_1} has no geometry	la cornice {_1} della vignetta non ha geometria
+@msg	the panel's frame {_1} has no geometry to place art in	la cornice {_1} della vignetta non ha geometria dove collocare l’arte
+@msg	the panel's frame {_1} has no geometry to resize	la cornice {_1} della vignetta non ha geometria da ridimensionare
+@msg	the panel's frame {_1} is not a path, so it cannot clip the artwork	la cornice {_1} della vignetta non è un tracciato, quindi non può ritagliare l’arte

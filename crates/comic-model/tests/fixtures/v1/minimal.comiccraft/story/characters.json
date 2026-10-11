@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "characters": [
+    {
+      "id": 5,
+      "name": "Ada",
+      "canonical_description": "Tall, close-cropped hair, a red scarf.",
+      "reference_asset_ids": [],
+      "style_profile_id": 7,
+      "approved_design_version": null,
+      "continuity_rules": [
+        "Ada keeps the red scarf in every shot."
+      ]
+    }
+  ]
+}

@@ -1115,7 +1115,7 @@ character    comic.character.create comic.character.update
 page/panel   comic.page.create      comic.page.delete       comic.page.reorder
              comic.page.template.apply
              comic.panel.add         comic.panel.move        comic.panel.resize
-             comic.panel.replace_art comic.panel.set_shot
+             comic.panel.delete      comic.panel.replace_art comic.panel.set_shot
 
 lettering    comic.lettering.add    comic.lettering.set_text
              comic.lettering.set_style
@@ -1220,7 +1220,7 @@ documentation rather than leaving the caller to guess. For the example above:
 | Related entity | Policy on `comic.panel.delete` |
 |---|---|
 | `Lettering` frame, tail and text objects | Deleted with the panel — they are the panel's presentation |
-| `Dialogue` records | Deleted with the panel unless flagged reusable, in which case detached and reported, so the text is moved rather than retyped |
+| `Dialogue` records | Deleted with the panel unless flagged reusable, in which case detached and reported — the record keeps naming the panel that was just deleted, because `Dialogue.panel_id` is required (schema §6.3), so schema rule 1 reports it until it is re-homed: for a spoken kind (`speech`, `thought`, `shout`, `whisper`), `comic.lettering.add {panel, dialogue}` adopts it for the **balloon's** panel, which is what *the text is moved rather than retyped* means. A dialogue this policy deletes takes every balloon that was showing it, wherever that balloon is: a balloon may show a record its own panel does not own, so `letteringDeleted` can name a balloon in another panel — a `Lettering` has no words of its own for the spoken kinds |
 | Artwork objects in the document | Deleted with the panel |
 | `Asset` records | Never deleted: lineage and provenance outlive the panel |
 | `Page.reading_order` | Renumbered in the same operation; a gap is a validation error, never a silent repair |
@@ -1289,6 +1289,7 @@ draft listed the same checks without saying what would implement them.
 | Text overflow | `text` | `TextLayout.overflow`, `TextLayout.bounds` (`crates/text/src/lib.rs:159-183`) |
 | Missing lettering font | `text` | the missing-font report the exporter already produces |
 | Invalid panel geometry | `comic-layout` | overlap, gutter width, minimum panel size, containment in the artboard |
+| Page size differs from the default | `comic-model` | rule 15: the artboard `rect` against `ProjectSettings.default_page_size`, as a **warning**. `comic-layout` deliberately does not repeat it — two findings for one fact is noise, and the schema's rule 15 is the only home |
 | Duplicate or missing comic ids | `comic-model` | id uniqueness within the bundle |
 | Missing or retired artboard | `comic-model` | `Page.artboard_id` against the document and `retired_artboard_ids` (§5.3.1) |
 | Broken panel → artwork link | `comic-model` + `doc` | `ArtworkRef.node_id` not found in the document |
@@ -1296,7 +1297,7 @@ draft listed the same checks without saying what would implement them.
 | Dangling clip or mask | `doc` | a clip group with no clipping path |
 | Invalid reading order | `comic-layout` | `Page.reading_order` covers every panel exactly once |
 | Missing generation asset | `comic-model` | unresolved `Asset.storage_reference`, or a content hash that does not match |
-| Unsupported page dimensions | `comic-layout` | the artboard `rect` against `ProjectSettings.default_page_size`, as a warning (schema rule 15) |
+| Unsupported page dimensions | `comic-layout` (publish, M7) | the artboard `rect` against the **export presets** — a print concern. Distinct from rule 15's default-page-size warning, which `comic-model` owns (above) |
 | Export failure | `pdf`, `render`, `svg` | reports collected from `pdf::export_with_report`, `svg::export_with_report`, `Renderer::export_region` |
 
 `comic.project.validate` runs this set and returns findings as structured data. It

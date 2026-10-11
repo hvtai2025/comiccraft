@@ -3854,3 +3854,51 @@ axis	Both	Обидві
 @msg	the PSD file is cut short	файл PSD обрізаний
 @msg	the PSD file's header is damaged	заголовок файлу PSD пошкоджено
 @msg	the PSD file's image data can't be read: {e}	не вдається прочитати дані зображення файлу PSD: {e}
+	Add Lettering	Додати летеринг
+	Add Panel	Додати кадр
+	Apply Page Template	Застосувати шаблон сторінки
+	Comic	Комікс
+	Delete Page	Видалити сторінку
+	Delete Panel	Видалити кадр
+	Move Panel	Перемістити кадр
+	New Comic Page	Нова сторінка коміксу
+	New Comic Project	Новий проєкт коміксу
+	Open Comic Project	Відкрити проєкт коміксу
+	Reorder Pages	Змінити порядок сторінок
+	Replace Panel Artwork	Замінити малюнок кадру
+	Resize Panel	Змінити розмір кадру
+	Save Comic Project	Зберегти проєкт коміксу
+	Set Lettering Style	Задати стиль летерингу
+	Set Lettering Text	Задати текст летерингу
+	Set Panel Shot	Задати план кадру
+	Set Reading Order	Задати порядок читання
+	Update Dialogue	Оновити діалог
+	Validate Comic Project	Перевірити проєкт коміксу
+@msg	artboard {artboard_id} was not created	монтажна область {artboard_id} не створена
+@msg	lettering {_1} is spoken but names no dialogue (schema rule 8)	летеринг {_1} мовний, але не вказує діалог (правило 8 схеми)
+@msg	lettering {_1} names dialogue {_2}, which is not on page {_3}: comic.lettering.set_text edits the record in the balloon's own page, and a dialogue owned by another page's panel belongs to that page — use comic.dialogue.update {{dialogue}} to change its words	летеринг {_1} вказує діалог {_2}, якого немає на сторінці {_3}: comic.lettering.set_text редагує запис на самій сторінці балона, а діалог, що належить панелі іншої сторінки, належить тій сторінці — щоб змінити слова, скористайтеся comic.dialogue.update {{dialogue}}
+@msg	lettering {_1}'s frame {_2} has no geometry to re-fit	у рамки {_2} летерингу {_1} немає геометрії для підгонки
+@msg	no comic project open (comic.project.create or comic.project.open)	проєкт коміксу не відкрито (comic.project.create або comic.project.open)
+@msg	no lettering names frame {_1}	жоден летеринг не вказує рамку {_1}
+@msg	no such dialogue {_1}	діалог {_1} не існує
+@msg	no such lettering {_1}	летеринг {_1} не існує
+@msg	no such page {_1}	сторінка {_1} не існує
+@msg	no such panel {_1}	кадр {_1} не існує
+@msg	no such panel {_1} on page {_2}	кадр {_1} не існує на сторінці {_2}
+@msg	no such scene {_1}	сцена {_1} не існує
+@msg	not saving {_1}: two files encode one id and the next load would read whichever sorts first — {_2} (repair the bundle by hand, then save)	{_1} не зберігається: два файли кодують один id, і під час наступного завантаження буде прочитано той, що йде першим — {_2} (виправте пакет вручну й збережіть)
+@msg	page {_1} is in no scene, so a panel cannot record which scene it belongs to	сторінка {_1} не належить жодній сцені, тому кадр не може записати, до якої сцени він належить
+@msg	page {_1} is in no scene, so it has no position to move within	сторінка {_1} не належить жодній сцені, тому їй нікуди переміщатися
+@msg	page {_1} is not listed in scene {_2}	сторінка {_1} не вказана в сцені {_2}
+@msg	page {_1} names artboard {artboard}, which the document does not have	сторінка {_1} вказує монтажну область {artboard}, якої немає в документі
+@msg	page {_1}: reading_order is not a permutation of panel_ids ({_2} panels, {_3} ordered) — schema rule 6, reported rather than repaired	сторінка {_1}: reading_order не є перестановкою panel_ids ({_2} кадрів, {_3} у порядку) — правило 6 схеми, повідомляється замість виправлення
+@msg	page {_1}: the artboard rectangle has no area ({r})	сторінка {_1}: прямокутник монтажної області не має площі ({r})
+@msg	page {_1}: the artboard rectangle is not finite ({r})	сторінка {_1}: прямокутник монтажної області не скінченний ({r})
+@msg	placing asset {_1} produced no object	розміщення ресурсу {_1} не створило обʼєкт
+@msg	the frame object {_1} has no geometry to resize	обʼєкт-рамка {_1} не має геометрії для зміни розміру
+@msg	the frame object {_1} is not a path	обʼєкт-рамка {_1} не є контуром
+@msg	the lettering's text object {_1} is not a type object	обʼєкт {_1} летерингу не є текстовим обʼєктом
+@msg	the panel's frame {_1} has no geometry	рамка {_1} кадру не має геометрії
+@msg	the panel's frame {_1} has no geometry to place art in	рамка {_1} кадру не має геометрії для розміщення малюнка
+@msg	the panel's frame {_1} has no geometry to resize	рамка {_1} кадру не має геометрії для зміни розміру
+@msg	the panel's frame {_1} is not a path, so it cannot clip the artwork	рамка {_1} кадру не є контуром, тому не може обрізати малюнок

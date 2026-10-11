@@ -20,54 +20,12 @@
 //! describes contracts and holds no transport.
 #![forbid(unsafe_code)]
 
-use serde::{Deserialize, Serialize};
-
-/// A provider's identity, as recorded in every asset's provenance.
-///
-/// Recorded verbatim with the model name and the exact request, so a generated asset can
-/// always be traced back to what produced it (design §9.3).
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct ProviderId(pub String);
-
-/// Where a generation job is in its life.
-///
-/// Frozen by `docs/comiccraft-project-schema.md` §8.1. Every transition is a value change on
-/// the job record — never a document change.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum JobStatus {
-    /// Accepted, not yet sent to a provider.
-    Queued,
-    /// Sent; awaiting a response.
-    Running,
-    /// A result exists and is being validated.
-    Completed,
-    /// The provider or the transport failed.
-    Failed,
-    /// A result exists and is waiting for a human decision (design §9.4).
-    AwaitingReview,
-    /// Stopped locally, and remotely where the provider supports it.
-    Cancelled,
-}
-
-impl JobStatus {
-    /// Whether the job has stopped and will not change again without a new job.
-    ///
-    /// `AwaitingReview` is deliberately **not** terminal: the result exists but the job is
-    /// still awaiting a decision, and `comic.job.apply` or `comic.job.reject` may still act
-    /// on it.
-    #[must_use]
-    pub fn is_terminal(self) -> bool {
-        matches!(self, Self::Failed | Self::Cancelled)
-    }
-
-    /// Whether a result asset is available to apply.
-    #[must_use]
-    pub fn has_result(self) -> bool {
-        matches!(self, Self::Completed | Self::AwaitingReview)
-    }
-}
+/// The job lifecycle and provider identity live in `crates/comic-model`, where the frozen
+/// schema puts them (§5.5 lists `ProviderId` as a shared type, and §8.1 names `JobStatus` on
+/// `GenerationJob.status`). They are re-exported rather than defined again: two wire-identical
+/// definitions would be one refactor away from drifting, and layering forbids `comic-model`
+/// depending on this crate, so this is the only direction that works.
+pub use vectorcraft_comic_model::{JobStatus, ProviderId};
 
 #[cfg(test)]
 mod tests {

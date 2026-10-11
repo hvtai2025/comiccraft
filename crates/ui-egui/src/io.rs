@@ -245,16 +245,49 @@ fn plan(app: &VectorcraftApp, mode: SaveMode, p: &Value) -> Result<SavePlan, Str
     fileio::save_plan(&app.session, mode, p).map_err(|e| e.to_string())
 }
 
+/// Does `p` name a **document** write — a path, a format or format options? A plain Save names
+/// none, and only a plain Save is routed to the open project (see [`save`]).
+fn names_a_document_write(p: &Value) -> bool {
+    ["path", "format", "options", "svg"].iter().any(|k| p.get(*k).is_some_and(|v| !v.is_null()))
+}
+
 /// File → Save, Save As…, Save a Copy…, Save as Template… and the options dialogs' OK. `p` is the
 /// engine command's `{path?, format?, options?, svg?}`.
+///
+/// **A plain Save with a ComicCraft project open is `comic.project.save`** (the routing below),
+/// because the model is part of what the user is saving; the rest is the document save.
 ///
 /// When no path is known, desktop asks with a save panel (one file type per save format) and the
 /// web opens the Save As dialog (file name and format). With `ask_options` and no options in `p`,
 /// a format picked that way that has options asks for them before anything is written (SVG
 /// Options, the Save PDF dialog, or the save options dialog: native and `.ai` files on Save As
-/// only), and so does Save As or Save a Copy to a given SVG path. → `{path, format, warnings…}` once written, or `{pending: <dialog kind>,
+/// only), and so does Save As or a Save a Copy to a given SVG path. → `{path, format, warnings…}` once written, or `{pending: <dialog kind>,
 /// path?}` while a dialog is open.
 pub fn save(app: &mut VectorcraftApp, mode: SaveMode, p: &Value, ask_options: bool) -> Result<Value, String> {
+    // **⌘S and the quit prompt's Save, with a ComicCraft project open, write the project** (M1 D1).
+    //
+    // The comic model is unsaved work exactly as the document is (`DocState::is_dirty`), but
+    // `document.save` writes the visual document alone — so a Save bound to it *appears* to
+    // succeed and leaves the model unsaved, and at the quit prompt the document then closes and
+    // takes the edit with it. `comic.project.save` writes both halves, so the answer the user gave
+    // is the one that happens.
+    //
+    // The routing lives here, at the app level, and **`document.save` is not touched**: its
+    // contract — write the visual document — holds for every caller that names it (an agent, a
+    // menu item, Save a Copy), so §10.1's "no existing command changes semantics" holds with it,
+    // and a document-only write stays reachable on a bundle that needs hand repair (§14).
+    // `comic.project.save` is deliberately given no registry shortcut either: key resolution takes
+    // the first matching spec without consulting enablement, so a shortcut would shadow Save in
+    // every session that has no project.
+    //
+    // `p` that names a **document** write (`path`, `format`, options) goes to `document.save` as
+    // before; only a plain Save is the project's. With no project open, nothing here runs.
+    if mode == SaveMode::Save && !names_a_document_write(p) && app.session.active().is_some_and(|d| d.comic.is_some()) {
+        let r = app.run("comic.project.save", json!({}))?;
+        let root = r["root"].as_str().unwrap_or_default().to_string();
+        report_saved(app, &root, &r);
+        return Ok(r);
+    }
     remember_view(app);
     // Writing over the file the document was read from is asked about here, not refused.
     let first = plan(app, mode, &acknowledged(p))?;

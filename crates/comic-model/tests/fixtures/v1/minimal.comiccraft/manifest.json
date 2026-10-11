@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "bundle_id": 20,
+  "comic_id": 1,
+  "title": "Minimal v1 fixture",
+  "next_comic_id": 21,
+  "retired_artboard_ids": [],
+  "document": {
+    "relative_path": "document/comic.vectorcraft",
+    "format_version": 4
+  },
+  "files": {
+    "assets/index.json": {
+      "sha256": "4c6d214ca1724dbb8c40f36ba3402b83faa7581dd6c7ab31c54162978cbbc6b8",
+      "bytes": 622
+    },
+    "assets/panels/panel-1.png": {
+      "sha256": "c54af4e9162be74adff0711701a4f1f656dc6a49f8c6acd9f9120aef38476081",
+      "bytes": 149
+    },
+    "document/comic.vectorcraft": {
+      "sha256": "1ee906fa3cc5085e03e4bdce71fa577ad53058cfabf55280e40a00256e8b1685",
+      "bytes": 52127
+    },
+    "jobs/job-18.json": {
+      "sha256": "fa4a60bf6b2fa597c910d04e30f8637474883ad805cbb90ecd2414fad3ea30cf",
+      "bytes": 719
+    },
+    "pages/page-8.json": {
+      "sha256": "e24ebe66f43636586452391d38c28d1e45c4cf2c79eb10f5d7a61270df320f6d",
+      "bytes": 4099
+    },
+    "project.json": {
+      "sha256": "f8dc2b253105ddc37d176db6782101e7be3c5f7957aad1c1d25302c35c5e6bd9",
+      "bytes": 727
+    },
+    "provenance/generations.json": {
+      "sha256": "e54106d8916bc93cdb7ed67552f1b82391ce856d58bc9050754212e6c70fd0a0",
+      "bytes": 1048
+    },
+    "story/chapters.json": {
+      "sha256": "c780c4df5ea6be6a23ab0f0dcfd7420460e54ddb8da3b01f8d88e7c9a903cac3",
+      "bytes": 274
+    },
+    "story/characters.json": {
+      "sha256": "2630e64bce689edb28285dcef0332f4e83f0a731695faa99e3ed5132b3eea346",
+      "bytes": 356
+    },
+    "story/locations.json": {
+      "sha256": "34fce5a0dbc7b508cf27cfdc6f176e16c1fe94a3faf8563bda8529272a38fd76",
+      "bytes": 197
+    },
+    "story/scenes.json": {
+      "sha256": "4bdd2acf3288a0406897b1b24b6d4abe9809913231c7ae8fdb787a7243c10f86",
+      "bytes": 374
+    },
+    "story/styles.json": {
+      "sha256": "de2d53ccc2a587de34a61433e7195e199a44d7b3bbdbb271ab685ec41745bb6c",
+      "bytes": 336
+    }
+  },
+  "created": "2026-10-11T06:00:00Z",
+  "updated": "2026-10-11T06:00:00Z",
+  "app": {
+    "name": "ComicCraft",
+    "version": "0.8.0",
+    "schema": 1
+  }
+}

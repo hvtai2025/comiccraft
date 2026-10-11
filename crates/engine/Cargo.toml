@@ -13,6 +13,10 @@ vectorcraft-geom = { workspace = true }
 vectorcraft-color = { workspace = true }
 vectorcraft-doc = { workspace = true }
 vectorcraft-tools = { workspace = true }
+# ComicCraft (design §4.2): the comic command surface (M1 W4) applies `comic-layout`'s plans to the
+# document and writes `comic-model`'s records. Both point downward from engine's layer 5.
+vectorcraft-comic-model = { workspace = true }
+vectorcraft-comic-layout = { workspace = true }
 vectorcraft-text = { workspace = true }
 vectorcraft-render = { workspace = true }
 vectorcraft-pathops = { workspace = true }

@@ -185,6 +185,12 @@ fn undo(s: &mut Session, _: &Value) -> Result<Value> {
         label: e.label,
         doc: std::mem::replace(&mut st.doc, e.doc),
         selection: std::mem::replace(&mut st.selection, e.selection),
+        // A step that recorded the comic model restores it; one that did not leaves the open
+        // project alone, which is what keeps a plain document edit from clearing it (M1 W4).
+        comic: match e.comic {
+            Some(before) => st.comic.replace(before),
+            None => None,
+        },
     });
     st.revision += 1;
     st.selection.prune(&st.doc);
@@ -201,6 +207,10 @@ fn redo(s: &mut Session, _: &Value) -> Result<Value> {
         label: e.label,
         doc: std::mem::replace(&mut st.doc, e.doc),
         selection: std::mem::replace(&mut st.selection, e.selection),
+        comic: match e.comic {
+            Some(before) => st.comic.replace(before),
+            None => None,
+        },
     });
     st.revision += 1;
     st.selection.prune(&st.doc);

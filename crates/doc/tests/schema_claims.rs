@@ -986,7 +986,7 @@ fn section_5_7_covers_map_valued_fields() {
 // it governs the one directory whose file the schema never shapes: §8.3 says the file holds "one
 // `GenerationJob` with the same shape as §8.1" while rule 3 enumerates it among the files that
 // declare a `schema_version`, and rule 18's predicate is the bare word "terminal", which neither
-// document defines — while the workspace's own `JobStatus::is_terminal` (crates/comic-ai/src/lib.rs,
+// document defines — while the workspace's own `JobStatus::is_terminal` (crates/comic-model/src/entities.rs,
 // which its doc comment freezes against schema §8.1) is `Failed | Cancelled`. Each test reads the
 // document, so the sentence that fails is quoted in the message.
 // =================================================================================================
@@ -1048,7 +1048,7 @@ fn rule_18_names_the_statuses_that_leave_the_jobs_directory_empty() {
     // rule 18 (schema:608) is "Every file in `jobs/` holds a job whose `status` is **not
     // terminal**", and §8.3 (schema:446) removes the file "when a job reaches a terminal state",
     // "so `jobs/` is empty in a quiescent project". Neither document says which of the six
-    // `JobStatus` values is terminal. The workspace's own definition — `crates/comic-ai/src/lib.rs`
+    // `JobStatus` values is terminal. The workspace's own definition — `crates/comic-model/src/entities.rs`
     // `is_terminal() = matches!(self, Failed | Cancelled)` — makes `completed` and `awaiting_review`
     // files legal, so `jobs/` is *not* empty after a successful generation and rule 18 never
     // reports the case §8.3 promises it does. Whatever "terminal" means, one of the two sentences
@@ -1063,7 +1063,7 @@ fn rule_18_names_the_statuses_that_leave_the_jobs_directory_empty() {
         named >= 2,
         "rule {n} says \"{rule18}\" and §8.3 removes the file at a terminal state, but neither names \
          which of the six `JobStatus` values is terminal ({statuses:?}). `completed` and \
-         `awaiting_review` are the two `crates/comic-ai`'s `is_terminal` calls non-terminal, and \
+         `awaiting_review` are the two `crates/comic-model`'s `is_terminal` calls non-terminal, and \
          under them `jobs/` is never empty in a quiescent project — exactly the case §8.3 says rule \
          18 reports. Name the statuses the rule means"
     );
@@ -1190,7 +1190,7 @@ fn the_milestone_record_states_the_counts_the_frozen_document_has() {
 /// The comic job statuses as §8.3's field list spells them (`GenerationJob.status`).
 const JOB_STATUSES: [&str; 6] = ["queued", "running", "completed", "failed", "awaiting_review", "cancelled"];
 
-const COMIC_AI_LIB: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../../crates/comic-ai/src/lib.rs");
+const COMIC_MODEL_ENTITIES: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../../crates/comic-model/src/entities.rs");
 
 /// `AwaitingReview` -> `awaiting_review`, so a Rust variant compares with a wire name.
 fn snake_case(name: &str) -> String {
@@ -1206,8 +1206,8 @@ fn snake_case(name: &str) -> String {
 
 /// The variants `JobStatus::is_terminal` matches, read from the code that defines the predicate.
 fn code_terminal_statuses() -> Vec<String> {
-    let code = std::fs::read_to_string(COMIC_AI_LIB).expect("crates/comic-ai/src/lib.rs must be readable");
-    let body = code.split_once("pub fn is_terminal").expect("`JobStatus::is_terminal` exists in crates/comic-ai").1;
+    let code = std::fs::read_to_string(COMIC_MODEL_ENTITIES).expect("crates/comic-model/src/entities.rs must be readable");
+    let body = code.split_once("pub fn is_terminal").expect("`JobStatus::is_terminal` exists in crates/comic-model").1;
     let body = body.split_once("\n    }").expect("`is_terminal`'s body closes").0;
     let mut out = Vec::new();
     let mut rest = body;

@@ -30,6 +30,10 @@ of the status report. You do not own the specialists' code.
   and a short list of the files that differ for comic reasons. Record it in the milestone
   report. Contribute the two upstream improvements the design names — the command-group
   registration seam and the never-reused artboard id counter — when they are cheap.
+- **Verify only on a quiescent tree.** No implementer editing, no reviewer mutating. A reviewer's
+  temporary mutation is indistinguishable from a real regression to anyone reading the tree, and
+  reading a tree in motion has already produced two false diagnoses in this project — a false red
+  gate and a false regression report. If you cannot tell whether the tree is still, wait.
 - **Run the gate.** `cargo xtask ci` on the integrated tree. A milestone is not done until
   it passes, and you report the failure rather than working around it.
 - **Enforce the two-round review.** Every implementation gets two rounds of code review and

@@ -121,6 +121,28 @@ for f in "${files[@]}"; do
     continue
   fi
 
+  # An implementer's own report is not a review record, and must not be reported as a gap for
+  # lacking a reviewer. From M1-W5 the convention also allows the review to live in a sibling
+  # <stem>-review.md, so pair them: an implementation's evidence is its report **plus** its review.
+  # Without this, an implementer record with no reviewer content is indistinguishable from a
+  # review that was never written, and the checker cries wolf on a well-recorded implementation.
+  # It has no 'Reviewer:' and no 'Verdict:' anywhere: those two lines are what make a file a
+  # review record. (Basing this on a 'Round' heading is not enough — an implementer's own report
+  # can contain '### Round 2 — the gate, green on all seven steps' as prose, which would make the
+  # checker think it was a half-written review.)
+  if ! grep -qiE '^Reviewer:' "$f" && ! grep -qiE '^Verdict:' "$f"; then
+    sib="${f%.md}-review.md"
+    if [ -f "$sib" ]; then
+      printf '  %sOK%s   %s\n         (implementer report; reviewed in %s)\n' \
+        "$GREEN" "$OFF" "$f" "$(basename "$sib")"
+      continue
+    fi
+    printf '  %sGAP%s  %s\n' "$RED" "$OFF" "$f"
+    printf '         - no reviewer content, and no %s to pair it with\n' "$(basename "$sib")"
+    GAPS=$((GAPS + 1))
+    continue
+  fi
+
   problems=()
 
   # --- reviewer, and the explicit waiver the rule allows ---

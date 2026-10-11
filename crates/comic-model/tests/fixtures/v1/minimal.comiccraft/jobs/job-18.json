@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "job": {
+    "id": 18,
+    "operation": "text_to_image",
+    "target_panel_id": 10,
+    "input_asset_ids": [
+      17
+    ],
+    "provider": "local-diffusion",
+    "model": "example-v1",
+    "request": {
+      "prompt": "rooftop at dawn, ink and wash",
+      "steps": 30
+    },
+    "status": "awaiting_review",
+    "progress": {
+      "done": 12,
+      "total": 30,
+      "note": "sampling"
+    },
+    "error": null,
+    "result_asset_ids": [],
+    "created": "2026-10-11T06:00:00Z",
+    "updated": "2026-10-11T06:00:00Z",
+    "target_revision": 1,
+    "consent": {
+      "granted": "2026-10-11T06:00:00Z",
+      "statement": "Send this panel's brief to the configured provider."
+    }
+  }
+}

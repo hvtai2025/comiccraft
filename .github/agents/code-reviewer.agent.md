@@ -47,7 +47,15 @@ if both are clean, your report must say what you tried to falsify and could not.
 
 ## Constraints
 
-- DO NOT edit production code. Report the finding and the reproduction; the owner fixes it.
+- DO NOT **leave** production code edited. Report the finding and the reproduction; the owner fixes it.
+- **You may mutate production code temporarily to falsify a test, and you should** — a mutation
+  table is the strongest evidence there is that a suite bites, and reading for it is much weaker.
+  Restore every file byte-for-byte, verify with `sha256sum`, and say in the record that you did.
+  This is not a licence to fix anything: the file must be identical when you report.
+- **Mutate one change at a time and restore immediately after each run**, never in a batch, and say
+  in the record that you mutated. The working tree is shared: while a mutation is in place the
+  implementation *looks* broken to everyone else, and the lead has already once diagnosed a correct
+  implementation as a regression from a mutation in flight. Keep that window as short as it can be.
 - DO NOT weaken or delete a failing test to reach a green run.
 - DO NOT approve a round without running the tests yourself and citing the output.
 - DO NOT treat "it compiles" or "the gate passes" as review evidence.
@@ -56,6 +64,10 @@ if both are clean, your report must say what you tried to falsify and could not.
 - ONLY edit test code: extend the implementer's inline `#[cfg(test)]` tests, or add
   integration tests under `crates/<crate>/tests/`. Milestone-level acceptance, golden
   fixtures and CLI/MCP end-to-end tests belong to `verification-engineer`.
+- **Run `cargo fmt` on every file you add or change, before you report.** `cargo xtask ci`
+  runs `fmt --check` first and stops there, so an unformatted test file turns the whole gate
+  red and hides every other step — the implementer then cannot tell your formatting from
+  their defect. This has already happened twice in M1.
 - ONLY use the existing harness — `testkit` for renders, `vectorcraft-cli` and
   `mcp --headless` for end-to-end. Do not build a second one.
 

@@ -9,6 +9,8 @@ pub mod clipboard;
 mod colorcmds;
 pub mod colormgmt;
 pub mod colortheme;
+/// The ComicCraft `comic.*` command surface (M1 W4): additive, gated on an open project.
+pub mod comic;
 mod create;
 mod css;
 mod cut;
@@ -276,6 +278,8 @@ pub fn command_specs() -> &'static [CommandSpec] {
         v.extend(cut::specs());
         v.extend(halftone::specs());
         v.extend(perspgrid::specs());
+        // ComicCraft (M1 W4). One registration line, per ADR-014; the modules are additive.
+        v.extend(comic::specs());
         v
     })
 }

@@ -4425,6 +4425,7 @@ version = "0.8.0"
 dependencies = [
  "serde",
  "serde_json",
+ "vectorcraft-comic-model",
 ]
 
 [[package]]
@@ -4433,6 +4434,11 @@ version = "0.8.0"
 dependencies = [
  "serde",
  "serde_json",
+ "thiserror 2.0.21",
+ "vectorcraft-comic-model",
+ "vectorcraft-doc",
+ "vectorcraft-geom",
+ "vectorcraft-text",
 ]
 
 [[package]]
@@ -4441,6 +4447,10 @@ version = "0.8.0"
 dependencies = [
  "serde",
  "serde_json",
+ "sha2",
+ "thiserror 2.0.21",
+ "vectorcraft-doc",
+ "vectorcraft-geom",
 ]
 
 [[package]]
@@ -4492,6 +4502,8 @@ dependencies = [
  "vectorcraft-brush",
  "vectorcraft-cad",
  "vectorcraft-color",
+ "vectorcraft-comic-layout",
+ "vectorcraft-comic-model",
  "vectorcraft-doc",
  "vectorcraft-eps",
  "vectorcraft-format",

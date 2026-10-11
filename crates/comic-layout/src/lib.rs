@@ -20,6 +20,15 @@
 //! | `publish`, `export` | `publishing-engineer` | screen/print/proof presets, the export gate, the package archive |
 #![forbid(unsafe_code)]
 
+pub mod fit;
+pub mod lettering;
+
+pub mod layout;
+pub mod panel;
+pub mod reading_order;
+pub mod template;
+pub mod validate;
+
 use serde::Serialize;
 
 /// Why a [`PanelRect`] could not be built.

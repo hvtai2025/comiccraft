@@ -70,6 +70,11 @@ fn close_now(app: &mut VectorcraftApp, i: usize) -> Result<Value, String> {
 }
 
 /// Answer the open dialog: save (or, with `discard`, don't), close the document and carry on.
+///
+/// **Nothing closes while anything is still unsaved** (M1 D1). The save is [`io::save`], which
+/// writes the open ComicCraft project when there is one, and after it the document is re-checked
+/// on both the foreground and the background path — a save that did not clear `is_dirty()` stops
+/// the close with a reason instead of discarding the work the prompt just asked about.
 pub fn confirm(app: &mut VectorcraftApp) -> Result<Value, String> {
     let d = app.ui.dialog.take().ok_or("no dialog open")?;
     let i = d.fields.get("index").and_then(Value::as_u64).map(|i| i as usize).filter(|i| *i < app.session.documents().len());
@@ -82,12 +87,17 @@ pub fn confirm(app: &mut VectorcraftApp) -> Result<Value, String> {
         if r.get("pending").is_some() {
             return Ok(r);
         }
-        // Closing needs the file written: wait for a background save, and stop if it failed.
-        if r["background"] == true {
-            crate::background::wait_all(app);
-            if let Some(d) = app.session.documents().get(i).filter(|d| d.is_dirty()) {
-                return Err(format!("{}: not saved, so not closed", d.title()));
-            }
+        // Closing needs the work written, so: wait for a background save, and stop if anything is
+        // still unsaved — on **either** path. The check used to run only when the save went to the
+        // background, which is how a *foreground* save that does not clear `is_dirty()` closed a
+        // document and took the unsaved work with it (M1 D1: the document half is written by
+        // `document.save`, the comic model by `comic.project.save`, and only a project save
+        // cleared both). `io::save` now saves the project when one is open, so answering "Save"
+        // here normally ends with `is_dirty()` false; anything the save did not write keeps the
+        // document open rather than closing on a lie.
+        crate::background::wait_all(app);
+        if let Some(d) = app.session.documents().get(i).filter(|d| d.is_dirty()) {
+            return Err(format!("{}: not saved, so not closed", d.title()));
         }
     }
     close_now(app, i)?;

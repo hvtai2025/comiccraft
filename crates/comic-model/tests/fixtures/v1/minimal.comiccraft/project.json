@@ -1,0 +1,38 @@
+{
+  "id": 1,
+  "schema_version": 1,
+  "title": "Minimal v1 fixture",
+  "metadata": {
+    "author": "ComicCraft fixture",
+    "language": "en",
+    "genre": "slice of life",
+    "reading_direction": "ltr",
+    "created": "2026-10-11T06:00:00Z",
+    "updated": "2026-10-11T06:00:00Z"
+  },
+  "chapter_ids": [
+    3
+  ],
+  "character_ids": [
+    5
+  ],
+  "location_ids": [
+    6
+  ],
+  "style_profile_ids": [
+    7
+  ],
+  "asset_registry_id": 2,
+  "settings": {
+    "default_page_size": {
+      "width": 612.0,
+      "height": 792.0
+    },
+    "default_template": "three-tier",
+    "default_lettering_style": "Comic Neue"
+  },
+  "visual_document": {
+    "relative_path": "document/comic.vectorcraft",
+    "format_version": 4
+  }
+}

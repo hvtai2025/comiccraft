@@ -12,12 +12,22 @@ workspace = true
 # an edge that does not exist, and it costs real build time — `render`, `pdf`, `svg` and `text`
 # are heavy, and building them for this crate's tests before it calls them is pure waste. Each
 # dependency arrives with the module that needs it:
-#   * vectorcraft-doc, vectorcraft-geom, vectorcraft-comic-model — layout and validation (M1–M2)
-#   * vectorcraft-text  — lettering fitting, via `layout_with` and `LayoutOptions` (M2)
+#   * vectorcraft-comic-model — the entities a plan is built for (`Page`, `Panel`, `PageSize`,
+#                               `ReadingDirection`) and the `Finding` the validator returns (M1)
+#   * vectorcraft-doc         — `NodeId`, for resolving `Panel.frame_node_id` (M1)
+#   * vectorcraft-geom        — `Rect`, the artboard rectangle as the model spells it (M1)
+#   * thiserror               — the template and layout error types (M1, the panel tree; the
+#                               lettering tree's `FitError` is hand-written)
+#   * vectorcraft-text        — lettering fitting, via `layout_with` and `LayoutOptions` (M1, the
+#                               lettering tree)
 #   * vectorcraft-render, vectorcraft-pdf, vectorcraft-svg — publishing assembly (M7)
-#   * thiserror         — with the validation error type (M2)
 [dependencies]
 serde = { workspace = true }
+vectorcraft-comic-model = { workspace = true }
+vectorcraft-doc = { workspace = true }
+vectorcraft-geom = { workspace = true }
+thiserror = { workspace = true }
+vectorcraft-text = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

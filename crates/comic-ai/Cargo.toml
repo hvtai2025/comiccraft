@@ -17,6 +17,7 @@ workspace = true
 # (design ADR-015): licence-compatible, gated so `cargo xtask wasm` still passes, and
 # unreachable from `crates/doc` and `crates/format`.
 [dependencies]
+vectorcraft-comic-model = { workspace = true }
 serde = { workspace = true }
 
 [dev-dependencies]

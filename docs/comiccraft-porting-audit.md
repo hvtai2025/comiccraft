@@ -457,6 +457,10 @@ at the baseline — only document tabs, the artboard navigator, and saved views.
 
 `R` = reuse unchanged, `A` = needs a thin adapter, `N` = new work in ComicCraft.
 
+> **Built, and measured:** M1's [reuse report](comiccraft-reuse-report.md) extends this matrix with
+> what was actually built — including which predictions held, which were wrong, and the size of the
+> change to pre-existing code (about 114 production lines outside the new comic crates).
+
 | Comic requirement | Status | What exists | Citation |
 |---|---|---|---|
 | Project/page persistence container | A | native JSON format (v4) + appended blobs; no third-party sections | `crates/format/src/lib.rs:49-68`, `crates/format/src/lib.rs:161-168` |
