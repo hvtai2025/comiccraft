@@ -7,3 +7,7 @@ plan/
 .DS_Store
 # A craft-fonts checkout for CRAFT_FONTS_DIR (CI and release workflows check it out here)
 /craft-fonts
+
+# The 4.2 MB stale HTML export of comiccraft_design.md. Regenerated on demand, never committed;
+# docs/comiccraft-design.md is the source of truth.
+porting_plan_and_design/comiccraft_design.html

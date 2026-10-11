@@ -1276,15 +1276,18 @@ fn mitigation_ranges(doc: &str) -> Vec<(usize, String, u32, u32)> {
 fn rule_18s_terminal_statuses_are_the_ones_the_code_calls_terminal() {
     // Rule 18's predicate has to be the same one the workspace implements, or the schema and the
     // code disagree about which job files are legal. The code is the authority the schema cites:
-    // `crates/comic-ai/src/lib.rs`, `is_terminal() = matches!(self, Failed | Cancelled)`, whose doc
-    // comment freezes it against schema §8.1. Reading both sides is what makes the two claims one.
+    // `crates/comic-model/src/entities.rs`, `is_terminal() = matches!(self, Failed | Cancelled)`,
+    // whose doc comment freezes it against schema §8.1. Reading both sides is what makes the two
+    // claims one. (The predicate lived in `crates/comic-ai` until M1; that crate now re-exports it
+    // from `comic-model`, where the frozen schema puts it, so this file must not be pointed back at
+    // `comic-ai` — it no longer defines the predicate that fails this test.)
     let schema = schema_doc();
     let (n, rule18) = referential_rules(&schema).into_iter().find(|(n, _)| *n == 18).expect("§13 has rule 18");
     let code = code_terminal_statuses();
     assert_eq!(
         code,
         vec!["cancelled".to_string(), "failed".to_string()],
-        "crates/comic-ai's `is_terminal` must keep matching exactly the two terminal statuses; the \
+        "crates/comic-model's `is_terminal` must keep matching exactly the two terminal statuses; the \
          schema's rule 18 is checked against this set"
     );
     let clause = rule18.split_once("Terminal is exactly").unwrap_or_else(|| {
@@ -1300,7 +1303,7 @@ fn rule_18s_terminal_statuses_are_the_ones_the_code_calls_terminal() {
     doc.dedup();
     assert_eq!(
         doc, code,
-        "rule {n} says \"{rule18}\" but `crates/comic-ai`'s `is_terminal` matches {code:?}: a job \
+        "rule {n} says \"{rule18}\" but `crates/comic-model`'s `is_terminal` matches {code:?}: a job \
          file with a status the code calls non-terminal is then illegal in `jobs/`, or vice versa"
     );
 }

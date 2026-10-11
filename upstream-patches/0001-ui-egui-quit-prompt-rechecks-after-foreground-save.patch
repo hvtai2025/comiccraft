@@ -1,0 +1,72 @@
+From 086f602833d85552e03f1e84945d4ebf62ded620 Mon Sep 17 00:00:00 2001
+From: hvtai2025 <hvt.2025.ai@gmail.com>
+Date: Sun, 11 Oct 2026 21:24:21 +0700
+Subject: [PATCH] ui-egui: re-check a document is saved on the foreground close
+ path too
+
+`unsaved::confirm` only waited for the save and re-checked `is_dirty()` when the
+save had gone to the background. On the foreground path the document was closed
+without checking anything, so a save that did not clear `is_dirty()` discarded
+the unsaved work the prompt had just asked the user about:
+
+    let r = io::save(..)?;
+    if r.get("pending").is_some() { return Ok(r); }
+    if r["background"] == true {            // <- foreground never reached this
+        crate::background::wait_all(app);
+        if let Some(d) = ..filter(|d| d.is_dirty()) {
+            return Err(format!("{}: not saved, so not closed", d.title()));
+        }
+    }
+    close_now(app, i)?;                     // <- so this could run on a lie
+
+Answering "Save" at the quit prompt and losing the edit is the observable
+symptom. Move the check out of the branch so it runs on both paths; `wait_all`
+already returns immediately when no job is in flight, so the foreground path
+costs nothing.
+
+Refusing to close is deliberate. A document still dirty after the save the
+prompt requested must not be discarded, and an error naming the document is a
+better answer than a silent loss. If a caller can reach this with work no save
+can clear, that is a separate bug, and closing anyway would hide it.
+
+Verified: `cargo check -p vectorcraft-ui-egui` on 3da4080b.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ crates/ui-egui/src/unsaved.rs | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/crates/ui-egui/src/unsaved.rs b/crates/ui-egui/src/unsaved.rs
+index 829d426f..858865f7 100644
+--- a/crates/ui-egui/src/unsaved.rs
++++ b/crates/ui-egui/src/unsaved.rs
+@@ -82,12 +82,20 @@ pub fn confirm(app: &mut VectorcraftApp) -> Result<Value, String> {
+         if r.get("pending").is_some() {
+             return Ok(r);
+         }
+-        // Closing needs the file written: wait for a background save, and stop if it failed.
+-        if r["background"] == true {
+-            crate::background::wait_all(app);
+-            if let Some(d) = app.session.documents().get(i).filter(|d| d.is_dirty()) {
+-                return Err(format!("{}: not saved, so not closed", d.title()));
+-            }
++        // Closing needs the work written, so: wait for the save that was just started, then stop
++        // if anything is still unsaved — on **either** path. The check used to run only when the
++        // save went to the background, so a *foreground* save that did not clear `is_dirty()`
++        // closed the document and took the unsaved work with it: the user was asked "save your
++        // work?", answered yes, and lost it. `wait_all` returns immediately when nothing is in
++        // flight, so running it on the foreground path costs nothing.
++        //
++        // Refusing to close is deliberate: a document that is still dirty after the save the
++        // prompt asked for must not be discarded, and an error naming the document is a better
++        // answer than a silent loss. If a caller can reach here with work that no save can clear,
++        // that is a separate bug — but it must not be papered over by closing anyway.
++        crate::background::wait_all(app);
++        if let Some(d) = app.session.documents().get(i).filter(|d| d.is_dirty()) {
++            return Err(format!("{}: not saved, so not closed", d.title()));
+         }
+     }
+     close_now(app, i)?;
+-- 
+2.43.0
+
