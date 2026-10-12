@@ -73,8 +73,16 @@ done
 echo
 echo "Comic commands"
 if [ -d crates/engine/src/cmd/comic ]; then
-  n="$(grep -rho 'cmd!("comic\.[a-z0-9._]*"' crates/engine/src/cmd/comic 2>/dev/null | sort -u | wc -l | tr -d ' ')"
-  echo "  $n comic command id(s) registered"
+  # The id is the macro's first argument (or its second when `cmd!` is spelled `cmd!(query …)`, the
+  # non-journaling form), and rustfmt puts it on the line **after** `cmd!(` when the spec is long —
+  # which is most of them. A line-oriented `grep 'cmd!("comic\.'` therefore reported **0**, which is
+  # what this did before the fix. Strip newlines first, then match `cmd!(` and the quoted id with only
+  # whitespace and an optional `query` between them, so every form is counted and a `"comic.…"` inside
+  # a message or a comment is not.
+  strip() { cat crates/engine/src/cmd/comic/*.rs 2>/dev/null | tr '\n' ' '; }
+  n="$(strip | grep -oE 'cmd!\([[:space:]]*(query[[:space:]]+)?"comic\.[a-z0-9._]*"' | grep -oE '"comic\.[a-z0-9._]*"' | sort -u | wc -l | tr -d ' ')"
+  q="$(strip | grep -oE 'cmd!\([[:space:]]*query[[:space:]]+"comic\.[a-z0-9._]*"' | grep -oE '"comic\.[a-z0-9._]*"' | sort -u | wc -l | tr -d ' ')"
+  echo "  $n comic command id(s) registered ($q query, $((n - q)) journaling)"
 else
   echo "  crates/engine/src/cmd/comic/ absent"
 fi

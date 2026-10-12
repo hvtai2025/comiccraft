@@ -3854,12 +3854,15 @@ axis	Both	Обидві
 @msg	the PSD file is cut short	файл PSD обрізаний
 @msg	the PSD file's header is damaged	заголовок файлу PSD пошкоджено
 @msg	the PSD file's image data can't be read: {e}	не вдається прочитати дані зображення файлу PSD: {e}
+@msg	{cmd}: {what}, so {action} — a locked panel does not move, resize, take new artwork or go away. Unlock it with {remedy}, then retry	{cmd}: {what}, тому {action} — заблокований кадр не переміщується, не змінює розмір, не отримує новий малюнок і не зникає. Зніміть блокування за допомогою {remedy} і повторіть
 	Add Lettering	Додати летеринг
 	Add Panel	Додати кадр
 	Apply Page Template	Застосувати шаблон сторінки
 	Comic	Комікс
 	Delete Page	Видалити сторінку
 	Delete Panel	Видалити кадр
+	Get Project Settings	Отримати налаштування проєкту
+	Lock Panel	Заблокувати кадр
 	Move Panel	Перемістити кадр
 	New Comic Page	Нова сторінка коміксу
 	New Comic Project	Новий проєкт коміксу
@@ -3871,6 +3874,7 @@ axis	Both	Обидві
 	Set Lettering Style	Задати стиль летерингу
 	Set Lettering Text	Задати текст летерингу
 	Set Panel Shot	Задати план кадру
+	Set Project Settings	Задати налаштування проєкту
 	Set Reading Order	Задати порядок читання
 	Update Dialogue	Оновити діалог
 	Validate Comic Project	Перевірити проєкт коміксу

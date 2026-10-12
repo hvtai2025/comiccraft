@@ -1,0 +1,44 @@
+{
+  "schema_version": 2,
+  "page": {
+    "id": 6,
+    "chapter_id": 4,
+    "scene_ids": [
+      5
+    ],
+    "artboard_id": 1,
+    "page_number": 1,
+    "panel_ids": [
+      7
+    ],
+    "reading_order": [
+      7
+    ],
+    "status": "draft"
+  },
+  "panels": [
+    {
+      "id": 7,
+      "page_id": 6,
+      "artboard_id": 1,
+      "scene_id": 5,
+      "frame_node_id": 2,
+      "artwork_refs": [],
+      "shot_description": "",
+      "dialogue_ids": [],
+      "lettering_ids": [],
+      "reading_order_index": 0,
+      "continuity_constraints": {
+        "characters": [],
+        "wardrobe": null,
+        "time_of_day": null,
+        "callbacks": [],
+        "exceptions": []
+      },
+      "generation_status": "none",
+      "locked": false
+    }
+  ],
+  "dialogue": [],
+  "lettering": []
+}

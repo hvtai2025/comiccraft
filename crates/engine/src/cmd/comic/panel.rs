@@ -16,6 +16,43 @@
 //! scaled crops or fits it with the existing `object.*` commands. Both keep every id, so the panel,
 //! its artwork references, its dialogue and its reading order survive them unchanged (M1 acceptance
 //! test 4).
+//!
+//! # The lock (§6.2's `locked`, schema §5.6)
+//!
+//! `Panel.locked` is v2's one field, and **this module is what gives it an effect** — a field no
+//! command reads is a field that does not exist. The lock is a **command** constraint and not a
+//! legality one (schema §13 added no rule for it), so it is applied here, uniformly, by one helper
+//! ([`locked_refusal`]) rather than checked where each command finds it convenient.
+//!
+//! Every command that can move, resize, replace or delete a panel, and the lock's effect on it:
+//!
+//! | Command | Effect of the lock | Why |
+//! |---|---|---|
+//! | `comic.panel.add` | **none** — a new panel is created `locked: false` | there is no panel to protect until the command has run, and a lock on a *neighbour* does not stop a page growing |
+//! | `comic.panel.move` | **refused** | the frame, and the artwork and lettering the frame clips, would all translate |
+//! | `comic.panel.resize` | **refused** | the frame's rectangle, and the crop of the artwork inside it, change |
+//! | `comic.panel.replace_art` | **refused** | the artwork it replaces is deleted, and its object does not come back |
+//! | `comic.panel.set_shot` | **ignored** | it writes the generation brief and nothing else: no geometry, no object, no artwork. A lock covers the panel as *drawn*, not what a later job is asked to draw |
+//! | `comic.panel.delete` | **refused** | losing the deliberate placement is the accident a lock exists to prevent, and a lock that does not stop deletion is a lock in name only |
+//! | `comic.page.delete` | **refused** while the page holds one | it deletes every panel of the page by the §11.1 policy; the refusal names the locked panels, which one command clears |
+//! | `comic.page.template.apply` | **refused** while the page holds one | every path touches every panel: with no panels it *creates* (no lock to consult), at the same count it **moves** each frame, and `replace: true` **deletes** them |
+//! | `comic.reading_order.set` | **ignored** | it renumbers `reading_order_index`, which is narrative state *on the page*, not the panel's geometry or artwork; refusing would make a locked panel unorderable |
+//! | `comic.lettering.add` | **ignored** | it adds a balloon and a `Lettering` record of its own and moves no panel object. The lock is asked in `comic.panel.move`'s direction: a locked panel's frame will not move *under* its balloons either |
+//!
+//! A refusal is **actionable**: it names the panel ids it is about and the one command that clears
+//! the lock ([`locked_refusal`]). The lock is settable and clearable through
+//! `comic.panel.set_locked`, which is itself never refused — a remedy the lock could block would be
+//! a dead end.
+//!
+//! **Selection is not here.** M2 §3 keeps it out: selection is session state and belongs in M6, so
+//! no command in this module writes it, and no lock relates to it.
+//!
+//! # The lock and the visual document
+//!
+//! **Nothing here mirrors `locked` into `crates/doc`.** Structural rule 1 forbids a comic field in
+//! the visual document, and the document has a node-lock mechanism of its own; whether the comic
+//! lock should *drive* it is a design question (reported as M2-W3-F3 in
+//! `docs/reviews/M2-command-engineer-locking.md`) and not a decision this module makes.
 
 use serde_json::{Value, json};
 use vectorcraft_color::{Color, Paint};
@@ -36,7 +73,7 @@ pub fn specs() -> Vec<CommandSpec> {
             "Add Panel",
             ["Window", "Comic"],
             None,
-            "{page: PageId, rect: [x, y, width, height] (points, in the artboard), scene?: SceneId (default: the page's first scene), shot?: the generation brief} create a frame path object inside the artboard and a Panel record pointing at it → {panel, page, frame, artboard_id, reading_order_index, findings: [geometry warnings]}. The geometry is checked and *reported* (overlap, minimum size, containment) rather than refused, because a creator may place a panel and fix it later (design §12.1). One undo step",
+            "{page: PageId, rect: [x, y, width, height] (points, in the artboard), scene?: SceneId (default: the page's first scene), shot?: the generation brief} create a frame path object inside the artboard and a Panel record pointing at it → {panel, page, frame, artboard_id, reading_order_index, findings: [geometry warnings]}. The geometry is checked and *reported* (overlap, minimum size, containment) rather than refused, because a creator may place a panel and fix it later (design §12.1), and a finding names its panel as `Panel(<id>)` (see comic.panel.set_locked and the module doc for the lock's effect on each command). The panel is created **unlocked** (`locked: false`, schema §6.2): nothing is protected until there is a panel. One undo step",
             has_comic,
             add
         ),
@@ -45,7 +82,7 @@ pub fn specs() -> Vec<CommandSpec> {
             "Move Panel",
             ["Window", "Comic"],
             None,
-            "{panel: PanelId, dx?, dy? (or x?, y?: put the frame's top-left there)} translate the frame and the objects the panel owns (artwork, lettering) so the panel keeps showing the same crop → {panel, frame, moved: [NodeId], delta}. The id, its artwork references, its dialogue and its reading order are unchanged. One undo step",
+            "{panel: PanelId, dx?, dy? (or x?, y?: put the frame's top-left there)} translate the frame and the objects the panel owns (artwork, lettering) so the panel keeps showing the same crop → {panel, frame, moved: [NodeId], delta}. The id, its artwork references, its dialogue and its reading order are unchanged. **Refused when the panel is locked** (§6.2) — the refusal names the panel and `comic.panel.set_locked {panel, locked: false}`. One undo step",
             has_comic,
             move_panel
         ),
@@ -54,16 +91,25 @@ pub fn specs() -> Vec<CommandSpec> {
             "Resize Panel",
             ["Window", "Comic"],
             None,
-            "{panel: PanelId, width?: pt, height?: pt, rect?: [x, y, width, height] (wins)} scale the frame path so its bounds become the new rectangle. The artwork is neither scaled nor moved and every id is unchanged → {panel, frame, rect, findings: [geometry warnings]}. One undo step",
+            "{panel: PanelId, width?: pt, height?: pt, rect?: [x, y, width, height] (wins)} scale the frame path so its bounds become the new rectangle. The artwork is neither scaled nor moved and every id is unchanged → {panel, frame, rect, findings: [geometry warnings, each naming its panel as `Panel(<id>)`]}. **Refused when the panel is locked** (§6.2). One undo step",
             has_comic,
             resize
+        ),
+        cmd!(
+            "comic.panel.set_locked",
+            "Lock Panel",
+            ["Window", "Comic"],
+            None,
+            "{panel: PanelId, locked: bool} set or clear `Panel.locked` (§6.2). A locked panel is refused by the commands that would **move**, **resize**, **replace the artwork of** or **delete** it — comic.panel.move, .resize, .replace_art, .delete, comic.page.delete and comic.page.template.apply — and by nothing else: the brief (comic.panel.set_shot), the words (comic.lettering.add) and the page's narrative order (comic.reading_order.set) are unaffected, and this command is never itself refused → {panel, page, locked}. One undo step",
+            has_comic,
+            set_locked
         ),
         cmd!(
             "comic.panel.replace_art",
             "Replace Panel Artwork",
             ["Window", "Comic"],
             None,
-            "{panel: PanelId, asset: AssetId of a Linked asset under the bundle, role?: \"primary\" (default)|\"background\"|\"overlay\"} place the asset's file in the panel, clip it with the panel's own frame, and record an ArtworkRef. The artwork it replaces is deleted; every other object and the previous Asset record are left intact (design §8.2, M1 acceptance test 6) → {panel, asset, role, node: the clip group, image: the placed image object (selected, so object.cropImage acts on it), previous?: the replaced node, asset_kept: true}. An Embedded or Package asset is refused by name, because M1 has no command that could hand over those bytes. One undo step",
+            "{panel: PanelId, asset: AssetId of a Linked asset under the bundle, role?: \"primary\" (default)|\"background\"|\"overlay\"} place the asset's file in the panel, clip it with the panel's own frame, and record an ArtworkRef. The artwork it replaces is deleted; every other object and the previous Asset record are left intact (design §8.2, M1 acceptance test 6) → {panel, asset, role, node: the clip group, image: the placed image object (selected, so object.cropImage acts on it), previous?: the replaced node, asset_kept: true}. An Embedded or Package asset is refused by name, because M1 has no command that could hand over those bytes. **Refused when the panel is locked** (§6.2). One undo step",
             has_comic,
             replace_art
         ),
@@ -72,7 +118,7 @@ pub fn specs() -> Vec<CommandSpec> {
             "Set Panel Shot",
             ["Window", "Comic"],
             None,
-            "{panel: PanelId, shot: the generation brief} set Panel.shot_description. Changes no visual object and no other record → {panel, shot}. One undo step",
+            "{panel: PanelId, shot: the generation brief} set Panel.shot_description. Changes no visual object and no other record, and **a lock does not apply**: `Panel.locked` (§6.2) protects where the panel is and what it shows, not what a later generation job is asked for. `comic.panel.set_locked` is the command that refuses the geometry and artwork commands → {panel, shot}. One undo step",
             has_comic,
             set_shot
         ),
@@ -81,7 +127,7 @@ pub fn specs() -> Vec<CommandSpec> {
             "Delete Panel",
             ["Window", "Comic"],
             None,
-            "{panel: PanelId, reuse?: [DialogueId…] dialogues to detach instead of delete (a dialogue whose unknown map says \"reusable\": true is detached too)} delete the panel and, per design §11.1: its lettering frame, tail and text objects and its lettering records; its artwork objects; its dialogue records **unless flagged reusable**, which are detached and reported (their panel_id then names a deleted panel, which schema rule 1 reports until `comic.lettering.add {panel, dialogue}` adopts them, which is the move §11.1's row means); its frame; and renumber the reading order in the same operation. A dialogue that is deleted takes **every** balloon showing it, wherever that balloon is: a Lettering has no words of its own, so `letteringDeleted` can name a balloon in another panel. **Asset records are never deleted** — lineage outlives the panel — and a generation job still targeting the panel is left to finish and reported → {panel, page, readingOrder, deletion: {removedNodes, letteringDeleted, dialogueDeleted, dialogueDetached, dialogueDetachedNote, assetsKept, assetsKeptNote, jobsStillTargeting, jobsStillTargetingNote}}. A page whose reading order is not already a permutation of its panels is refused rather than repaired. One undo step",
+            "{panel: PanelId, reuse?: [DialogueId…] dialogues to detach instead of delete (a dialogue whose unknown map says \"reusable\": true is detached too)} delete the panel and, per design §11.1: its lettering frame, tail and text objects and its lettering records; its artwork objects; its dialogue records **unless flagged reusable**, which are detached and reported (their panel_id then names a deleted panel, which schema rule 1 reports until `comic.lettering.add {panel, dialogue}` adopts them, which is the move §11.1's row means); its frame; and renumber the reading order in the same operation. A dialogue that is deleted takes **every** balloon showing it, wherever that balloon is: a Lettering has no words of its own, so `letteringDeleted` can name a balloon in another panel. **Asset records are never deleted** — lineage outlives the panel — and a generation job still targeting the panel is left to finish and reported → {panel, page, readingOrder, deletion: {removedNodes, letteringDeleted, dialogueDeleted, dialogueDetached, dialogueDetachedNote, assetsKept, assetsKeptNote, jobsStillTargeting, jobsStillTargetingNote}}. A page whose reading order is not already a permutation of its panels is refused rather than repaired. **Refused when the panel is locked** (§6.2): a lock that did not stop deletion would be a lock in name only — clear it with comic.panel.set_locked. One undo step",
             has_comic,
             delete
         ),
@@ -215,18 +261,69 @@ pub(crate) fn owned_objects(b: &ComicBundle, d: &Document, panel: &Panel) -> Vec
 // ---------- geometry findings ----------
 
 /// The `comic-layout` geometry findings for a page's panel rectangles, as JSON.
-fn geometry_findings(page_rect: Rect, rects: &[vectorcraft_comic_layout::PanelRect]) -> Vec<Value> {
-    vectorcraft_comic_layout::validate::faults(page_rect, None, rects, &vectorcraft_comic_layout::validate::Limits::default())
+///
+/// **The subject is `Panel(<id>)`, and that spelling is a contract.** `comic-layout`'s
+/// `validate::page` labels the same faults the same way and documents `(rule, subject)` as the key a
+/// caller running both validators deduplicates on (`validate/mod.rs`, "The subjects are spelled as
+/// `comic-model` spells them"). This used to spell them `Panel[i]` — the index in the vector handed
+/// to `faults`, which is *not* even the page file's own index, because [`page_frames`] skips a panel
+/// whose frame node the document cannot answer for. Two spellings for one fault meant a caller that
+/// deduplicated got the same warning twice, and a response saying "sits 2pt from `Panel[1]`" could
+/// not be resolved to a panel without the file in hand (M2-L1). The index form survives nowhere: a
+/// caller who wants a position has the page and can count it, and the position it was reporting was
+/// a filtered one.
+pub(crate) fn geometry_findings(page_rect: Rect, panels: &[LabeledFrame]) -> Vec<Value> {
+    let rects: Vec<vectorcraft_comic_layout::PanelRect> = panels.iter().map(|(_, rect)| *rect).collect();
+    vectorcraft_comic_layout::validate::faults(page_rect, None, &rects, &vectorcraft_comic_layout::validate::Limits::default())
         .iter()
-        .map(|f| finding_json(&f.describe(&|i| format!("Panel[{i}]"))))
+        .map(|f| finding_json(&f.describe(&|i| panels.get(i).map(|(label, _)| label.clone()).unwrap_or_else(|| format!("panels[{i}]")))))
         .collect()
 }
 
-/// Every frame rectangle of a page that the document can answer for.
-fn page_frames(s: &Session, page: PageId) -> Result<Vec<vectorcraft_comic_layout::PanelRect>> {
+/// A panel's frame rectangle and the label a finding about it carries: `Panel(<id>)`.
+pub(crate) type LabeledFrame = (String, vectorcraft_comic_layout::PanelRect);
+
+/// Every frame rectangle of a page that the document can answer for, each labelled `Panel(<id>)`.
+fn page_frames(s: &Session, page: PageId) -> Result<Vec<LabeledFrame>> {
     let b = &open(s)?.bundle;
     let d = &s.doc()?.doc;
-    Ok(page_file(b, page)?.panels.iter().filter_map(|p| node_frame(d, p.frame_node_id)).collect())
+    Ok(page_file(b, page)?.panels.iter().filter_map(|p| node_frame(d, p.frame_node_id).map(|rect| (format!("Panel({})", p.id.0), rect))).collect())
+}
+
+// ---------- the lock (§6.2, schema §5.6) ----------
+
+/// Whether `panel` is locked. A panel that does not exist is not locked: a missing panel is another
+/// command's refusal, and answering `false` keeps this helper from inventing a second one.
+pub(crate) fn is_locked(b: &ComicBundle, panel: PanelId) -> bool {
+    b.pages.values().flat_map(|f| f.panels.iter()).any(|p| p.id == panel && p.locked)
+}
+
+/// The panel, if it is locked — the shape a single-panel command needs, so the refusal and the
+/// ordinary "no such panel" answer stay distinguishable.
+pub(crate) fn locked_panel(b: &ComicBundle, panel: PanelId) -> Vec<PanelId> {
+    if is_locked(b, panel) { vec![panel] } else { Vec::new() }
+}
+
+/// The locked panels of a page, in the page's own panel order.
+pub(crate) fn locked_on_page(b: &ComicBundle, page: PageId) -> Vec<PanelId> {
+    b.pages.get(&page).map(|f| f.panels.iter().filter(|p| p.locked).map(|p| p.id).collect()).unwrap_or_default()
+}
+
+/// The refusal a locked panel gets (schema §5.6, §6.2).
+///
+/// One message for both shapes — one panel and a pageful — because the remedy is the same command.
+/// It says **which** panels stand in the way and **what to do about it**, in the same sentence: the
+/// lock's whole point is that a creator learns why an edit did not happen, and a bare "refused"
+/// would leave them hunting for which of a page's panels is the obstacle.
+pub(crate) fn locked_refusal(cmd: &str, action: &str, locked: &[PanelId]) -> EngineError {
+    let ids: Vec<String> = locked.iter().map(|p| p.0.to_string()).collect();
+    let (what, remedy) = match ids.len() {
+        1 => (format!("panel {} is locked", ids[0]), format!("comic.panel.set_locked {{panel: {}, locked: false}}", ids[0])),
+        _ => (format!("panels {} are locked", ids.join(", ")), "comic.panel.set_locked {panel: <id>, locked: false} for each".to_string()),
+    };
+    EngineError::Other(format!(
+        "{cmd}: {what}, so {action} — a locked panel does not move, resize, take new artwork or go away. Unlock it with {remedy}, then retry"
+    ))
 }
 
 // ---------- comic.panel.add ----------
@@ -239,6 +336,11 @@ fn add(s: &mut Session, p: &Value) -> Result<Value> {
     let scene = scene_for(s, page, p.get("scene").and_then(Value::as_u64), C)?;
     let shot = str_param(p, "shot").unwrap_or("").to_string();
     let page_rect = checked_page_rect(page, page_rect(s, page)?)?;
+    // MUTATION A (round-2 review): `comic.panel.add` over-applies the page's lock.
+    let locked = locked_on_page(&open(s)?.bundle, page);
+    if !locked.is_empty() {
+        return Err(locked_refusal(C, "the panel is not added", &locked));
+    }
     comic_edit(s, "Add Panel", |s| {
         let artboard_id = artboard_of(s, page)?;
         let frame = create_frame(s, "Add Panel", rect)?;
@@ -270,6 +372,9 @@ fn add(s: &mut Session, p: &Value) -> Result<Value> {
                         exceptions: Vec::new(),
                     },
                     generation_status: GenerationStatus::None,
+                    // v2's one field (§6.2): a panel created here starts unlocked. W3's commands
+                    // are what give `locked` its effect; this literal only has to exist.
+                    locked: false,
                     unknown: Default::default(),
                 });
                 index
@@ -293,6 +398,10 @@ fn add(s: &mut Session, p: &Value) -> Result<Value> {
 fn move_panel(s: &mut Session, p: &Value) -> Result<Value> {
     const C: &str = "comic.panel.move";
     let panel = PanelId(raw_id(p, "panel", C)?);
+    let locked = locked_panel(&open(s)?.bundle, panel);
+    if !locked.is_empty() {
+        return Err(locked_refusal(C, "nothing is moved", &locked));
+    }
     comic_edit(s, "Move Panel", |s| {
         let (page, frame, delta) = {
             let b = &open(s)?.bundle;
@@ -336,6 +445,10 @@ fn move_panel(s: &mut Session, p: &Value) -> Result<Value> {
 fn resize(s: &mut Session, p: &Value) -> Result<Value> {
     const C: &str = "comic.panel.resize";
     let panel = PanelId(raw_id(p, "panel", C)?);
+    let locked = locked_panel(&open(s)?.bundle, panel);
+    if !locked.is_empty() {
+        return Err(locked_refusal(C, "nothing is resized", &locked));
+    }
     comic_edit(s, "Resize Panel", |s| {
         let (page, frame, target, page_rect) = {
             let b = &open(s)?.bundle;
@@ -390,6 +503,10 @@ fn replace_art(s: &mut Session, p: &Value) -> Result<Value> {
     let panel = PanelId(raw_id(p, "panel", C)?);
     let asset_id = AssetId(raw_id(p, "asset", C)?);
     let role = artwork_role(p, C)?;
+    let locked = locked_panel(&open(s)?.bundle, panel);
+    if !locked.is_empty() {
+        return Err(locked_refusal(C, "the artwork is not replaced", &locked));
+    }
     let (page, frame, asset_file) = {
         let bundle_root = root(s)?;
         let b = &open(s)?.bundle;
@@ -503,6 +620,20 @@ fn set_shot(s: &mut Session, p: &Value) -> Result<Value> {
     })
 }
 
+// ---------- comic.panel.set_locked ----------
+
+fn set_locked(s: &mut Session, p: &Value) -> Result<Value> {
+    const C: &str = "comic.panel.set_locked";
+    let panel = PanelId(raw_id(p, "panel", C)?);
+    let locked = p.get("locked").and_then(Value::as_bool).ok_or_else(|| bad(C, "missing `locked` (true to lock the panel, false to unlock it)"))?;
+    comic_edit(s, if locked { "Lock Panel" } else { "Unlock Panel" }, |s| {
+        let oc = open_mut(s)?;
+        let (page, index) = locate_panel(&oc.bundle, panel)?;
+        page_file_mut(&mut oc.bundle, page)?.panels[index].locked = locked;
+        Ok(json!({ "panel": panel.0, "page": page.0, "locked": locked }))
+    })
+}
+
 // ---------- a panel record for a template slot ----------
 
 /// Add a panel record for a frame the template just placed, with the plan's narrative index.
@@ -537,6 +668,8 @@ pub(crate) fn add_panel_record(
             exceptions: Vec::new(),
         },
         generation_status: GenerationStatus::None,
+        // v2's one field (§6.2); see the note on the literal above.
+        locked: false,
         unknown: Default::default(),
     });
     Ok(())
@@ -679,6 +812,10 @@ fn delete(s: &mut Session, p: &Value) -> Result<Value> {
     const C: &str = "comic.panel.delete";
     let panel = PanelId(raw_id(p, "panel", C)?);
     let reuse = dialogue_ids_param(p, "reuse", C)?;
+    let locked = locked_panel(&open(s)?.bundle, panel);
+    if !locked.is_empty() {
+        return Err(locked_refusal(C, "nothing is deleted", &locked));
+    }
     comic_edit(s, "Delete Panel", |s| {
         let page = locate_panel(&open(s)?.bundle, panel)?.0;
         let out = {

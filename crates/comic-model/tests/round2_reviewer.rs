@@ -50,7 +50,11 @@ fn fixture_root() -> PathBuf {
 }
 
 fn scratch(name: &str) -> PathBuf {
-    let dir = Path::new(env!("CARGO_TARGET_TMPDIR")).join(name);
+    // The pid keeps two *concurrent* runs of this package (this workspace has several agents in it)
+    // from clobbering each other's `target/tmp/<name>`; the suite's fixed scratch names made a
+    // simultaneous run of one test binary fail spuriously (M2-T1: two runs of this file, each
+    // deleting the other's fixture copy mid-test — `copy: … NotFound`, `Missing { path: … }`).
+    let dir = Path::new(env!("CARGO_TARGET_TMPDIR")).join(format!("{name}-{}", std::process::id()));
     fs::remove_dir_all(&dir).ok();
     fs::create_dir_all(&dir).expect("scratch directory");
     dir

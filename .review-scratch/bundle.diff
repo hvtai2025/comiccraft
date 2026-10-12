@@ -1,0 +1,332 @@
+diff --git a/crates/comic-model/src/bundle.rs b/crates/comic-model/src/bundle.rs
+index 82456642..91a52e24 100644
+--- a/crates/comic-model/src/bundle.rs
++++ b/crates/comic-model/src/bundle.rs
+@@ -29,6 +29,7 @@ use crate::entities::{
+ use crate::error::Error;
+ use crate::ids::{ComicId, IdNewtype, JobId, PageId};
+ use crate::json::{join_relative, path_within, scan_tree, to_canonical_bytes};
++use crate::migrate::{self, Migration};
+ use crate::validate::Finding;
+ use crate::{DocumentPayload, SCHEMA_VERSION};
+ 
+@@ -398,6 +399,61 @@ impl ComicBundle {
+     pub fn job_file_key(id: JobId) -> String {
+         format!("{JOBS_DIR}/job-{}.json", id.0)
+     }
++
++    /// Every file of this bundle that declares a `schema_version`, with its bundle-relative key —
++    /// the list rule 3 compares and the list §2's refusal walks.
++    ///
++    /// One authority for two questions: rule 3 asks whether each equals the manifest's
++    /// `schema_version`, and [`load`] asks whether any is **greater** than the version this build
++    /// implements, which §2 refuses rather than reading partially. Both must see every file, so a
++    /// file added here is governed by both at once and neither list can drift from the other.
++    ///
++    /// `manifest.json` is not in it: the manifest **is** the version the others are compared
++    /// against (§4), and §2's check of it is [`check_supported`]'s.
++    #[must_use]
++    pub fn declared_versions(&self) -> Vec<(String, u32)> {
++        let mut declared: Vec<(String, u32)> = vec![
++            (PROJECT_FILE.to_string(), self.project.schema_version),
++            ("story/chapters.json".to_string(), self.chapters.schema_version),
++            ("story/scenes.json".to_string(), self.scenes.schema_version),
++            ("story/characters.json".to_string(), self.characters.schema_version),
++            ("story/locations.json".to_string(), self.locations.schema_version),
++            ("story/styles.json".to_string(), self.styles.schema_version),
++            (ASSET_INDEX_FILE.to_string(), self.assets.schema_version),
++            (PROVENANCE_FILE.to_string(), self.provenance.schema_version),
++        ];
++        for (id, file) in &self.pages {
++            declared.push((Self::page_file_key(*id), file.schema_version));
++        }
++        for (id, file) in &self.jobs {
++            declared.push((Self::job_file_key(*id), file.schema_version));
++        }
++        declared
++    }
++
++    /// Write this build's `schema_version` on every file that declares one (§2, §5.4, rule 3).
++    ///
++    /// §2 makes the manifest's version **the bundle's**: "the writer writes the version it
++    /// implements". A file that declares its own copy must therefore be written at the same
++    /// version, or the save would contradict rule 3 in the very bytes it wrote — a v2 manifest over
++    /// v1 page files is exactly that contradiction, and it is what a save of a bundle read forward
++    /// from v1 would produce without this.
++    pub fn normalize_declared_versions(&mut self) {
++        self.project.schema_version = SCHEMA_VERSION;
++        self.chapters.schema_version = SCHEMA_VERSION;
++        self.scenes.schema_version = SCHEMA_VERSION;
++        self.characters.schema_version = SCHEMA_VERSION;
++        self.locations.schema_version = SCHEMA_VERSION;
++        self.styles.schema_version = SCHEMA_VERSION;
++        self.assets.schema_version = SCHEMA_VERSION;
++        self.provenance.schema_version = SCHEMA_VERSION;
++        for file in self.pages.values_mut() {
++            file.schema_version = SCHEMA_VERSION;
++        }
++        for file in self.jobs.values_mut() {
++            file.schema_version = SCHEMA_VERSION;
++        }
++    }
+ }
+ 
+ /// Parse `pages/page-<PageId>.json` into the page id it encodes (§13 rule 13).
+@@ -432,7 +488,20 @@ pub struct LoadedBundle {
+     pub files: BTreeMap<String, FileEntry>,
+     /// What §14 steps 1 and 4 found. Referential rules 1–18 are not run here; see
+     /// [`validate`](crate::validate).
++    ///
++    /// A **migration** is deliberately not a finding: §14's findings are the inconsistencies of a
++    /// load, and a bundle read forward is not inconsistent — it is merely older. The migration is
++    /// reported in [`migrations`](Self::migrations) instead, so it is neither silent nor filed
++    /// with the damage.
+     pub findings: Vec<Finding>,
++    /// What §11's migrations did, in order — empty when the bundle already declares
++    /// [`SCHEMA_VERSION`].
++    ///
++    /// §11 requires a migration to report rather than act silently, and this is that report: a
++    /// caller is expected to surface it (a project that was read forward is a project whose next
++    /// save will write a different format). Each entry names the version pair and carries one
++    /// actionable note per observable effect.
++    pub migrations: Vec<Migration>,
+ }
+ 
+ /// What [`save`] needs from the caller.
+@@ -451,12 +520,18 @@ pub struct SaveOptions {
+ /// Read a bundle from a directory (§14).
+ ///
+ /// What is fatal is what leaves nothing to report against: a missing or unparseable
+-/// `manifest.json` (§14 step 1), an unsupported `schema_version` (§2), a missing or unparseable
++/// `manifest.json` (§14 step 1), an unsupported `schema_version` (§2) — the manifest's or a **file's**
++/// own, because §2 says "never partially load" — a missing or unparseable
+ /// `project.json`, a missing visual document, and a comic file that does not parse (§14 step 3).
+ /// Everything else — the `files`/tree mismatch, an **absent collection file**, a counter repaired
+ /// upward — is a [`Finding`] on a usable project, because §14's sentence exists so "a creator can
+ /// open a damaged bundle and repair it rather than being locked out".
+ ///
++/// A bundle that declares an **older** version is read forward (§2) and the migration is returned
++/// in [`LoadedBundle::migrations`], not in `findings`: a project read forward is not inconsistent,
++/// it is older (§11's reporting requirement is what puts it in the return value rather than in a
++/// log line nobody reads).
++///
+ /// The split is by **role**, not by convenience:
+ ///
+ /// - **Identity files** — `manifest.json` and `project.json` — carry the project, the id counter
+@@ -480,6 +555,7 @@ pub fn load(root: &Path) -> Result<LoadedBundle, Error> {
+     }
+     let manifest: Manifest = read_json(&manifest_path, "manifest")?;
+     check_supported(manifest.schema_version)?;
++    let declared_version = manifest.schema_version;
+ 
+     // Identity: fatal when absent (see the doc comment above).
+     let project: ComicProject = read_json(&root.join(PROJECT_FILE), "project")?;
+@@ -615,6 +691,15 @@ pub fn load(root: &Path) -> Result<LoadedBundle, Error> {
+     let files_of_record: BTreeSet<String> = manifest.files.keys().cloned().collect();
+     let mut bundle =
+         ComicBundle { manifest, project, chapters, scenes, characters, locations, styles, pages, assets, provenance, jobs, files_of_record };
++    // §2's refusal, per file — after every file has parsed, so the refusal can name the one that is
++    // unreadable rather than a prefix of the bundle. The manifest's own version is
++    // `check_supported`'s; this is the same rule applied to the files that declare a copy of it.
++    // Rule 3 still governs a file declaring an *older* version, which is read forward.
++    for (key, found) in bundle.declared_versions() {
++        if found > SCHEMA_VERSION {
++            return Err(Error::FileSchemaTooNew { path: root.join(join_relative(&key)?), found, supported: SCHEMA_VERSION });
++        }
++    }
+     if let Some(next) = bundle.repair_id_counter() {
+         findings.push(Finding::warning(
+             None,
+@@ -622,15 +707,22 @@ pub fn load(root: &Path) -> Result<LoadedBundle, Error> {
+             format!("the counter was behind the ids the bundle contains; repaired upward to {next} (§9)"),
+         ));
+     }
+-    Ok(LoadedBundle { bundle, files, findings })
++    // §2/§11: a lesser version is accepted and migrated forward, and the migration is **reported**
++    // rather than performed in the dark. The counter repair runs first, because it is a §14
++    // consequence of what the files hold, not of the format version they were written at.
++    let migrations: Vec<Migration> = migrate::migrate(&mut bundle, declared_version)?.into_iter().collect();
++    Ok(LoadedBundle { bundle, files, findings, migrations })
+ }
+ 
+-/// Refuse a bundle this build cannot read, and migrate an older one forward (§2, §11).
++/// Refuse a bundle this build cannot read, and accept an older one so it can be migrated (§2, §11).
+ ///
+ /// The rule is asymmetric on purpose: a **greater** version is refused outright, naming the
+ /// required version, because reading it partially would be worse than not reading it; a **lesser**
+-/// or equal one is accepted and migrated. At v1 there is nothing to migrate, so the migration
+-/// step is a no-op that says so — a v2 fixture and its migration land together (§11.1).
++/// or equal one is accepted and migrated by [`migrate::migrate`], which `load` runs and reports.
++///
++/// This is the **manifest's** half of §2. Every file that declares a `schema_version` of its own is
++/// checked by the same rule — a greater one is [`Error::FileSchemaTooNew`], a lesser one is rule
++/// 3's to report — because "never partially load" is a claim about the bundle, not about one file.
+ pub fn check_supported(found: u32) -> Result<(), Error> {
+     if found > SCHEMA_VERSION {
+         return Err(Error::SchemaTooNew { found, supported: SCHEMA_VERSION });
+@@ -716,6 +808,12 @@ pub fn save(bundle: &mut ComicBundle, root: &Path, options: &SaveOptions) -> Res
+             manifest.files = files;
+             bundle.project = project;
+             bundle.manifest = manifest;
++            bundle.normalize_declared_versions();
++            // The model now holds what was written, declared version included. A bundle read
++            // forward from v1 was *read* at v1 (so a load never rewrites history — the files on
++            // disk still say what they said) and is *written* at v2; the in-memory model follows
++            // the bytes, because a caller that validates the model after a save must see the
++            // bundle it just wrote and not the one it opened.
+             // The new generation of record is this save: exactly the keys it staged, so the *next*
+             // save prunes what this one replaced or dropped and leaves everything else alone —
+             // including a file that appeared while this generation was the current one.
+@@ -748,19 +846,19 @@ fn write_generation(
+     fs::create_dir_all(staging).map_err(|source| Error::Write { path: staging.to_path_buf(), source })?;
+ 
+     let mut staged: BTreeSet<String> = BTreeSet::new();
+-    stage_file(staging, &mut staged, PROJECT_FILE, &to_canonical_bytes("project.json", project)?)?;
+-    stage_file(staging, &mut staged, "story/chapters.json", &to_canonical_bytes("story/chapters.json", &bundle.chapters)?)?;
+-    stage_file(staging, &mut staged, "story/scenes.json", &to_canonical_bytes("story/scenes.json", &bundle.scenes)?)?;
+-    stage_file(staging, &mut staged, "story/characters.json", &to_canonical_bytes("story/characters.json", &bundle.characters)?)?;
+-    stage_file(staging, &mut staged, "story/locations.json", &to_canonical_bytes("story/locations.json", &bundle.locations)?)?;
+-    stage_file(staging, &mut staged, "story/styles.json", &to_canonical_bytes("story/styles.json", &bundle.styles)?)?;
+-    stage_file(staging, &mut staged, ASSET_INDEX_FILE, &to_canonical_bytes("assets/index.json", &bundle.assets)?)?;
+-    stage_file(staging, &mut staged, PROVENANCE_FILE, &to_canonical_bytes("provenance/generations.json", &bundle.provenance)?)?;
++    stage_versioned(staging, &mut staged, PROJECT_FILE, "project.json", project)?;
++    stage_versioned(staging, &mut staged, "story/chapters.json", "story/chapters.json", &bundle.chapters)?;
++    stage_versioned(staging, &mut staged, "story/scenes.json", "story/scenes.json", &bundle.scenes)?;
++    stage_versioned(staging, &mut staged, "story/characters.json", "story/characters.json", &bundle.characters)?;
++    stage_versioned(staging, &mut staged, "story/locations.json", "story/locations.json", &bundle.locations)?;
++    stage_versioned(staging, &mut staged, "story/styles.json", "story/styles.json", &bundle.styles)?;
++    stage_versioned(staging, &mut staged, ASSET_INDEX_FILE, "assets/index.json", &bundle.assets)?;
++    stage_versioned(staging, &mut staged, PROVENANCE_FILE, "provenance/generations.json", &bundle.provenance)?;
+     for (id, file) in &bundle.pages {
+-        stage_file(staging, &mut staged, &ComicBundle::page_file_key(*id), &to_canonical_bytes("a page file", file)?)?;
++        stage_versioned(staging, &mut staged, &ComicBundle::page_file_key(*id), "a page file", file)?;
+     }
+     for (id, file) in &bundle.jobs {
+-        stage_file(staging, &mut staged, &ComicBundle::job_file_key(*id), &to_canonical_bytes("a job file", file)?)?;
++        stage_versioned(staging, &mut staged, &ComicBundle::job_file_key(*id), "a job file", file)?;
+     }
+     if let Some(payload) = &options.document {
+         stage_file(staging, &mut staged, document_key, &payload.bytes)?;
+@@ -873,6 +971,51 @@ fn stage_file(staging: &Path, staged: &mut BTreeSet<String>, key: &str, bytes: &
+     Ok(())
+ }
+ 
++/// A file that declares its own `schema_version` (rule 3).
++///
++/// Every such file is written at **the bundle's** version, because §2 makes the manifest's version
++/// the bundle's: the writer "writes the version it implements". A bundle read forward from v1 has
++/// files still declaring 1, and a save that left them there would write a v2 manifest over v1 page
++/// files — rule 3's exact contradiction — and a canonical form no fresh save produces.
++trait DeclaresVersion: Clone + Serialize {
++    /// Set the version this file will be written at.
++    fn set_declared_version(&mut self, version: u32);
++}
++
++macro_rules! declares_version {
++    ($($file:ty),+ $(,)?) => {
++        $(impl DeclaresVersion for $file {
++            fn set_declared_version(&mut self, version: u32) {
++                self.schema_version = version;
++            }
++        })+
++    };
++}
++
++declares_version!(
++    ComicProject,
++    ChaptersFile,
++    ScenesFile,
++    CharactersFile,
++    LocationsFile,
++    StylesFile,
++    AssetIndexFile,
++    ProvenanceFile,
++    PageFile,
++    JobFile
++);
++
++/// Stage one file at the version this build implements (§2, rule 3).
++///
++/// The copy is what the *disk* gets; the model's own [`ComicBundle::normalize_declared_versions`]
++/// happens once, after the whole write has succeeded, so nothing here mutates `bundle` and a failed
++/// save leaves the caller's model the way the refused-save rule promises.
++fn stage_versioned<T: DeclaresVersion>(staging: &Path, staged: &mut BTreeSet<String>, key: &str, what: &str, file: &T) -> Result<(), Error> {
++    let mut file = file.clone();
++    file.set_declared_version(SCHEMA_VERSION);
++    stage_file(staging, staged, key, &to_canonical_bytes(what, &file)?)
++}
++
+ /// Whether `name`, in the directory `dir`, is a file **this version** writes there.
+ ///
+ /// The prune must stop at what this version owns. §4 defines `manifest.files` as every file except
+@@ -1252,6 +1395,70 @@ mod tests {
+         assert!(check_supported(0).is_err(), "version 0 was never a bundle format");
+     }
+ 
++    #[test]
++    fn declared_versions_covers_every_file_that_declares_one() {
++        // `ComicBundle::declared_versions` is what rule 3 compares and what §2's refusal walks, so
++        // a file missing from it would be invisible to both. The fixture is the checklist: every
++        // `.json` it holds declares a `schema_version`, so every one must appear in the list.
++        let root = crate::scratch::scratch_dir_created("declared-versions");
++        copy_fixture(&root);
++        let loaded = load(&root).expect("the v1 fixture loads");
++        let listed: BTreeSet<String> = loaded.bundle.declared_versions().into_iter().map(|(key, _)| key).collect();
++        for key in scan_tree(&root).expect("the tree").keys() {
++            if key.ends_with(".json") && key != MANIFEST_FILE {
++                assert!(listed.contains(key), "`{key}` declares a `schema_version` and `declared_versions` omits it");
++            }
++        }
++        assert!(
++            loaded.bundle.declared_versions().iter().all(|(_, version)| *version == 1),
++            "the fixture is v1 in every file: {:?}",
++            loaded.bundle.declared_versions()
++        );
++        let mut normalized = loaded.bundle.clone();
++        normalized.normalize_declared_versions();
++        for (file, version) in normalized.declared_versions() {
++            assert_eq!(version, SCHEMA_VERSION, "`{file}` declares a version the writer would not write");
++        }
++        fs::remove_dir_all(&root).ok();
++    }
++
++    #[test]
++    fn a_migration_is_reported_and_a_current_bundle_is_not() {
++        // §11: a migration must report rather than act in the dark. A bundle already at this
++        // build's version is not a migration, and reporting one would put noise on every load.
++        let root = crate::scratch::scratch_dir_created("migration-report");
++        copy_fixture(&root);
++        let loaded = load(&root).expect("the v1 fixture loads");
++        assert_eq!(loaded.migrations.len(), 1, "a v1 bundle is migrated: {:?}", loaded.migrations);
++        let migration = &loaded.migrations[0];
++        assert_eq!((migration.from, migration.to), (1, 2));
++        assert_eq!(
++            migration.notes,
++            vec!["v2 adds `Panel.locked` (default `false`); 3 panels take the default".to_string()],
++            "the report names the field and what it did"
++        );
++
++        let mut current = loaded.bundle.clone();
++        current.manifest.schema_version = SCHEMA_VERSION;
++        assert_eq!(migrate::migrate(&mut current, SCHEMA_VERSION).expect("current is not a migration"), None);
++        fs::remove_dir_all(&root).ok();
++    }
++
++    #[test]
++    fn a_version_with_no_migration_step_refuses_rather_than_guesses() {
++        // §11: validate the input and refuse rather than guess. There is no step older than v1, so
++        // the only reachable shape is the unreachable one — pinned anyway, because the alternative
++        // (a `match` arm that quietly returns `Ok`) is how a format silently drifts.
++        let mut bundle = empty_bundle();
++        match migrate::migrate(&mut bundle, 0) {
++            Err(Error::Migration { found, supported, reason }) => {
++                assert_eq!((found, supported), (0, SCHEMA_VERSION));
++                assert!(reason.contains("no migration"), "{reason}");
++            }
++            other => panic!("a version with no step must refuse, got {other:?}"),
++        }
++    }
++
+     #[test]
+     fn a_save_refuses_a_timestamp_that_is_not_canonical() {
+         // §5.7: one canonical form, or a save cannot round-trip byte-identically.

@@ -166,6 +166,19 @@ fn schema_doc() -> String {
     std::fs::read_to_string(SCHEMA_DOC).unwrap_or_else(|e| panic!("the frozen schema doc must be readable at {SCHEMA_DOC}: {e}"))
 }
 
+/// The `schema_version` the document's own examples declare, as written.
+///
+/// Read out of the document rather than hard-coded, because the number is not this file's subject:
+/// the *shape* is. A version bump is a migration with its own contract, and the half that pins the
+/// number against the code lives where the constant does — `crates/comic-model/tests/schema_contract.rs`,
+/// which fails if any example disagrees with `SCHEMA_VERSION`. What this file checks is that the
+/// sections that describe a versioned file still *show* it (and agree with each other); a bump must
+/// not quietly drop the wrapper from one of them.
+fn declared_version(doc: &str) -> String {
+    let at = doc.find("\"schema_version\":").expect("the document declares a version");
+    doc[at + "\"schema_version\":".len()..].chars().skip_while(|c| c.is_whitespace()).take_while(char::is_ascii_digit).collect()
+}
+
 /// The rule numbers in the §13 referential-rule table, in table order.
 fn referential_rule_numbers(doc: &str) -> Vec<u32> {
     let table = doc
@@ -426,7 +439,7 @@ fn rule_3_names_every_file_that_declares_a_schema_version() {
     // `project.json`, `pages/page-<id>.json`, `assets/index.json` and `provenance/generations.json`.
     let doc = schema_doc();
     let section54 = doc.split_once("### 5.4 Story files").expect("§5.4 exists").1.split_once("### 5.5").expect("§5.5 follows §5.4").0;
-    assert!(section54.contains("\"schema_version\": 1"), "§5.4 must still declare the story files versioned");
+    assert!(section54.contains(&format!("\"schema_version\": {}", declared_version(&doc))), "§5.4 must still declare the story files versioned");
     let story_files: Vec<String> = section54
         .lines()
         .filter_map(|l| {
@@ -1318,7 +1331,7 @@ fn the_jobs_file_wrapper_carries_the_schema_version_rule_three_checks() {
     let jobs = jobs.split_once("\n## 9.").expect("§9 follows §8.3").0;
     let flat = flattened(jobs);
     assert!(
-        flat.contains(r#"{ "schema_version": 1, "job": { … }, "unknown": {} }"#),
+        flat.contains(&format!(r#"{{ "schema_version": {}, "job": {{ … }}, "unknown": {{}} }}"#, declared_version(&doc))),
         "rule 3 lists every `jobs/job-<id>.json` among the files that declare `schema_version`, so \
          §8.3 has to show the file's wrapper (version, entity, unknown) — a bare `GenerationJob` \
          leaves the bytes undetermined. §8.3 text: {jobs:?}"

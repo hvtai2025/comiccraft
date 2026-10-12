@@ -1,0 +1,17 @@
+{
+  "schema_version": 2,
+  "styles": [
+    {
+      "id": 7,
+      "name": "Ink and wash",
+      "description": "Loose ink line over a flat wash.",
+      "palette": [
+        "#1b1b1f",
+        "#e8e2d8",
+        "#b4432f"
+      ],
+      "line_weight": 2.0,
+      "rendering_notes": "Flat colour, soft shadow, no gradients."
+    }
+  ]
+}

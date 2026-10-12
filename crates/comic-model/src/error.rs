@@ -83,6 +83,21 @@ pub enum Error {
         /// Why the migration refused.
         reason: String,
     },
+    /// A **file** inside the bundle declares a schema version this build does not implement. §2:
+    /// refuse, naming the required version; never partially load. The manifest's own copy of the
+    /// version is [`Error::SchemaTooNew`]'s; this is the same refusal for a file that declares one
+    /// of its own, which rule 3 governs when it is *older* and §2 refuses when it is newer.
+    #[error(
+        "`{path}` declares comic bundle schema version {found}, newer than the {supported} this build implements: upgrade ComicCraft to open this project"
+    )]
+    FileSchemaTooNew {
+        /// The file that declares it.
+        path: PathBuf,
+        /// The version the file declares.
+        found: u32,
+        /// [`SCHEMA_VERSION`](crate::SCHEMA_VERSION).
+        supported: u32,
+    },
     /// A file the bundle needs is not there.
     #[error("`{path}` does not exist")]
     Missing {

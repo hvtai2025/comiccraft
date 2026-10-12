@@ -68,6 +68,20 @@ pub fn is_generic_family(family: &str) -> bool {
     GENERIC_FAMILIES.iter().any(|generic| generic.eq_ignore_ascii_case(family))
 }
 
+/// Whether `family` is one of the two comic families ADR-017 ships in `craft-fonts`.
+///
+/// The same pair, and the same comparison, as `vectorcraft_text::craft_fonts::comic_fonts` selects
+/// them with, and as [`is_generic_family`] compares (`craft-fonts` carries no other comic family, so
+/// there is no third case to ask about).
+///
+/// This is the condition [`missing_face_finding`] reports on, and the only one it reports on: it is
+/// what decides whether naming `craft-fonts` is the creator's fix or a wrong turn.
+#[must_use]
+pub fn is_comic_family(family: &str) -> bool {
+    let family = family.trim();
+    family.eq_ignore_ascii_case(DIALOGUE_FAMILY) || family.eq_ignore_ascii_case(DISPLAY_FAMILY)
+}
+
 /// A family and a style within it.
 ///
 /// The pair, not the family alone: `Comic Neue` present with only `Regular` is a real and different
@@ -149,22 +163,65 @@ pub fn missing_face_findings(missing: &[MissingFace], subject: &str) -> Vec<Find
     missing.iter().map(|face| missing_face_finding(face, subject)).collect()
 }
 
+/// The **`CRAFT_FONTS`-empty contract**, as one named call (design §8.3, M2 §4.3).
+///
+/// The lettering faces a project asks for, each one reported when it is not available exactly as
+/// named — while every plan that asks for one goes on to lay its text out in the face that stands
+/// in. Two guarantees, and neither is worth anything alone:
+///
+/// * **The report is produced.** A face that is not there is named, with its status and the face
+///   shown instead, in the exporter's own terms ([`MissingFace`] is field for field
+///   `text.missingFonts`'s record).
+/// * **The layout still runs.** A missing face is neither an error nor a refusal: the words are
+///   still wrapped, measured and placed, so the creator gets a page *and* a message.
+///
+/// **A fallback that renders and says nothing is the failure this contract rules out**, because all
+/// the creator sees is a page that looks wrong with no way to learn why. This is therefore the one
+/// name the face half of a plan's report is produced through — `plan::ruler_findings` calls this and
+/// nothing else for it — so a substitute face that skipped the report would have to skip the
+/// contract by name, and a test that cites the name reds.
+#[must_use]
+pub fn lettering_face_report(db: &FontDb, faces: &[Face], subject: &str) -> Vec<Finding> {
+    missing_face_findings(&missing_faces(db, faces), subject)
+}
+
 /// One missing face's finding.
+///
+/// The message reports **what was observed** — the family and style the project asked for, the
+/// status, and the face that stands in — and says where the face comes from **only when this module
+/// knows it** ([`is_comic_family`], the one condition it branches on):
+///
+/// * A comic family: `craft-fonts` is named, because ADR-017 ships those faces there and that is
+///   why a build without `CRAFT_FONTS` has none of them.
+/// * Any other family: the message says the face is not one of the comic faces and that
+///   `craft-fonts` is not where it belongs, so the fix is to install it or choose another.
+///
+/// The second half is why this function has a branch at all. The previous wording ended *"the comic
+/// faces belong in craft-fonts, and CRAFT_FONTS being empty is why they are looked for there"* for
+/// **every** missing face, which asserts a cause nothing checked: for a project's own face — one
+/// that was never in `craft-fonts` — it is false in a build that did embed craft-fonts and in one
+/// that did not, and it sends the creator to a checkout that never carried the face (M2 §7.4, W4's
+/// D2). The status already distinguishes the two shapes of absence the exporter distinguishes
+/// (`missing` is the absent family, `substitute` the absent style of a family that *is* here), so
+/// nothing is lost by stating no cause (M2-W4-N1 keeps the `resolved: None` case honest).
 #[must_use]
 pub fn missing_face_finding(face: &MissingFace, subject: &str) -> Finding {
     let shown = match &face.resolved {
         Some((family, style)) => format!("{family} {style}"),
         None => FALLBACK_FAMILY.to_string(),
     };
+    let home = if is_comic_family(&face.family) {
+        format!("{} is one of ADR-017's comic faces, which are shipped in craft-fonts and reach a build through CRAFT_FONTS_DIR", face.family)
+    } else {
+        format!(
+            "{} is not one of ADR-017's comic faces ({DIALOGUE_FAMILY}, {DISPLAY_FAMILY}), so craft-fonts is not where it belongs: it has to be installed, or another face chosen",
+            face.family
+        )
+    };
     Finding::warning(
         None,
         subject.to_string(),
-        format!(
-            "the lettering face {} {} is not available ({}) and shows in {shown}; the comic faces belong in craft-fonts, and CRAFT_FONTS being empty is why they are looked for there",
-            face.family,
-            face.style,
-            face.status.as_str(),
-        ),
+        format!("the lettering face {} {} is not available ({}) and shows in {shown}; {home}", face.family, face.style, face.status.as_str()),
     )
 }
 
@@ -254,6 +311,142 @@ mod tests {
         assert!(message.contains("missing"), "{message}");
         assert!(message.contains(FALLBACK_FAMILY), "{message}");
         assert_eq!(findings[0].subject, "lettering speech");
+    }
+
+    #[test]
+    fn a_comic_family_is_the_comic_families_and_a_near_miss_is_not() {
+        // The condition the message branches on, on its own: ADR-017's two families, compared the
+        // way the exporter resolves a family (any ASCII case) and the way `is_generic_family`
+        // compares (trimmed). A near miss is not one of them — `Comic Neue Pro` and `Bangers
+        // Display` are other faces, and a generic family is a family the platform resolves.
+        for comic in [DIALOGUE_FAMILY, DISPLAY_FAMILY] {
+            assert!(is_comic_family(comic), "{comic}");
+            assert!(is_comic_family(&comic.to_uppercase()), "{comic} in another case");
+            assert!(is_comic_family(&format!("  {comic}  ")), "{comic} with whitespace");
+        }
+        for not_comic in ["", "  ", "Comic Neue Pro", "Bangers Display", "Comic Sans MS", FALLBACK_FAMILY, "sans-serif"] {
+            assert!(!is_comic_family(not_comic), "{not_comic:?} is not an ADR-017 comic face");
+        }
+    }
+
+    #[test]
+    fn the_families_craft_fonts_calls_comic_are_the_ones_this_condition_accepts() {
+        // ADR-017 names the two families here and `vectorcraft_text::craft_fonts::comic_fonts` selects
+        // the same two out of the build input, so the condition the message branches on is the same
+        // condition the fonts arrive by. The constants are this module's own, so that half always
+        // runs; the cross-check needs a craft-fonts build and is the half that would catch a third
+        // comic family added upstream without being added here.
+        for comic in [DIALOGUE_FAMILY, DISPLAY_FAMILY] {
+            assert!(is_comic_family(comic), "{comic}");
+        }
+        let from_the_build_input = vectorcraft_text::craft_fonts::comic_fonts();
+        if from_the_build_input.is_empty() {
+            eprintln!("skipped: built without craft-fonts (set CRAFT_FONTS_DIR to a craft-fonts checkout to run the cross-check)");
+        }
+        for font in from_the_build_input {
+            assert!(is_comic_family(font.family), "{} reaches a build as a comic face, so the message must treat it as one", font.family);
+        }
+    }
+
+    #[test]
+    fn a_face_is_sent_to_craft_fonts_only_when_that_is_where_it_belongs() {
+        // The message is a function of the face record, so it is built here rather than resolved:
+        // both branches then hold in a build with the comic faces embedded *and* in one without
+        // them, which is the pair of configurations the contract is stated over. `Comic Neue` is
+        // ADR-017's; `No Such Lettering Face` is a project's own, and no checkout of the comic faces
+        // ever carried it.
+        let message = |family: &str| {
+            let face = MissingFace {
+                family: family.to_string(),
+                style: BOLD.to_string(),
+                status: FontMatch::Missing,
+                resolved: Some((FALLBACK_FAMILY.to_string(), BOLD.to_string())),
+            };
+            missing_face_finding(&face, "lettering speech").message
+        };
+        let observed = |family: &str| format!("the lettering face {family} {BOLD} is not available (missing) and shows in {FALLBACK_FAMILY} {BOLD};");
+        for comic in [DIALOGUE_FAMILY, DISPLAY_FAMILY] {
+            let named = message(comic);
+            // Unchanged in the front half: the face, the status and what stands in.
+            assert!(named.starts_with(&observed(comic)), "{named}");
+            assert!(named.contains("shipped in craft-fonts"), "a comic face is one craft-fonts is where it belongs: {named}");
+        }
+        let own = message("No Such Lettering Face");
+        assert!(own.starts_with(&observed("No Such Lettering Face")), "{own}");
+        assert!(
+            own.contains(&format!("not one of ADR-017's comic faces ({DIALOGUE_FAMILY}, {DISPLAY_FAMILY})")),
+            "the condition is reported, not a cause: {own}"
+        );
+        assert!(!own.contains("CRAFT_FONTS"), "no build input is blamed for a face it never carried: {own}");
+        assert!(own.contains("installed"), "and the creator is sent to a fix that works: {own}");
+        assert_ne!(message(DIALOGUE_FAMILY), own, "the two cases are two messages, not one");
+    }
+
+    #[test]
+    fn the_message_names_no_cause_but_the_one_it_checked() {
+        // The old wording — "CRAFT_FONTS being empty is why they are looked for there" — was false
+        // for every face that is not one of the comic faces, and a creator follows it to the wrong
+        // fix. Neither branch asserts why a face is absent: the status carries the exporter's two
+        // shapes of absence (`missing`, `substitute`), and where the face comes from is said only
+        // where this module knows it.
+        for (family, belongs_in_craft_fonts) in [(DIALOGUE_FAMILY, true), ("No Such Lettering Face", false), (FALLBACK_FAMILY, false)] {
+            let face = MissingFace {
+                family: family.to_string(),
+                style: REGULAR.to_string(),
+                status: FontMatch::Style,
+                resolved: Some((family.to_string(), BOLD.to_string())),
+            };
+            let message = missing_face_finding(&face, "lettering speech").message;
+            assert!(!message.contains("empty"), "a build input's state is asserted, and it was never read: {message}");
+            assert!(!message.contains("is why"), "no cause is claimed without being checked: {message}");
+            assert_eq!(message.contains("shipped in craft-fonts"), belongs_in_craft_fonts, "{message}");
+            assert!(!message.contains("missing"), "the status is the family present and the style absent: {message}");
+        }
+    }
+
+    #[test]
+    fn the_contract_reports_the_face_that_was_asked_for_and_never_the_one_that_stands_in() {
+        // The contract at the level it is named. A face that cannot exist in any build — with the
+        // comic faces embedded or without them — is reported, and the report names the *requested*
+        // family and style. Those are exactly the two things a silent substitution replaces, so
+        // asserting on them is what makes a report about the substitute face red rather than merely
+        // different: `Comic Neue Bold` showing as `Source Sans 3 Regular` is the state this
+        // contract describes, and the state it must never describe as what the project asked for.
+        let db = FontDb::global();
+        let requested = Face::new("No Such Lettering Face", BOLD);
+        let findings = lettering_face_report(db, std::slice::from_ref(&requested), "lettering speech");
+        assert_eq!(findings.len(), 1, "{findings:?}");
+        let message = &findings[0].message;
+        assert!(message.contains("No Such Lettering Face Bold"), "{message}");
+        assert!(message.contains("missing"), "{message}");
+        assert!(message.contains(FALLBACK_FAMILY), "{message}");
+        assert_eq!(findings[0].subject, "lettering speech");
+        assert_eq!(findings[0].severity, vectorcraft_comic_model::Severity::Warning);
+        // The other half: a face that *is* available exactly reports nothing. The contract is about
+        // absent faces, not about reporting faces, so a report that fired on every face would be as
+        // useless as one that fired on none.
+        assert!(lettering_face_report(db, &[Face::new(FALLBACK_FAMILY, REGULAR)], "lettering speech").is_empty());
+    }
+
+    #[test]
+    fn the_family_present_style_absent_half_of_the_contract_is_reported_as_a_substitute_and_not_as_absence() {
+        // The exporter distinguishes "no such family" from "the family, but not this style" —
+        // `FontMatch::Missing` (`"missing"`) against `FontMatch::Style` (`"substitute"`), which the
+        // finding prints as the status — and a creator's fix differs: install the face, or ask for a
+        // style the family has. A bundled family with a style no file carries is the one way to pin
+        // that distinction in every build, `CRAFT_FONTS` present or absent.
+        let db = FontDb::global();
+        let requested = Face::new(FALLBACK_FAMILY, "No Such Weight 4f2a");
+        let missing = missing_faces(db, std::slice::from_ref(&requested));
+        assert_eq!(missing.len(), 1, "{missing:?}");
+        assert_eq!(missing[0].status, FontMatch::Style, "the family is present, so this is a style and not an absence");
+        let findings = lettering_face_report(db, std::slice::from_ref(&requested), "lettering speech");
+        assert_eq!(findings.len(), 1, "{findings:?}");
+        let message = &findings[0].message;
+        assert!(message.contains(FALLBACK_FAMILY), "{message}");
+        assert!(message.contains("No Such Weight 4f2a"), "{message}");
+        assert!(message.contains("substitute"), "the status printed is not the exporter's own string: {message}");
+        assert!(!message.contains("missing"), "the family is present, so this is a style and not an absence: {message}");
     }
 
     #[test]

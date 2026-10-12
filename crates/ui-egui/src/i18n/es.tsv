@@ -3871,12 +3871,15 @@ axis	Both	Ambos
 @msg	the PSD file is cut short	el archivo PSD está incompleto
 @msg	the PSD file's header is damaged	el encabezado del archivo PSD está dañado
 @msg	the PSD file's image data can't be read: {e}	no se pueden leer los datos de imagen del archivo PSD: {e}
+@msg	{cmd}: {what}, so {action} — a locked panel does not move, resize, take new artwork or go away. Unlock it with {remedy}, then retry	{cmd}: {what}, así que {action} — una viñeta bloqueada no se mueve, no cambia de tamaño, no recibe ilustración nueva ni desaparece. Desbloquéala con {remedy} y vuelve a intentarlo
 	Add Lettering	Agregar rotulación
 	Add Panel	Agregar viñeta
 	Apply Page Template	Aplicar plantilla de página
 	Comic	Cómic
 	Delete Page	Eliminar página
 	Delete Panel	Eliminar viñeta
+	Get Project Settings	Obtener ajustes del proyecto
+	Lock Panel	Bloquear viñeta
 	Move Panel	Mover viñeta
 	New Comic Page	Nueva página de cómic
 	New Comic Project	Nuevo proyecto de cómic
@@ -3888,6 +3891,7 @@ axis	Both	Ambos
 	Set Lettering Style	Definir el estilo de rotulación
 	Set Lettering Text	Definir el texto de rotulación
 	Set Panel Shot	Definir el plano de la viñeta
+	Set Project Settings	Definir ajustes del proyecto
 	Set Reading Order	Definir el orden de lectura
 	Update Dialogue	Actualizar diálogo
 	Validate Comic Project	Validar proyecto de cómic

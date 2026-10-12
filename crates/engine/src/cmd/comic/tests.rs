@@ -648,10 +648,10 @@ fn every_comic_command_refuses_a_malformed_call_without_panicking() {
     let lettering = balloon["lettering"].as_u64().expect("id");
     let dialogue = lettering_of(&s, lettering).dialogue_id.expect("a dialogue").0;
 
-    // The two commands with no required parameter: schema §12 lets extra keys through, so a junk
-    // call to them is *valid*, and the assertion for them is only that nothing panics. Every other
-    // command must refuse junk — and an empty call — with `BadParams` or a documented `Other`.
-    const NO_REQUIRED_PARAM: &[&str] = &["comic.project.save", "comic.project.validate"];
+    // The commands with no required parameter: schema §12 lets extra keys through, so a junk call to
+    // them is *valid*, and the assertion for them is only that nothing panics. Every other command
+    // must refuse junk — and an empty call — with `BadParams` or a documented `Other`.
+    const NO_REQUIRED_PARAM: &[&str] = &["comic.project.save", "comic.project.validate", "comic.project.settings.get"];
     let junk = json!({"page": "x", "panel": [], "lettering": null, "dialogue": -1, "asset": {}, "rect": "nope", "size": "big", "to": "later", "order": 3, "kind": 7, "text": 5});
     for spec in specs() {
         for (label, params) in [("junk", &junk), ("empty", &json!({}))] {
@@ -932,4 +932,429 @@ fn a_balloon_may_show_a_dialogue_owned_by_a_panel_on_another_page() {
     let refused = s.execute("comic.lettering.set_text", &json!({"lettering": far["lettering"], "text": "retyped"})).expect_err("set_text refuses");
     assert!(refused.to_string().contains("comic.dialogue.update"), "and the refusal names the verb that does reach it: {refused}");
     assert_eq!(dialogue_of(&s, dialogue).text, "C says, revised", "the refused call changed nothing");
+}
+
+// ---------- M2-L1: the subject spelling the dedupe key depends on ----------
+
+/// The `subject`s of a command's `findings` array.
+fn finding_subjects(out: &Value) -> Vec<String> {
+    out["findings"].as_array().expect("findings").iter().filter_map(|f| f["subject"].as_str().map(str::to_string)).collect()
+}
+
+/// The `message`s of a command's `findings` array.
+fn finding_messages(out: &Value) -> Vec<String> {
+    out["findings"].as_array().expect("findings").iter().filter_map(|f| f["message"].as_str().map(str::to_string)).collect()
+}
+
+/// **M2-L1.** A geometry fault must be spelled the way `comic-layout`'s `validate::page` spells it —
+/// `Panel(<id>)` — because `validate`'s own doc offers `(rule, subject)` as the key a caller running
+/// both validators deduplicates on, and two spellings for one fault make that dedupe silently
+/// double-report. The index form (`Panel[i]`) was also unresolvable: it indexed the *filtered*
+/// rectangle vector, so it was not even the page file's own index.
+///
+/// The test drives the case the criterion is about — a page resized until two panels nearly touch —
+/// and asserts that the command's finding and the validator's finding are **the same pair**, and that
+/// the subject names a panel the page really has. Under the old `Panel[0]` spelling both halves fail.
+#[test]
+fn a_geometry_finding_names_its_panel_the_way_the_validator_does() {
+    let (mut s, _root) = project("l1-subject");
+    let page = s.execute("comic.page.create", &json!({})).expect("comic.page.create")["page"].as_u64().expect("page id");
+    let left = panel_on(&mut s, page, [40.0, 40.0, 200.0, 300.0]);
+    let right = panel_on(&mut s, page, [242.0, 40.0, 200.0, 300.0]);
+    // 2pt apart, against the 6pt minimum: one warning, naming the *left* panel of the pair, because
+    // `faults` reports the first of the two it was given.
+    let resized = s.execute("comic.panel.resize", &json!({"panel": right, "width": 200.0, "height": 300.0})).expect("comic.panel.resize");
+    let subjects = finding_subjects(&resized);
+    assert_eq!(subjects.len(), 1, "one warning for one fault: {resized}");
+    assert_eq!(subjects[0], format!("Panel({left})"), "the subject is an id, not an index: {resized}");
+    assert!(!subjects[0].contains('['), "the index spelling is gone: {resized}");
+    let message = &finding_messages(&resized)[0];
+    assert!(message.contains(&format!("Panel({right})")), "and the message names the other panel by id too: {message}");
+
+    // The validator's finding for the same rectangles is the *same* `(rule, subject)` — which is what
+    // makes a caller's dedupe work — and it is about a panel the page really has.
+    let report = s.execute("comic.project.validate", &json!({})).expect("comic.project.validate");
+    let pair = report["findings"]
+        .as_array()
+        .expect("findings")
+        .iter()
+        .find(|f| f["subject"] == subjects[0].as_str())
+        .unwrap_or_else(|| panic!("no finding in validate shares the command's subject: {report}"));
+    assert_eq!(pair["rule"], Value::Null, "both are design §12.1 geometry checks, not a referential rule: {pair}");
+    assert!(pair["message"].as_str().is_some_and(|m| m.contains("2pt")), "{pair}");
+    let ids: Vec<u64> = open_comic(&s).bundle.pages[&vectorcraft_comic_model::PageId(page)].panels.iter().map(|p| p.id.0).collect();
+    assert!(ids.contains(&left), "the subject resolves to a panel of this page: {ids:?}");
+
+    // `comic.page.template.apply` reports the same kind of fault through the same helper.
+    let applied = s.execute("comic.page.template.apply", &json!({"page": page, "template": "two-tier"})).expect("a two-slot template");
+    for subject in finding_subjects(&applied).into_iter().chain(finding_subjects(&resized)) {
+        assert!(subject.starts_with("Panel(") && subject.ends_with(')'), "every geometry subject is `Panel(<id>)`: {subject}");
+    }
+}
+
+// ---------- the lock (§6.2): every row of the table in `panel.rs`'s module doc ----------
+
+/// The refusal a locked panel gets, asserted for content rather than for being *some* error: it must
+/// name the panel and the one command that clears the lock.
+fn assert_locked_refusal(err: &EngineError, panel: u64) {
+    let message = err.to_string();
+    assert!(message.contains("locked"), "the refusal says the panel is locked: {message}");
+    assert!(message.contains(&format!("panel {panel}")), "it names the panel: {message}");
+    assert!(message.contains("comic.panel.set_locked"), "and the command that clears the lock: {message}");
+}
+
+#[test]
+fn a_new_panel_is_unlocked_and_set_locked_is_the_way_in_and_out() {
+    let (mut s, _root) = project("lock-set");
+    let page = s.execute("comic.page.create", &json!({})).expect("comic.page.create")["page"].as_u64().expect("page id");
+    let panel = panel_on(&mut s, page, [40.0, 40.0, 200.0, 150.0]);
+    assert!(!panel_record(&s, panel).locked, "comic.panel.add creates an unlocked panel (§6.2) — nothing is protected until there is one");
+
+    let locked = s.execute("comic.panel.set_locked", &json!({"panel": panel, "locked": true})).expect("lock");
+    assert_eq!(locked["panel"].as_u64(), Some(panel));
+    assert_eq!(locked["page"].as_u64(), Some(page));
+    assert_eq!(locked["locked"].as_bool(), Some(true));
+    assert!(panel_record(&s, panel).locked);
+    s.execute("comic.panel.set_locked", &json!({"panel": panel, "locked": false})).expect("unlock");
+    assert!(!panel_record(&s, panel).locked);
+
+    assert!(bad_params(&s.execute("comic.panel.set_locked", &json!({"panel": panel})).expect_err("no `locked`")));
+    assert!(bad_params(&s.execute("comic.panel.set_locked", &json!({"panel": panel, "locked": "yes"})).expect_err("not a bool")));
+    assert!(s.execute("comic.panel.set_locked", &json!({"panel": 9999, "locked": true})).is_err(), "no such panel");
+}
+
+#[test]
+fn a_locked_panel_is_not_moved_resized_or_re_arted_and_the_refusal_acts_on_it() {
+    let (mut s, root) = project("lock-geom");
+    let page = s.execute("comic.page.create", &json!({})).expect("comic.page.create")["page"].as_u64().expect("page id");
+    let panel = panel_on(&mut s, page, [40.0, 40.0, 200.0, 150.0]);
+    let asset = add_asset(&mut s, &root);
+    s.execute("comic.panel.set_locked", &json!({"panel": panel, "locked": true})).expect("lock");
+
+    let frame = panel_record(&s, panel).frame_node_id;
+    let before = s.doc().expect("a document").doc.node(frame).and_then(|n| n.geometric_bounds()).expect("bounds");
+    let nodes = s.doc().expect("a document").doc.node_count();
+
+    assert_locked_refusal(&s.execute("comic.panel.move", &json!({"panel": panel, "dx": 50.0})).expect_err("move"), panel);
+    assert_locked_refusal(&s.execute("comic.panel.resize", &json!({"panel": panel, "width": 100.0})).expect_err("resize"), panel);
+    assert_locked_refusal(&s.execute("comic.panel.replace_art", &json!({"panel": panel, "asset": asset.0})).expect_err("artwork"), panel);
+
+    // The refusals are refusals, not half-applied edits: the frame is where it was, no object was
+    // placed or deleted, and nothing was recorded.
+    let after = s.doc().expect("a document").doc.node(frame).and_then(|n| n.geometric_bounds()).expect("bounds");
+    assert_eq!((before.x0, before.y0, before.width(), before.height()), (after.x0, after.y0, after.width(), after.height()));
+    assert_eq!(s.doc().expect("a document").doc.node_count(), nodes, "no object was added or removed");
+    assert!(panel_record(&s, panel).artwork_refs.is_empty(), "the artwork the refusal named was not recorded");
+}
+
+#[test]
+fn a_locked_panel_is_not_deleted_and_neither_is_its_page() {
+    let (mut s, _root) = project("lock-delete");
+    let page = s.execute("comic.page.create", &json!({})).expect("comic.page.create")["page"].as_u64().expect("page id");
+    let first = panel_on(&mut s, page, [40.0, 40.0, 200.0, 150.0]);
+    let second = panel_on(&mut s, page, [300.0, 40.0, 200.0, 150.0]);
+    s.execute("comic.panel.set_locked", &json!({"panel": second, "locked": true})).expect("lock the second");
+
+    assert_locked_refusal(&s.execute("comic.panel.delete", &json!({"panel": second})).expect_err("delete the locked panel"), second);
+    // `comic.page.delete` refuses on **any** locked panel of the page, and names it — the page is one
+    // command away from being deletable, which is what makes the refusal actionable.
+    assert_locked_refusal(&s.execute("comic.page.delete", &json!({"page": page})).expect_err("delete the page"), second);
+    assert!(
+        panel_record(&s, first).id.0 == first && open_comic(&s).bundle.pages.contains_key(&vectorcraft_comic_model::PageId(page)),
+        "nothing was deleted"
+    );
+    // The *unlocked* panel of the same page is still deletable: the lock is per panel.
+    s.execute("comic.panel.delete", &json!({"panel": first})).expect("the unlocked panel goes");
+}
+
+#[test]
+fn a_locked_panel_blocks_a_template_that_would_move_or_replace_it() {
+    let (mut s, _root) = project("lock-template");
+    let page = s.execute("comic.page.create", &json!({"template": "three-tier"})).expect("a templated page")["page"].as_u64().expect("page id");
+    let panel = open_comic(&s).bundle.pages[&vectorcraft_comic_model::PageId(page)].panels[0].id.0;
+    s.execute("comic.panel.set_locked", &json!({"panel": panel, "locked": true})).expect("lock one panel");
+
+    // "Refused" is not enough on its own: the re-lay path **moves every frame** and changes no
+    // membership, so a check that ran after the lay-out would still refuse *and* leave the page
+    // re-laid. The frame rectangles are therefore read before and after, so this pins "refused
+    // **before** anything was written" and not merely "refused".
+    let frame_rects = |s: &Session| -> Vec<(u64, [f64; 4])> {
+        open_comic(s).bundle.pages[&vectorcraft_comic_model::PageId(page)]
+            .panels
+            .iter()
+            .map(|p| {
+                let b = s.doc().expect("a document").doc.node(p.frame_node_id).and_then(|n| n.geometric_bounds()).expect("bounds");
+                (p.id.0, [b.x0, b.y0, b.width(), b.height()])
+            })
+            .collect()
+    };
+    let before = frame_rects(&s);
+    assert_eq!(before.len(), 3);
+
+    // The same-count path moves every frame, so it is refused…
+    assert_locked_refusal(&s.execute("comic.page.template.apply", &json!({"page": page, "template": "wide-top"})).expect_err("re-lay"), panel);
+    // …and `replace: true` deletes them, so it is refused too.
+    assert_locked_refusal(
+        &s.execute("comic.page.template.apply", &json!({"page": page, "template": "two-tier", "replace": true})).expect_err("replace"),
+        panel,
+    );
+    assert_eq!(open_comic(&s).bundle.pages[&vectorcraft_comic_model::PageId(page)].panels.len(), 3, "nothing was laid out or deleted");
+    assert_eq!(frame_rects(&s), before, "the refusal came before the write: a lay-out that ran first would have moved these frames");
+
+    // A lock on *another* page does not stop a page being laid out from scratch: there is no panel
+    // here to protect.
+    let fresh = s.execute("comic.page.create", &json!({})).expect("a second page")["page"].as_u64().expect("page id");
+    let applied = s.execute("comic.page.template.apply", &json!({"page": fresh, "template": "two-tier"})).expect("create-panels path");
+    assert_eq!(applied["panels"].as_array().map(Vec::len), Some(2));
+    assert!(applied["panels"].as_array().expect("panels").iter().all(|p| !panel_record(&s, p["panel"].as_u64().expect("id")).locked));
+}
+
+#[test]
+fn a_lock_does_not_stop_the_brief_the_words_or_the_narrative_order() {
+    let (mut s, _root) = project("lock-scope");
+    let page = s.execute("comic.page.create", &json!({})).expect("comic.page.create")["page"].as_u64().expect("page id");
+    let first = panel_on(&mut s, page, [40.0, 40.0, 200.0, 150.0]);
+    let second = panel_on(&mut s, page, [300.0, 40.0, 200.0, 150.0]);
+    s.execute("comic.panel.set_locked", &json!({"panel": first, "locked": true})).expect("lock");
+
+    // The brief: a lock covers the panel as drawn, not what a later job is asked to draw.
+    s.execute("comic.panel.set_shot", &json!({"panel": first, "shot": "a locked panel's brief"})).expect("set_shot");
+    assert_eq!(panel_record(&s, first).shot_description, "a locked panel's brief");
+    // The words: `comic.lettering.add` writes a balloon and a record of its own and moves no panel
+    // object, so the lock — which is asked in `comic.panel.move`'s direction — does not apply.
+    s.execute("comic.lettering.add", &json!({"page": page, "panel": first, "kind": "narration", "text": "caption", "at": [120.0, 100.0]}))
+        .expect("lettering.add on a locked panel");
+    // The narrative order: it is page state, not the panel's geometry or artwork. The panel's
+    // `reading_order_index` really does change, which is the point — a lock that froze it would make
+    // a locked panel unorderable.
+    let reversed = vec![second, first];
+    let out = s.execute("comic.reading_order.set", &json!({"page": page, "order": reversed})).expect("reading_order.set");
+    assert_eq!(out["reading_order"].as_array().map(|a| a.iter().filter_map(Value::as_u64).collect::<Vec<_>>()), Some(reversed.clone()));
+    assert_eq!(panel_record(&s, first).reading_order_index, 1, "the locked panel's index was renumbered like any other");
+    assert_eq!(panel_record(&s, second).reading_order_index, 0);
+    assert_eq!(open_comic(&s).bundle.pages[&vectorcraft_comic_model::PageId(page)].page.reading_order[0].0, second);
+    // And the geometry is exactly where it was: none of the three touched it.
+    let frame = panel_record(&s, first).frame_node_id;
+    let bounds = s.doc().expect("a document").doc.node(frame).and_then(|n| n.geometric_bounds()).expect("bounds");
+    assert_eq!((bounds.x0, bounds.y0), (40.0, 40.0), "the locked panel never moved: {bounds:?}");
+}
+
+#[test]
+fn unlocking_lets_the_refused_command_through() {
+    let (mut s, _root) = project("lock-remedy");
+    let page = s.execute("comic.page.create", &json!({})).expect("comic.page.create")["page"].as_u64().expect("page id");
+    let panel = panel_on(&mut s, page, [40.0, 40.0, 200.0, 150.0]);
+    s.execute("comic.panel.set_locked", &json!({"panel": panel, "locked": true})).expect("lock");
+    let refused = s.execute("comic.panel.move", &json!({"panel": panel, "dx": 10.0})).expect_err("refused while locked");
+    assert_locked_refusal(&refused, panel);
+    // The remedy the refusal names is the remedy that works, and it is one command.
+    s.execute("comic.panel.set_locked", &json!({"panel": panel, "locked": false})).expect("unlock");
+    s.execute("comic.panel.move", &json!({"panel": panel, "dx": 10.0})).expect("the same call now succeeds");
+    let frame = panel_record(&s, panel).frame_node_id;
+    let bounds = s.doc().expect("a document").doc.node(frame).and_then(|n| n.geometric_bounds()).expect("bounds");
+    assert!((bounds.x0 - 50.0).abs() < 1e-9, "{bounds:?}");
+}
+
+// ---------- M2-L2: the project's lettering face ----------
+
+#[test]
+fn the_projects_lettering_face_reaches_the_plan_the_record_and_the_missing_face_report() {
+    let (mut s, _root) = project("l2-face");
+    let page = s.execute("comic.page.create", &json!({})).expect("comic.page.create")["page"].as_u64().expect("page id");
+    let panel = panel_on(&mut s, page, [40.0, 40.0, 200.0, 150.0]);
+
+    // A project that names no face letters in the kind's own ADR-017 face.
+    let plain = s
+        .execute("comic.lettering.add", &json!({"page": page, "panel": panel, "kind": "speech", "text": "one", "at": [120.0, 100.0]}))
+        .expect("a balloon");
+    assert_eq!(lettering_of(&s, plain["lettering"].as_u64().expect("id")).text_layout_settings.font.as_deref(), Some("Comic Neue"));
+    // …and a sound effect in Bangers, so the pair below is about the *kind*, not about one constant.
+    let bang = s
+        .execute("comic.lettering.add", &json!({"page": page, "panel": panel, "kind": "sound_effect", "text": "BAM", "at": [120.0, 100.0]}))
+        .expect("a sound effect");
+    assert_eq!(lettering_of(&s, bang["lettering"].as_u64().expect("id")).text_layout_settings.font.as_deref(), Some("Bangers"));
+
+    // Now the project names a face. It must reach three places: the plan's report, the record the
+    // command writes, and (through both) the layout. A name no build can have makes the report
+    // discriminating with or without `CRAFT_FONTS`: if the setting were ignored the report would name
+    // `Bangers Regular` (or nothing, in a build that has it) and never this.
+    s.execute("comic.project.settings.set", &json!({"defaultLetteringStyle": "No Such Project Face"})).expect("name a face");
+    let out = s
+        .execute("comic.lettering.add", &json!({"page": page, "panel": panel, "kind": "sound_effect", "text": "POW", "at": [120.0, 100.0]}))
+        .expect("a sound effect in the project's face");
+    let messages = finding_messages(&out);
+    assert!(
+        messages.iter().any(|m| m.contains("No Such Project Face Regular")),
+        "the missing-face report names the project's face, family and kind style: {out}"
+    );
+    // …and the face it says is *missing* is the project's, not the kind's. This pins the clause that
+    // names the absent face rather than the absence of a word: the message legitimately *mentions*
+    // `Bangers` when the missing face is not one of ADR-017's comic faces, because it lists them
+    // (M2-L3, `comic-layout`'s `missing_face_finding`). The clause is what a silent substitution
+    // would change, and it is the same sentence in every wording of the trailing explanation.
+    assert!(
+        messages.iter().any(|m| m.contains("the lettering face No Such Project Face Regular is not available")),
+        "the report names the project's face as the one that is missing: {out}"
+    );
+    assert!(messages.iter().all(|m| !m.contains("the lettering face Bangers")), "the kind's default face is not what was asked for any more: {out}");
+    assert_eq!(
+        lettering_of(&s, out["lettering"].as_u64().expect("id")).text_layout_settings.font.as_deref(),
+        Some("No Such Project Face"),
+        "the record persists the project's face, so a later re-fit keeps it (schema §6.6)"
+    );
+    // The layout still ran — the CRAFT_FONTS-empty contract is *report and lay out*, never refuse —
+    // so the balloon has its frame, its text object and its words.
+    let record = lettering_of(&s, out["lettering"].as_u64().expect("id"));
+    assert!(s.doc().expect("a document").doc.node(record.frame_node_id).is_some(), "the frame exists");
+    assert!(s.doc().expect("a document").doc.node(record.text_node_id).is_some(), "the text object exists");
+    assert_eq!(text_of(&s, record.text_node_id.0), "POW");
+    // A re-fit reads the record, not the kind, so the face survives `set_text`.
+    s.execute("comic.lettering.set_text", &json!({"lettering": record.id.0, "text": "POW!"})).expect("set_text");
+    assert_eq!(lettering_of(&s, record.id.0).text_layout_settings.font.as_deref(), Some("No Such Project Face"));
+
+    // An explicit per-lettering `font` still wins: the setting is a default, not an override.
+    let own = s
+        .execute(
+            "comic.lettering.add",
+            &json!({"page": page, "panel": panel, "kind": "speech", "text": "mine", "style": {"font": "Some Other Face"}, "at": [120.0, 100.0]}),
+        )
+        .expect("a balloon with its own face");
+    assert_eq!(lettering_of(&s, own["lettering"].as_u64().expect("id")).text_layout_settings.font.as_deref(), Some("Some Other Face"));
+
+    // And clearing the setting restores the kind's faces.
+    s.execute("comic.project.settings.set", &json!({"defaultLetteringStyle": null})).expect("clear");
+    let back = s
+        .execute("comic.lettering.add", &json!({"page": page, "panel": panel, "kind": "sound_effect", "text": "ZAP", "at": [120.0, 100.0]}))
+        .expect("a sound effect again");
+    assert_eq!(lettering_of(&s, back["lettering"].as_u64().expect("id")).text_layout_settings.font.as_deref(), Some("Bangers"));
+}
+
+#[test]
+fn the_project_settings_are_settable_readable_and_independent() {
+    let (mut s, _root) = project("l2-settings");
+    let first = s.execute("comic.page.create", &json!({})).expect("comic.page.create");
+    assert_eq!(first["artboard_rect"][2].as_f64(), Some(612.0), "the create-time default page size");
+
+    let initial = s.execute("comic.project.settings.get", &json!({})).expect("settings.get");
+    assert_eq!(initial["default_lettering_style"], Value::Null, "a project created without a choice names no face");
+    assert_eq!(initial["default_template"], Value::Null);
+    assert_eq!(initial["default_page_size"]["width"].as_f64(), Some(612.0));
+
+    // Set one thing: the other two are left exactly as they were.
+    let set = s.execute("comic.project.settings.set", &json!({"defaultLetteringStyle": "My Comic Face"})).expect("settings.set");
+    assert_eq!(set["default_lettering_style"].as_str(), Some("My Comic Face"));
+    assert_eq!(set["default_page_size"]["height"].as_f64(), Some(792.0), "the omitted key was left alone");
+    assert_eq!(s.execute("comic.project.settings.get", &json!({})).expect("settings.get")["default_lettering_style"].as_str(), Some("My Comic Face"));
+
+    // The page size is read too: a new page with no `size` takes the new default, and the page
+    // already on disk now differs from it, which rule 15 reports.
+    s.execute("comic.project.settings.set", &json!({"defaultPageSize": [200.0, 300.0]})).expect("a new default size");
+    let second = s.execute("comic.page.create", &json!({})).expect("a page at the new default");
+    assert_eq!(second["artboard_rect"][2].as_f64(), Some(200.0), "comic.page.create reads default_page_size");
+    let report = s.execute("comic.project.validate", &json!({})).expect("comic.project.validate");
+    assert!(
+        report["findings"].as_array().expect("findings").iter().any(|f| f["rule"] == 15),
+        "rule 15 compares the first page's artboard against the new default: {report}"
+    );
+
+    // `null` clears, and a blank name is refused rather than silently meaning "no face".
+    s.execute("comic.project.settings.set", &json!({"defaultPageSize": null})).expect("clear the size");
+    assert_eq!(s.execute("comic.project.settings.get", &json!({})).expect("get")["default_page_size"], Value::Null);
+    assert!(bad_params(&s.execute("comic.project.settings.set", &json!({"defaultLetteringStyle": "   "})).expect_err("blank")));
+    assert!(bad_params(&s.execute("comic.project.settings.set", &json!({"defaultLetteringStyle": 5})).expect_err("not a name")));
+    assert!(bad_params(
+        &s.execute("comic.project.settings.set", &json!({"defaultPageSize": {"width": -1.0, "height": 10.0}})).expect_err("bad size")
+    ));
+    // A `set` that names nothing this command accepts is refused rather than answered with `Ok`:
+    // otherwise a mistyped key is reported as a change that was made. `default_template` is
+    // deliberately not among the keys (nothing reads it, M2-W3-F2) — and that is exactly the case
+    // this refusal is for.
+    assert!(bad_params(&s.execute("comic.project.settings.set", &json!({"defaultTemplate": "three-tier"})).expect_err("a key nothing reads")));
+    assert!(bad_params(&s.execute("comic.project.settings.set", &json!({})).expect_err("nothing to set")));
+}
+
+// ---------- W1's hand-off: the migration reaches the caller ----------
+
+/// Copy a directory tree — the v1 fixture is **read-only to this test**, because W1's fixture is
+/// checked in and byte-pinned, so every write happens in the copy.
+fn copy_tree(from: &std::path::Path, to: &std::path::Path) {
+    std::fs::create_dir_all(to).expect("create the destination");
+    for entry in std::fs::read_dir(from).expect("read the fixture").flatten() {
+        let (src, dst) = (entry.path(), to.join(entry.file_name()));
+        if src.is_dir() {
+            copy_tree(&src, &dst);
+        } else {
+            std::fs::copy(&src, &dst).expect("copy a file");
+        }
+    }
+}
+
+#[test]
+fn opening_an_older_bundle_reports_the_migration_and_a_save_retires_it() {
+    let v1 = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../comic-model/tests/fixtures/v1/minimal.comiccraft");
+    assert!(v1.join("manifest.json").is_file(), "W1's v1 fixture is the anchor for this");
+    let pinned = vectorcraft_comic_model::sha256_hex(&std::fs::read(v1.join("manifest.json")).expect("read the fixture manifest"));
+    let root = scratch("migration").join("v1-copy.comiccraft");
+    copy_tree(&v1, &root);
+
+    let mut s = Session::new();
+    let out = s.execute("comic.project.open", &json!({"path": root.to_string_lossy()})).expect("comic.project.open on a v1 bundle");
+    // §11: a migration is reported, as a **value** and not as a §14 finding.
+    let migrations = out["migrations"].as_array().expect("migrations");
+    assert_eq!(migrations.len(), 1, "a v1 bundle is read forward once: {out}");
+    assert_eq!(migrations[0]["from"].as_u64(), Some(1));
+    assert_eq!(migrations[0]["to"].as_u64(), Some(2));
+    assert!(migrations[0]["summary"].as_str().is_some_and(|s| s.contains("schema version 1 to 2")), "{out}");
+    assert!(migrations[0]["notes"].as_array().is_some_and(|a| !a.is_empty()), "a migration with nothing to report would be unobservable: {out}");
+    assert!(out["migrationsNote"].as_str().is_some_and(|s| s.contains("older, not inconsistent")), "{out}");
+    assert_eq!(out["findings"].as_array().map(Vec::len), Some(0), "a migrated bundle is older, not inconsistent: {out}");
+
+    // `comic.project.validate` mentions it too, and still not as a finding: the error count must not
+    // depend on the age of the file.
+    let report = s.execute("comic.project.validate", &json!({})).expect("comic.project.validate");
+    assert_eq!(report["migrations"].as_array().map(Vec::len), Some(1), "validate carries the load's migration: {report}");
+    assert_eq!(report["errors"].as_u64(), Some(0));
+
+    // A save writes this build's schema version, so the migration it reported is spent — and a later
+    // validate that still said "read forward" would be asserting a cause it has not checked.
+    s.execute("comic.project.save", &json!({})).expect("save the copy");
+    let after = s.execute("comic.project.validate", &json!({})).expect("comic.project.validate after the save");
+    assert_eq!(after["migrations"].as_array().map(Vec::len), Some(0), "the save retired it: {after}");
+    assert!(after["migrationsNote"].is_null());
+    let manifest: Value = serde_json::from_slice(&std::fs::read(root.join("manifest.json")).expect("the saved manifest")).expect("json");
+    assert_eq!(manifest["schema_version"].as_u64(), Some(u64::from(vectorcraft_comic_model::SCHEMA_VERSION)), "the copy is current now");
+    // Reopening the copy reports nothing to migrate, which is the other half of the same claim.
+    let mut again = Session::new();
+    let reopened = again.execute("comic.project.open", &json!({"path": root.to_string_lossy()})).expect("reopen the copy");
+    assert_eq!(reopened["migrations"].as_array().map(Vec::len), Some(0), "a current bundle is not a migration: {reopened}");
+
+    // The fixture itself was only ever read.
+    let after_hash = vectorcraft_comic_model::sha256_hex(&std::fs::read(v1.join("manifest.json")).expect("read the fixture manifest"));
+    assert_eq!(pinned, after_hash, "W1's v1 fixture is byte-stable: this test copied it instead of writing to it");
+}
+
+#[test]
+fn the_v1_fixtures_own_named_face_is_applied_to_a_lettering_on_it() {
+    // The same test as `the_projects_lettering_face_reaches…`, on a **real** project that names a
+    // face: W1's v1 fixture sets `default_lettering_style: "Comic Neue"`, and `sound_effect`'s kind
+    // default is `Bangers`, so the record says which one the code read.
+    let v1 = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../comic-model/tests/fixtures/v1/minimal.comiccraft");
+    let root = scratch("migration-face").join("v1-copy.comiccraft");
+    copy_tree(&v1, &root);
+    let mut s = Session::new();
+    s.execute("comic.project.open", &json!({"path": root.to_string_lossy()})).expect("comic.project.open");
+    assert_eq!(open_comic(&s).bundle.project.settings.default_lettering_style.as_deref(), Some("Comic Neue"));
+    let (page, panel) = {
+        let b = &open_comic(&s).bundle;
+        let (id, file) = b.pages.iter().next().expect("the fixture has a page");
+        (*id, file.panels[0].id)
+    };
+    let out = s
+        .execute("comic.lettering.add", &json!({"page": page.0, "panel": panel.0, "kind": "sound_effect", "text": "BAM"}))
+        .expect("a sound effect on the fixture's page");
+    assert_eq!(
+        lettering_of(&s, out["lettering"].as_u64().expect("id")).text_layout_settings.font.as_deref(),
+        Some("Comic Neue"),
+        "the project's named face, not the kind's Bangers: {out}"
+    );
 }

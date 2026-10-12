@@ -42,7 +42,7 @@ pub fn specs() -> Vec<CommandSpec> {
             "Delete Page",
             ["Window", "Comic"],
             None,
-            "{page: PageId, reuse?: [DialogueId…] dialogues to detach instead of delete, as comic.panel.delete} delete every panel of the page by the design §11.1 policy, drop the page from its scene, retire its artboard id in the manifest (never pruned: schema rule 17) and remove the artboard from the document → {page, artboard_id, removedNodes, deletedPanels, letteringDeleted, dialogueDeleted, dialogueDetached, assetsKept, jobsStillTargeting, deletion: {the same totals and their notes as one object}}. `letteringDeleted` is every balloon deleted with the page — including a balloon elsewhere that was showing a dialogue the page owned (a dialogue is deleted with its panel, and the balloons that showed it have no words of their own). One undo step",
+            "{page: PageId, reuse?: [DialogueId…] dialogues to detach instead of delete, as comic.panel.delete} delete every panel of the page by the design §11.1 policy, drop the page from its scene, retire its artboard id in the manifest (never pruned: schema rule 17) and remove the artboard from the document → {page, artboard_id, removedNodes, deletedPanels, letteringDeleted, dialogueDeleted, dialogueDetached, assetsKept, jobsStillTargeting, deletion: {the same totals and their notes as one object}}. `letteringDeleted` is every balloon deleted with the page — including a balloon elsewhere that was showing a dialogue the page owned (a dialogue is deleted with its panel, and the balloons that showed it have no words of their own). **Refused while any panel of the page is locked** (§6.2): this deletes them all, so one `comic.panel.set_locked {panel, locked: false}` per locked panel is the way through. One undo step",
             has_comic,
             delete
         ),
@@ -60,7 +60,7 @@ pub fn specs() -> Vec<CommandSpec> {
             "Apply Page Template",
             ["Window", "Comic"],
             None,
-            "{page: PageId, template: \"two-tier\"|\"three-tier\"|\"four-tier\"|\"wide-top\"|\"grid-<rows>x<columns>\", margin?: pt (18), gutter?: pt (12), replace?: false} lay the template out over the page's artboard. With no panels, one is created per slot; with the same count, the existing panels keep their ids and narrative index and their frames move to the template's rectangles, and the page's `reading_order` is left exactly as it is — this path renumbers nothing, so a gap stays a gap and stays reported (design §11.1: a gap is never a silent repair); a different count is refused unless replace is true, which deletes them first by the design §11.1 policy. Creating panels or replacing them does renumber, and there a page whose reading_order is not a permutation of its panels is **refused**, not repaired → {page, template, panels: [{panel, frame, index}], reading_order: [PanelId], findings: [geometry warnings]}. **The plan is validated before it is written** and a rejected plan writes nothing (design §8.1). One undo step",
+            "{page: PageId, template: \"two-tier\"|\"three-tier\"|\"four-tier\"|\"wide-top\"|\"grid-<rows>x<columns>\", margin?: pt (18), gutter?: pt (12), replace?: false} lay the template out over the page's artboard. With no panels, one is created per slot; with the same count, the existing panels keep their ids and narrative index and their frames move to the template's rectangles, and the page's `reading_order` is left exactly as it is — this path renumbers nothing, so a gap stays a gap and stays reported (design §11.1: a gap is never a silent repair); a different count is refused unless replace is true, which deletes them first by the design §11.1 policy. Creating panels or replacing them does renumber, and there a page whose reading_order is not a permutation of its panels is **refused**, not repaired → {page, template, panels: [{panel, frame, index}], reading_order: [PanelId], findings: [geometry warnings]}. **The plan is validated before it is written** and a rejected plan writes nothing (design §8.1). **Refused while any panel of the page is locked** (§6.2): every path touches every panel — with no panels it creates them, at the same count it moves every frame, and `replace: true` deletes them. One undo step",
             has_comic,
             template_apply
         ),
@@ -69,7 +69,7 @@ pub fn specs() -> Vec<CommandSpec> {
             "Set Reading Order",
             ["Window", "Comic"],
             None,
-            "{page: PageId, order: [PanelId…] every panel of the page exactly once, in the order they are read} write Page.reading_order and every Panel.reading_order_index in one step → {page, reading_order}. An order that is not a permutation of the page's panels is **refused**, not repaired (design §11.1). One undo step",
+            "{page: PageId, order: [PanelId…] every panel of the page exactly once, in the order they are read} write Page.reading_order and every Panel.reading_order_index in one step → {page, reading_order}. An order that is not a permutation of the page's panels is **refused**, not repaired (design §11.1). **A lock does not apply**: `Panel.locked` (§6.2) protects where a panel is and what it shows, and this writes the page's narrative order, which a locked panel has no claim on. One undo step",
             has_comic,
             reading_order_set
         ),
@@ -306,6 +306,10 @@ fn delete(s: &mut Session, p: &Value) -> Result<Value> {
     const C: &str = "comic.page.delete";
     let page = PageId(super::panel::raw_id(p, "page", C)?);
     let reuse = super::panel::dialogue_ids_param(p, "reuse", C)?;
+    let locked = super::panel::locked_on_page(&open(s)?.bundle, page);
+    if !locked.is_empty() {
+        return Err(super::panel::locked_refusal(C, "the page is not deleted", &locked));
+    }
     comic_edit(s, "Delete Page", |s| {
         let artboard_id = super::panel::artboard_of(s, page)?;
         // Every panel of the page, by the design §11.1 policy. The order is the page's, so the
@@ -481,6 +485,14 @@ pub(crate) fn apply_template(s: &mut Session, page: PageId, name: &str, margin: 
     let warnings: Vec<Value> = plan_findings.iter().map(finding_json).collect();
 
     let existing: Vec<PanelId> = page_file(&open(s)?.bundle, page)?.panels.iter().map(|p2| p2.id).collect();
+    // The lock (§6.2), before anything is written. **Every** path below touches every panel: the
+    // create path only runs on a page with no panels, the re-lay path moves each frame, and
+    // `replace: true` deletes them — so one check on the page's panels is the whole rule, and it is
+    // asked here rather than in one branch so a later branch cannot quietly skip it.
+    let locked = super::panel::locked_on_page(&open(s)?.bundle, page);
+    if !locked.is_empty() {
+        return Err(super::panel::locked_refusal(C, "the template is not applied", &locked));
+    }
     if !existing.is_empty() && existing.len() != plan.panels.len() && !replace {
         return Err(bad(
             C,
@@ -568,14 +580,13 @@ pub(crate) fn apply_template(s: &mut Session, page: PageId, name: &str, margin: 
         let page_rect = checked_page_rect(page, page_rect(s, page)?)?;
         let b = &open(s)?.bundle;
         let d = &s.doc()?.doc;
-        let rects: Vec<vectorcraft_comic_layout::PanelRect> =
-            page_file(b, page)?.panels.iter().filter_map(|p2| node_frame(d, p2.frame_node_id)).collect();
+        let rects: Vec<super::panel::LabeledFrame> = page_file(b, page)?
+            .panels
+            .iter()
+            .filter_map(|p2| node_frame(d, p2.frame_node_id).map(|rect| (format!("Panel({})", p2.id.0), rect)))
+            .collect();
         let mut all = warnings;
-        all.extend(
-            vectorcraft_comic_layout::validate::faults(page_rect, None, &rects, &vectorcraft_comic_layout::validate::Limits::default())
-                .iter()
-                .map(|f| finding_json(&f.describe(&|i| format!("Panel[{i}]")))),
-        );
+        all.extend(super::panel::geometry_findings(page_rect, &rects));
         all
     };
     let reading_order = reading_order_ids(page_file(&open(s)?.bundle, page)?);

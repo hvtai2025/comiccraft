@@ -58,6 +58,22 @@ Both sets are required.
 the reviewer never fixes production code** — findings go back to the owner with a minimal
 reproduction.
 
+### Land the tests before you write the record
+
+**Write the failing test file to disk and run it, then write the record.** A record is prose; a test is
+executable evidence, and only one of the two survives losing your session.
+
+This is not hypothetical. Two reviewers were cleared mid-task in M2 and left no records at all. One of
+them had already written `crates/comic-layout/tests/m2_w4_round1_reviewer.rs`, and running it later
+recovered **two findings that would otherwise have been lost silently** — including a defect introduced
+by the fix for a previous one. The other left six passing tests, which at least showed *what* it had
+cleared. **A lost record is a lost finding; a test file is not**, because whoever comes next can execute
+it.
+
+The corollary is about temporary files: a scratch script or probe is **not** evidence, so **do not leave
+one in `tests/`** — it would be committed as if it were a test. Delete it as part of writing the record,
+and say so.
+
 ## The review record
 
 Every change leaves one, at `docs/reviews/<milestone>-<owner>-<slug>.md`:

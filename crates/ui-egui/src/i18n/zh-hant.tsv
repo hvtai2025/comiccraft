@@ -3288,6 +3288,8 @@ axis	Both	兩者
 	Comic	漫畫
 	Delete Page	刪除頁面
 	Delete Panel	刪除分格
+	Get Project Settings	取得專案設定
+	Lock Panel	鎖定分格
 	Move Panel	移動分格
 	New Comic Page	新增漫畫頁面
 	New Comic Project	新增漫畫專案
@@ -3299,6 +3301,7 @@ axis	Both	兩者
 	Set Lettering Style	設定文字樣式
 	Set Lettering Text	設定文字內容
 	Set Panel Shot	設定分格鏡頭
+	Set Project Settings	變更專案設定
 	Set Reading Order	設定閱讀順序
 	Update Dialogue	更新對白
 	Validate Comic Project	驗證漫畫專案

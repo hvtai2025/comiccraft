@@ -1,0 +1,32 @@
+   Compiling vectorcraft-comic-model v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/comic-model)
+   Compiling vectorcraft-comic-layout v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/comic-layout)
+   Compiling vectorcraft-engine v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/engine)
+   Compiling vectorcraft-testkit v0.8.0 (/home/hvt/web/comiclab.io.vn/comiccraft/crates/testkit)
+    Finished `test` profile [optimized + debuginfo] target(s) in 14.72s
+     Running tests/comic_locking_r2.rs (target/debug/deps/comic_locking_r2-1490f95a6e3008d9)
+
+running 4 tests
+test r2_a_second_save_retires_the_revived_migration_again_and_the_file_never_goes_backwards ... after the second save: manifest v2, migrations=0, dirty=false
+ok
+test r2_an_undo_after_a_save_revives_the_migration_report_the_save_retired ... 1. open      : manifest v1, migrations=1, note="the bundle declared an older schema_version and was read forward to 2 (§2, §11); a migrated bundle is older, not inconsistent, so this is not a `finding`. Saving writes schema version 2"
+2. edit      : comic.page.create → page 21
+3. save      : manifest v2 (sha256 25dd8ab8a25665a3e031e5046f3c8b5f78fbe1ba95674563f0d79b39db6552b2)
+   validate  : migrations=0, note=null
+4. undo      : manifest v2 (sha256 25dd8ab8a25665a3e031e5046f3c8b5f78fbe1ba95674563f0d79b39db6552b2)
+   validate  : migrations=1, note="the bundle declared an older schema_version and was read forward to 2 (§2, §11); a migrated bundle is older, not inconsistent, so this is not a `finding`. Saving writes schema version 2"
+5. reopen    : migrations=0, note=null
+ok
+test r2_settings_set_stores_a_face_name_verbatim_while_every_reader_trims_it ... settings.get : "  Comic Neue  "
+applied      : the text object's family is "Comic Neue"
+plan         : text_layout={"align":"left","fitToFrame":false,"font":"Comic Neue","leading":12.6,"padding":5.0,"size":10.5,"tracking":0.0}
+record       : Lettering.text_layout_settings.font = "Comic Neue"
+ok
+test r2_the_rewind_reaches_the_loads_findings_and_nothing_reads_them_so_nothing_is_revived ... load         : 2 finding(s): [("story/styles.json", "`manifest.files` lists a file that is not in the bundle: the previous generation's manifest, read inside §10's save window (§14)"), ("story/styles.json", "the file is not in the bundle: it loaded as an empty collection, so the project opens and can be repaired (§14)")]
+OpenComic     : 2 finding(s) held
+edit         : comic.page.create → page 8
+validate     : 0 finding(s): []
+after undo   : OpenComic holds 2 finding(s), the load's are 2
+ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+

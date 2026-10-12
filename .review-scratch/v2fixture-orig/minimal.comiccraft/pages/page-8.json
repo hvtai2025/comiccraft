@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "page": {
+    "id": 8,
+    "chapter_id": 3,
+    "scene_ids": [
+      4
+    ],
+    "artboard_id": 1,
+    "page_number": 1,
+    "panel_ids": [
+      9,
+      10,
+      11
+    ],
+    "reading_order": [
+      9,
+      10,
+      11
+    ],
+    "status": "draft"
+  },
+  "panels": [
+    {
+      "id": 9,
+      "page_id": 8,
+      "artboard_id": 1,
+      "scene_id": 4,
+      "frame_node_id": 2,
+      "artwork_refs": [
+        {
+          "asset_id": 17,
+          "node_id": 13,
+          "role": "primary"
+        }
+      ],
+      "shot_description": "Wide shot of the rooftop at dawn.",
+      "dialogue_ids": [
+        12
+      ],
+      "lettering_ids": [
+        14
+      ],
+      "reading_order_index": 0,
+      "continuity_constraints": {
+        "characters": [
+          5
+        ],
+        "wardrobe": "red scarf",
+        "time_of_day": "dawn",
+        "callbacks": [],
+        "exceptions": [
+          "no scarf in the flashback"
+        ]
+      },
+      "generation_status": "none",
+      "locked": false
+    },
+    {
+      "id": 10,
+      "page_id": 8,
+      "artboard_id": 1,
+      "scene_id": 4,
+      "frame_node_id": 3,
+      "artwork_refs": [],
+      "shot_description": "Close on Ada, three-quarter.",
+      "dialogue_ids": [
+        13
+      ],
+      "lettering_ids": [
+        15
+      ],
+      "reading_order_index": 1,
+      "continuity_constraints": {
+        "characters": [
+          5
+        ],
+        "wardrobe": "red scarf",
+        "time_of_day": "dawn",
+        "callbacks": [],
+        "exceptions": []
+      },
+      "generation_status": "completed",
+      "locked": false
+    },
+    {
+      "id": 11,
+      "page_id": 8,
+      "artboard_id": 1,
+      "scene_id": 4,
+      "frame_node_id": 4,
+      "artwork_refs": [],
+      "shot_description": "Empty sky over the harbour.",
+      "dialogue_ids": [],
+      "lettering_ids": [
+        16
+      ],
+      "reading_order_index": 2,
+      "continuity_constraints": {
+        "characters": [],
+        "wardrobe": null,
+        "time_of_day": "dawn",
+        "callbacks": [],
+        "exceptions": []
+      },
+      "generation_status": "none",
+      "locked": false
+    }
+  ],
+  "dialogue": [
+    {
+      "id": 12,
+      "panel_id": 9,
+      "speaker_character_id": 5,
+      "text": "We open on the rooftop.",
+      "language": "en",
+      "reading_order_index": 0,
+      "approval_status": "approved"
+    },
+    {
+      "id": 13,
+      "panel_id": 10,
+      "speaker_character_id": 5,
+      "text": "It is quieter up here.",
+      "language": "en",
+      "reading_order_index": 0,
+      "approval_status": "pending"
+    }
+  ],
+  "lettering": [
+    {
+      "id": 14,
+      "page_id": 8,
+      "panel_id": 9,
+      "artboard_id": 1,
+      "kind": "speech",
+      "dialogue_id": 12,
+      "text": null,
+      "frame_node_id": 5,
+      "tail_node_id": 6,
+      "text_node_id": 7,
+      "text_layout_settings": {
+        "font": "Comic Neue",
+        "size": 12.0,
+        "leading": 14.4,
+        "tracking": 0.0,
+        "align": "center",
+        "padding": 4.0,
+        "fit_to_frame": true
+      },
+      "overflow_policy": "shrink"
+    },
+    {
+      "id": 15,
+      "page_id": 8,
+      "panel_id": 10,
+      "artboard_id": 1,
+      "kind": "speech",
+      "dialogue_id": 13,
+      "text": null,
+      "frame_node_id": 8,
+      "tail_node_id": 9,
+      "text_node_id": 10,
+      "text_layout_settings": {
+        "font": "Comic Neue",
+        "size": 12.0,
+        "leading": 14.4,
+        "tracking": 0.0,
+        "align": "center",
+        "padding": 4.0,
+        "fit_to_frame": true
+      },
+      "overflow_policy": "shrink"
+    },
+    {
+      "id": 16,
+      "page_id": 8,
+      "panel_id": 11,
+      "artboard_id": 1,
+      "kind": "narration",
+      "dialogue_id": null,
+      "text": "Three days earlier.",
+      "frame_node_id": 11,
+      "tail_node_id": null,
+      "text_node_id": 12,
+      "text_layout_settings": {
+        "font": "Comic Neue",
+        "size": 12.0,
+        "leading": 14.4,
+        "tracking": 0.0,
+        "align": "center",
+        "padding": 4.0,
+        "fit_to_frame": true
+      },
+      "overflow_policy": "warn"
+    }
+  ]
+}

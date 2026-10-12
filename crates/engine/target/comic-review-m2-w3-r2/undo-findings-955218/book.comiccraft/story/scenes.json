@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "scenes": [
+    {
+      "id": 5,
+      "chapter_id": 4,
+      "title": "Scene 1",
+      "synopsis": "",
+      "page_ids": [
+        6,
+        8
+      ],
+      "location_id": null,
+      "character_ids": [],
+      "order_index": 0,
+      "continuity_notes": ""
+    }
+  ]
+}

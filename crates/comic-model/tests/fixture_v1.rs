@@ -1,13 +1,23 @@
-//! The v1 fixture: the regression anchor for the whole M1 surface (schema §11.1).
+//! The v1 fixture: the migration anchor for the whole M1 surface (schema §11.1).
 //!
 //! `tests/fixtures/v1/minimal.comiccraft/` is a frozen bundle — 1 chapter, 1 scene, 1 page,
-//! 3 panels, 2 speech balloons, 1 caption, 1 linked asset and 1 job — and §11.1 requires it to
-//! **load, validate and round-trip byte-identically after a save, with ids unchanged**.
+//! 3 panels, 2 speech balloons, 1 caption, 1 linked asset and 1 job — and it is **byte-frozen**:
+//! the v2 bump (schema §6.2, `Panel.locked`) did not touch one byte of it. §11.1 requires a fixture
+//! for every previous version, and a schema bump that rewrote history would leave no way to test
+//! the migration at all.
 //!
-//! The round trip is the strongest statement this crate can make about §5.7's canonical form: a
-//! save is compared byte for byte against the committed fixture, so a change to field order, to
-//! number form, to the sorted-ness of a map, or to the trailing newline fails here rather than in
-//! a creator's bundle.
+//! What this file checks about it under **v2 code**:
+//!
+//! - it loads, its ids are unchanged, its unknown fields survive, and it validates clean;
+//! - it is migrated forward: every panel takes `locked: false`, and the load **reports** that
+//!   migration rather than doing it in the dark (§11);
+//! - a **load** writes nothing, so the frozen bytes on disk are exactly what M1 froze;
+//! - saving it produces `tests/fixtures/v2/minimal.comiccraft/` **byte for byte**, which is what
+//!   makes the v2 fixture a migrated v1 rather than a second hand-written copy;
+//! - a newer `schema_version` is refused, naming the version it needs (§2).
+//!
+//! The byte-identical round trip §11.1 requires now belongs to the fixture at the version this
+//! crate writes, and that is `tests/fixture_v2.rs`.
 //!
 //! `clippy.toml` allows panics in tests; an integration-test crate needs the file-level
 //! equivalent, because clippy only applies the `allow` to `#[cfg(test)]` modules.
@@ -25,12 +35,18 @@ use vectorcraft_comic_model::{
 use vectorcraft_geom::Rect;
 
 const FIXTURE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/v1/minimal.comiccraft");
+/// The same fixture read forward: the canonical form this build writes (§5.7, §11.1).
+const FIXTURE_V2: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/v2/minimal.comiccraft");
 
 /// The fixture's `manifest.updated`, which a save writes back, so the manifest's bytes do not move.
 const FIXTURE_UPDATED: &str = "2026-10-11T06:00:00Z";
 
 fn fixture_root() -> PathBuf {
     PathBuf::from(FIXTURE)
+}
+
+fn fixture_v2_root() -> PathBuf {
+    PathBuf::from(FIXTURE_V2)
 }
 
 /// A scratch directory under the target directory, so a test never writes outside the checkout.
@@ -118,6 +134,92 @@ fn the_fixture_is_the_bundle_the_schema_describes() {
 
     assert_eq!(loaded.findings, Vec::new(), "a frozen fixture has nothing to report");
     assert!(loaded.bundle.manifest.next_comic_id > loaded.bundle.highest_comic_id(), "the counter is ahead of every id");
+
+    // Read forward, not rewritten: the model is v2's shape, the bytes on disk are still v1's.
+    assert_eq!(loaded.bundle.manifest.schema_version, 1, "a load does not rewrite the version it read");
+    assert_eq!(loaded.migrations.len(), 1, "the migration is reported rather than done in the dark (§11)");
+    assert_eq!((loaded.migrations[0].from, loaded.migrations[0].to), (1, 2));
+    assert!(page.panels.iter().all(|panel| !panel.locked), "every v1 panel takes v2's default (§6.2)");
+}
+
+#[test]
+fn the_fixture_is_migrated_by_the_load_and_the_report_says_what_it_did() {
+    // §11: "Report incompatible data as a visible, actionable error" and, for a migration that
+    // succeeds, report what it did rather than acting silently. The report is a value on
+    // `LoadedBundle`, so a caller that never reads it has still been told.
+    let loaded = load(&fixture_root()).expect("the v1 fixture loads");
+    let migration = &loaded.migrations[0];
+    assert_eq!(migration.from, 1);
+    assert_eq!(migration.to, vectorcraft_comic_model::SCHEMA_VERSION);
+    assert!(
+        migration.notes.iter().any(|note| note.contains("Panel.locked") && note.contains("3 panels")),
+        "the report names the field v2 added and how many panels took it: {:?}",
+        migration.notes
+    );
+    // The `Display` form is what a caller logs; it must carry the whole report, not just the pair.
+    let rendered = migration.to_string();
+    assert!(rendered.contains("1") && rendered.contains("2") && rendered.contains("Panel.locked"), "{rendered}");
+
+    // The same project the v2 fixture holds: a migration preserves every stable id (§11), so the
+    // two fixtures must agree on all of them, and `retired_artboard_ids` is not an exception.
+    let read_forward = load(&fixture_v2_root()).expect("the v2 fixture loads");
+    assert_eq!(read_forward.bundle.highest_comic_id(), loaded.bundle.highest_comic_id());
+    assert_eq!(read_forward.bundle.next_comic_id(), loaded.bundle.next_comic_id());
+    assert_eq!(read_forward.bundle.manifest.bundle_id, loaded.bundle.manifest.bundle_id);
+    assert_eq!(read_forward.bundle.manifest.retired_artboard_ids, loaded.bundle.manifest.retired_artboard_ids);
+    assert_eq!(read_forward.bundle.pages.keys().collect::<Vec<_>>(), loaded.bundle.pages.keys().collect::<Vec<_>>(), "the page ids survive the bump");
+}
+
+#[test]
+fn a_v1_bundle_that_declares_locked_is_reported_rather_than_honoured_in_silence() {
+    // The one input v2's field default would silently *accept*. A v1 writer had no `locked` key, so
+    // a v1 bundle carrying one is a hand-edit (or a foreign tool); §11 says validate the input and
+    // refuse rather than guess, and §14 says refuse nothing short of an unparseable file — so the
+    // value is **preserved** and the migration says so. Silence here would be a lock nobody set
+    // appearing in a project, or a lock the creator set disappearing.
+    let root = scratch("fixture-v1-hand-edited-lock");
+    copy_tree(&fixture_root(), &root);
+    let page_path = root.join("pages/page-8.json");
+    let page = fs::read_to_string(&page_path).expect("readable");
+    let edited = page.replacen("\"generation_status\": \"none\"", "\"generation_status\": \"none\",\n      \"locked\": true", 1);
+    assert_ne!(page, edited, "the edit must land");
+    fs::write(&page_path, edited).expect("write");
+
+    let loaded = load(&root).expect("a hand-edited but parseable page file loads (§14)");
+    let panels = &loaded.bundle.pages.get(&PageId(8)).expect("page 8").panels;
+    assert!(panels.iter().any(|panel| panel.locked), "the declared value is preserved, not dropped");
+    assert_eq!(panels.iter().filter(|panel| panel.locked).count(), 1);
+
+    let migration = &loaded.migrations[0];
+    assert!(
+        migration.notes.iter().any(|note| note.contains("Panel(9)") && note.contains("locked")),
+        "the migration reports the key a v1 writer could not have written: {:?}",
+        migration.notes
+    );
+    assert!(migration.notes.iter().any(|note| note.contains("2 panels take")), "and counts the rest: {:?}", migration.notes);
+    fs::remove_dir_all(&root).ok();
+}
+
+#[test]
+fn a_save_leaves_the_in_memory_model_at_the_version_it_wrote() {
+    // §2: "the writer writes the version it implements", on every file that declares one (rule 3).
+    // The bytes are checked by the byte-for-byte test above; this is the other half, and the one a
+    // command layer feels — `comic.project.save` followed by `comic.project.validate` runs on the
+    // model it just saved, so a v2 manifest left over v1 page files in memory would report rule 3 on
+    // a project the same call had just written correctly.
+    let root = scratch("fixture-save-adopts-version");
+    copy_tree(&fixture_root(), &root);
+    let mut loaded = load(&root).expect("loads");
+    let options = vectorcraft_comic_model::SaveOptions { now: FIXTURE_UPDATED.to_string(), document: None };
+    save(&mut loaded.bundle, &root, &options).expect("saves");
+
+    for (file, version) in loaded.bundle.declared_versions() {
+        assert_eq!(version, vectorcraft_comic_model::SCHEMA_VERSION, "`{file}` still declares what it was read at");
+    }
+    let document = document_facts();
+    let findings = validate(&loaded.bundle, &ValidationInput { root: &root, document: &document, archive_root: None });
+    assert_eq!(findings, Vec::new(), "the model it just wrote must be consistent with itself: {findings:?}");
+    fs::remove_dir_all(&root).ok();
 }
 
 #[test]
@@ -130,48 +232,63 @@ fn the_fixture_validates_with_no_findings() {
 }
 
 #[test]
-fn the_fixture_round_trips_byte_identically() {
-    let root = scratch("fixture-round-trip");
+fn a_load_of_the_v1_fixture_writes_nothing() {
+    // The fixture is the one artifact that must not move: M1 froze it, and a schema bump that
+    // rewrote it would leave nothing to test the migration against (§11.1). A load reports; it
+    // does not save. This compares the source tree with itself around a load in a copy of it.
+    let before = tree(&fixture_root());
+    let root = scratch("fixture-load-writes-nothing");
+    copy_tree(&fixture_root(), &root);
+    let _loaded = load(&root).expect("the copy loads");
+    assert_eq!(tree(&root), before, "a load leaves the bundle's bytes exactly as it found them");
+    assert_eq!(tree(&fixture_root()), before, "and the checked-in fixture is never written to");
+    fs::remove_dir_all(&root).ok();
+}
+
+#[test]
+fn saving_the_v1_fixture_produces_the_v2_fixture_byte_for_byte() {
+    // The migration, proved by bytes rather than by assertion: the v2 fixture **is** this v1
+    // fixture read forward, so the two fixtures cannot drift apart, and the v1 → v2 step is
+    // exercised by every run of this test. §11.1's byte-identical round trip belongs to the
+    // fixture at the version this crate writes, which is `tests/fixture_v2.rs`.
+    let root = scratch("fixture-migrate-to-v2");
     copy_tree(&fixture_root(), &root);
 
     let mut loaded = load(&root).expect("the copy loads");
-    let before = loaded.bundle.clone();
-    let ids_before = (before.highest_comic_id(), before.next_comic_id());
+    let ids_before = (loaded.bundle.highest_comic_id(), loaded.bundle.next_comic_id());
     let options = vectorcraft_comic_model::SaveOptions { now: FIXTURE_UPDATED.to_string(), document: None };
     save(&mut loaded.bundle, &root, &options).expect("saves");
 
     assert_eq!((loaded.bundle.highest_comic_id(), loaded.bundle.next_comic_id()), ids_before, "a save preserves every id and the counter");
 
-    let expected = tree(&fixture_root());
+    let expected = tree(&fixture_v2_root());
     let actual = tree(&root);
-    assert_eq!(
-        actual.keys().collect::<Vec<_>>(),
-        expected.keys().collect::<Vec<_>>(),
-        "a save writes exactly the fixture's files — no extra, no missing"
-    );
+    assert_eq!(actual.keys().collect::<Vec<_>>(), expected.keys().collect::<Vec<_>>(), "a save writes exactly the v2 fixture's files");
     for (key, want) in &expected {
         let got = actual.get(key).expect("present");
-        assert_eq!(String::from_utf8_lossy(got), String::from_utf8_lossy(want), "`{key}` must round-trip byte-identically (§5.7, §11.1)");
+        assert_eq!(String::from_utf8_lossy(got), String::from_utf8_lossy(want), "`{key}` must match the v2 fixture byte for byte (§5.7)");
     }
     fs::remove_dir_all(&root).ok();
 }
 
 #[test]
-fn a_second_save_of_a_reloaded_bundle_is_a_fixed_point() {
+fn a_second_save_of_a_migrated_bundle_is_a_fixed_point() {
     // The strongest form of §11.1: save, reload, save again, and the bytes do not move. A writer
-    // whose canonical form was not idempotent would drift here even if it matched once.
+    // whose canonical form was not idempotent would drift here even if it matched once — and a
+    // migration that was re-applied on a v2 bundle would show up as exactly this drift.
     let root = scratch("fixture-fixed-point");
     copy_tree(&fixture_root(), &root);
     let options = vectorcraft_comic_model::SaveOptions { now: FIXTURE_UPDATED.to_string(), document: None };
 
     let mut loaded = load(&root).expect("loads");
-    save(&mut loaded.bundle, &root, &options).expect("first save");
+    save(&mut loaded.bundle, &root, &options).expect("first save, which migrates to v2");
     let once = tree(&root);
+    assert_eq!(once, tree(&fixture_v2_root()), "the first save is the v2 fixture");
 
     let mut again = load(&root).expect("reloads");
+    assert_eq!(again.migrations, Vec::new(), "a v2 bundle is not migrated again");
     save(&mut again.bundle, &root, &options).expect("second save");
     assert_eq!(tree(&root), once, "a save of a loaded bundle changes nothing");
-    assert_eq!(tree(&root), tree(&fixture_root()), "and matches the frozen fixture");
     fs::remove_dir_all(&root).ok();
 }
 
@@ -201,14 +318,39 @@ fn the_fixture_preserves_the_unknown_field_a_newer_build_wrote() {
 
 #[test]
 fn the_fixture_refuses_a_newer_schema_version() {
-    // §2: refuse, naming the required version, and never partially load.
+    // §2: refuse, naming the required version, and never partially load. The bump to v2 is what
+    // makes this testable at all — `SCHEMA_VERSION + 1` is a version no build implements.
     let root = scratch("fixture-newer-version");
     copy_tree(&fixture_root(), &root);
+    let newer = vectorcraft_comic_model::SCHEMA_VERSION + 1;
     let manifest = fs::read_to_string(root.join("manifest.json")).expect("readable");
-    fs::write(root.join("manifest.json"), manifest.replace("\"schema_version\": 1", "\"schema_version\": 2")).expect("write");
+    fs::write(root.join("manifest.json"), manifest.replace("\"schema_version\": 1", &format!("\"schema_version\": {newer}"))).expect("write");
     match load(&root) {
-        Err(vectorcraft_comic_model::Error::SchemaTooNew { found, supported }) => assert_eq!((found, supported), (2, 1)),
+        Err(vectorcraft_comic_model::Error::SchemaTooNew { found, supported }) => {
+            assert_eq!((found, supported), (newer, vectorcraft_comic_model::SCHEMA_VERSION));
+        }
         other => panic!("a newer bundle must be refused with the version it needs, got {other:?}"),
+    }
+    fs::remove_dir_all(&root).ok();
+}
+
+#[test]
+fn a_newer_version_declared_by_a_file_is_refused_rather_than_read_partially() {
+    // §2 again, one file down: "never partially load" is a claim about the bundle, and a page file
+    // that declares a version this build does not implement may mean something else by its keys.
+    // Rule 3 governs a file that declares an *older* version (it is read forward); a *newer* one is
+    // this refusal.
+    let root = scratch("fixture-newer-file-version");
+    copy_tree(&fixture_v2_root(), &root);
+    let page_path = root.join("pages/page-8.json");
+    let page = fs::read_to_string(&page_path).expect("readable");
+    fs::write(&page_path, page.replace("\"schema_version\": 2", "\"schema_version\": 3")).expect("write");
+    match load(&root) {
+        Err(vectorcraft_comic_model::Error::FileSchemaTooNew { path, found, supported }) => {
+            assert_eq!(path, page_path, "the refusal names the file that declares it");
+            assert_eq!((found, supported), (3, vectorcraft_comic_model::SCHEMA_VERSION));
+        }
+        other => panic!("a file declaring a newer version must be refused, got {other:?}"),
     }
     fs::remove_dir_all(&root).ok();
 }

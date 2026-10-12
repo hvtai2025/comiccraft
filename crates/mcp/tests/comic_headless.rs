@@ -111,8 +111,14 @@ fn prepare_linked_asset(root: &std::path::Path, id: u64) {
     let bytes = vectorcraft_format::base64_decode(PLATE_PNG).expect("the embedded png decodes");
     assert_eq!(bytes.len(), 75, "the constant is the 75-byte plate its sha256 below was measured on");
     std::fs::write(assets.join("plate.png"), &bytes).expect("the linked asset's file");
+    // Rule 3 requires every file that declares a `schema_version` to declare the manifest's, and
+    // this fixture is the writer's own job done by hand — so it takes the version from the bundle it
+    // is being written into instead of a literal a schema bump would leave stale (v2's migration
+    // changed nothing about the asset registry, but the *number* moved).
+    let manifest: Value = serde_json::from_slice(&std::fs::read(root.join("manifest.json")).expect("manifest.json")).expect("the manifest is JSON");
+    let schema_version = manifest["schema_version"].as_u64().expect("the manifest declares a schema_version");
     let index = json!({
-        "schema_version": 1,
+        "schema_version": schema_version,
         "assets": [{
             "id": id,
             "asset_type": "source",
@@ -175,13 +181,13 @@ fn acceptance_12_the_essential_operations_succeed_through_mcp_headless() {
 
     // ---------- the comic commands are discoverable, and honest about being disabled ----------
     let before = comic_ids(&mut s, next(), false);
-    assert_eq!(before.len(), 19, "nineteen comic.* commands over MCP: {before:?}");
+    assert_eq!(before.len(), 22, "twenty-two comic.* commands over MCP: {before:?}");
     assert!(before.iter().all(|c| c.starts_with("comic.")), "{before:?}");
     let none_enabled = comic_ids(&mut s, next(), true);
     assert_eq!(
         none_enabled,
         ["comic.project.create", "comic.project.open"],
-        "of the nineteen, only the two that open or create a project are enabled without one: {none_enabled:?}"
+        "of the twenty-two, only the two that open or create a project are enabled without one: {none_enabled:?}"
     );
     let refused = run_err(&mut s, next(), "comic.page.create", json!({}));
     assert!(refused.contains("no comic project open"), "the refusal names the way out: {refused}");
@@ -191,7 +197,7 @@ fn acceptance_12_the_essential_operations_succeed_through_mcp_headless() {
         run(&mut s, next(), "comic.project.create", json!({"path": root.to_string_lossy(), "title": "MCP book", "pageSize": [612.0, 792.0]}));
     assert_eq!(created["artboards"].as_u64(), Some(1), "a project open, and its document has an artboard");
     let enabled = comic_ids(&mut s, next(), true);
-    assert_eq!(enabled.len(), 19, "with a project open, all nineteen are enabled: {enabled:?}");
+    assert_eq!(enabled.len(), 22, "with a project open, all twenty-two are enabled: {enabled:?}");
 
     let one = run(&mut s, next(), "comic.page.create", json!({}))["page"].as_u64().expect("page 1");
     let two = run(&mut s, next(), "comic.page.create", json!({"size": [300.0, 400.0], "template": "two-tier"}))["page"].as_u64().expect("page 2");

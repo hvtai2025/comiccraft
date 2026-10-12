@@ -3510,6 +3510,8 @@ axis	Both	两者
 	Comic	漫画
 	Delete Page	删除页面
 	Delete Panel	删除分格
+	Get Project Settings	获取项目设置
+	Lock Panel	锁定分格
 	Move Panel	移动分格
 	New Comic Page	新建漫画页面
 	New Comic Project	新建漫画项目
@@ -3521,6 +3523,7 @@ axis	Both	两者
 	Set Lettering Style	设置文字样式
 	Set Lettering Text	设置文字内容
 	Set Panel Shot	设置分格镜头
+	Set Project Settings	更改项目设置
 	Set Reading Order	设置阅读顺序
 	Update Dialogue	更新对白
 	Validate Comic Project	验证漫画项目

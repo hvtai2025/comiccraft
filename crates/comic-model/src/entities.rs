@@ -718,6 +718,10 @@ pub struct Page {
 ///
 /// There is no `geometry_ref`: the frame object in the visual document owns the geometry, and the
 /// panel reaches it by `frame_node_id` (design §6.1).
+///
+/// `locked` is the one field v2 adds, and it is the **comic layer's** record of the creator's
+/// decision — not a copy of the document object's own `locked` (`crates/doc/src/node.rs:502`),
+/// which this crate cannot read (it is L2 and never parses the document). See §6.2.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Panel {
     /// The panel's id.
@@ -744,6 +748,14 @@ pub struct Panel {
     pub continuity_constraints: ContinuityConstraints,
     /// Whether the artwork has been generated.
     pub generation_status: GenerationStatus,
+    /// Whether the creator pinned this panel against the commands that move, resize or delete it
+    /// (§6.2, v2).
+    ///
+    /// `#[serde(default)]` is what lets a **v1** file, which has no such key, load as `false`
+    /// (§5.7: the reader accepts any valid JSON, and §11 migrates it forward). The writer always
+    /// emits it, so the canonical v2 form carries it on every panel.
+    #[serde(default)]
+    pub locked: bool,
     /// Unknown keys, preserved (§12).
     #[serde(flatten)]
     pub unknown: Unknown,

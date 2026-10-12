@@ -147,6 +147,9 @@ mod tests {
                 exceptions: Vec::new(),
             },
             generation_status: GenerationStatus::None,
+            // v2's one field (§6.2), at its default: this test builds a panel record to feed
+            // `narrative_order`/`reading_order` checks, and none of them reads a lock.
+            locked: false,
             unknown: Unknown::default(),
         }
     }

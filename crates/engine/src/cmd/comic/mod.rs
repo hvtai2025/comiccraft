@@ -77,7 +77,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use serde_json::{Value, json};
-use vectorcraft_comic_model::{ComicBundle, DialogueId, Finding, LetteringId, PageId, PanelId, Severity, Timestamp};
+use vectorcraft_comic_model::{ComicBundle, DialogueId, Finding, LetteringId, Migration, PageId, PanelId, Severity, Timestamp};
 use vectorcraft_doc::{Document, NodeId};
 use vectorcraft_geom::Rect;
 
@@ -105,13 +105,24 @@ pub struct OpenComic {
     /// What the last load or `comic.project.validate` reported. `Severity::Error` here never blocks
     /// a save — see the module doc.
     pub findings: Vec<Finding>,
+    /// What §11's migrations did when this project was **loaded**, in order — empty for a bundle
+    /// that already declares this build's `schema_version`.
+    ///
+    /// Held here rather than recomputed because it is a fact about *this session's load*: the model
+    /// has no record of having been read forward, and `comic-model` reports it as a value rather
+    /// than a §14 finding ("a migrated bundle is older, not inconsistent"). It is surfaced by
+    /// `comic.project.open` (where the creator learns about it) and by `comic.project.validate`
+    /// (while it is still true), and `comic.project.save` clears it, because a project that has
+    /// been written in this build's format is no longer one whose next save will write a different
+    /// one.
+    pub migrations: Vec<Migration>,
 }
 
 impl OpenComic {
     /// A project opened from `root`.
     #[must_use]
-    pub fn new(root: PathBuf, bundle: ComicBundle, findings: Vec<Finding>) -> Self {
-        Self { root, bundle, findings }
+    pub fn new(root: PathBuf, bundle: ComicBundle, findings: Vec<Finding>, migrations: Vec<Migration>) -> Self {
+        Self { root, bundle, findings, migrations }
     }
 }
 
@@ -371,6 +382,36 @@ pub(crate) fn finding_json(f: &Finding) -> Value {
 
 pub(crate) fn findings_json(fs: &[Finding]) -> Value {
     Value::Array(fs.iter().map(finding_json).collect())
+}
+
+/// What §11's migrations did, as JSON (W1's hand-off: `comic-model` reports them as a **value**, so
+/// a command has to carry them to the caller or nobody reads them).
+///
+/// The shape is the model's own record plus the sentence it already knows how to write: `from`/`to`
+/// is the version pair, `notes` is one actionable line per observable effect, and `summary` is
+/// [`Migration`]'s `Display`. It is deliberately **not** a `Finding`: a project read forward is
+/// older, not inconsistent, and filing it with the damage would make `comic.project.validate`'s
+/// error count depend on the age of the file rather than on its contents.
+pub(crate) fn migration_json(m: &Migration) -> Value {
+    json!({ "from": m.from, "to": m.to, "notes": m.notes, "summary": m.to_string() })
+}
+
+pub(crate) fn migrations_json(ms: &[Migration]) -> Value {
+    Value::Array(ms.iter().map(migration_json).collect())
+}
+
+/// The sentence that goes beside [`migrations_json`], or `null` when nothing was migrated — the
+/// house style for a note that exists to explain a non-empty list.
+pub(crate) fn migrations_note(ms: &[Migration]) -> Value {
+    if ms.is_empty() {
+        Value::Null
+    } else {
+        json!(format!(
+            "the bundle declared an older schema_version and was read forward to {} (§2, §11); a migrated bundle is older, not inconsistent, so this is not a `finding`. Saving writes schema version {}",
+            vectorcraft_comic_model::SCHEMA_VERSION,
+            vectorcraft_comic_model::SCHEMA_VERSION
+        ))
+    }
 }
 
 /// The order a page's panels are read in, as bare ids.

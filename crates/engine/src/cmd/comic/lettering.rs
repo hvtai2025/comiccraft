@@ -44,7 +44,7 @@ pub fn specs() -> Vec<CommandSpec> {
             "Add Lettering",
             ["Window", "Comic"],
             None,
-            "{page: PageId, panel: PanelId, kind: \"speech\"|\"thought\"|\"narration\"|\"shout\"|\"whisper\"|\"sound_effect\", text?: the words (for a spoken kind a new Dialogue record is made when `dialogue` is absent; required for narration and sound_effect), dialogue?: DialogueId (a spoken kind already saying something), at?: [x, y] the box's anchor (default: the panel frame's centre), tail?: [x, y] what a spoken kind points at (default: the frame's bottom centre), overflowPolicy?: \"warn\" (default)|\"shrink\"|\"resize_frame\", style?: {font?, size?, leading?, tracking?, align?, padding?}} plan the balloon or caption with comic-layout and write it as editable objects: the frame path (Lettering.frame_node_id), the tail path (tail_node_id) and an area text object (text_node_id), plus the Lettering record → {lettering, dialogue?, kind, frame, tail?, text_node, bounds, text_layout, findings: [the plan's reports, including a missing comic face]}. A `Dialogue` has **one owner**, the panel `Dialogue.panel_id` names (design §6.1): a balloon given another panel's `dialogue` shows that record's words without claiming it, so only the owner lists it in `Panel.dialogue_ids`. When `panel_id` names a panel that no longer exists — a dialogue `comic.panel.delete {reuse}` detached (§11.1) — **this panel adopts it**, which is the move the §11.1 row promises and the way back from the rule-1 Error. One undo step",
+            "{page: PageId, panel: PanelId, kind: \"speech\"|\"thought\"|\"narration\"|\"shout\"|\"whisper\"|\"sound_effect\", text?: the words (for a spoken kind a new Dialogue record is made when `dialogue` is absent; required for narration and sound_effect), dialogue?: DialogueId (a spoken kind already saying something), at?: [x, y] the box's anchor (default: the panel frame's centre), tail?: [x, y] what a spoken kind points at (default: the frame's bottom centre), overflowPolicy?: \"warn\" (default)|\"shrink\"|\"resize_frame\", style?: {font?, size?, leading?, tracking?, align?, padding?} (the face defaults to the kind's ADR-017 face, or to the family the project names in `default_lettering_style` — design §8.3, schema §5.3)} plan the balloon or caption with comic-layout and write it as editable objects: the frame path (Lettering.frame_node_id), the tail path (tail_node_id) and an area text object (text_node_id), plus the Lettering record → {lettering, dialogue?, kind, frame, tail?, text_node, bounds, text_layout, findings: [one report per face the plan asked for that is not available, naming the family, the style, the status and the face that stands in — the CRAFT_FONTS-empty contract]}. A lock does not apply here (§6.2): this adds a balloon of its own and moves no panel object. A `Dialogue` has **one owner**, the panel `Dialogue.panel_id` names (design §6.1): a balloon given another panel's `dialogue` shows that record's words without claiming it, so only the owner lists it in `Panel.dialogue_ids`. When `panel_id` names a panel that no longer exists — a dialogue `comic.panel.delete {reuse}` detached (§11.1) — **this panel adopts it**, which is the move the §11.1 row promises and the way back from the rule-1 Error. One undo step",
             has_comic,
             add
         ),
@@ -152,10 +152,36 @@ fn positive(o: &serde_json::Map<String, Value>, key: &str, cmd: &str) -> Result<
 
 // ---------- the style a record carries ----------
 
-/// The typography a `Lettering` record currently asks for, as a plan style: the kind's default with
-/// every setting the record states applied on top.
-fn style_from_record(l: &Lettering) -> LetteringStyle {
-    let mut style = style_of(l.kind);
+/// The family the project asks its lettering to be set in, if it names one (schema §5.3,
+/// design §8.3).
+///
+/// `ProjectSettings.default_lettering_style` is a **name**, and this is the reader that makes it
+/// mean something: before M2-L2 it was written by nothing and read by nothing, so a project's chosen
+/// face never reached a plan and §8.3's "the lettering then falls back with a missing-font report"
+/// was only ever about the *kind's* face. The name is read as the **family**; the style within it
+/// (Regular/Bold/Italic) stays the kind's, because a single string cannot carry a pair — a project
+/// that wants a different weight per kind says so on the record with `comic.lettering.set_style`.
+/// A blank or whitespace-only name is no name: `comic-layout` skips an empty family as "not a font".
+fn project_face(b: &ComicBundle) -> Option<String> {
+    let name = b.project.settings.default_lettering_style.as_ref()?.trim();
+    (!name.is_empty()).then(|| name.to_string())
+}
+
+/// The kind's default style, with the project's chosen face in place of the kind's default family.
+fn style_for_project(b: &ComicBundle, kind: LetteringKind) -> LetteringStyle {
+    let mut style = style_of(kind);
+    if let Some(face) = project_face(b) {
+        style.text.family = face;
+    }
+    style
+}
+
+/// The typography a `Lettering` record currently asks for, as a plan style: the kind's default (with
+/// the project's chosen face, when there is one) with every setting the record states applied on
+/// top. A record that states a `font` keeps it — the project's setting is a **default**, and the
+/// per-lettering `font` is what selects a face (schema §6.6).
+fn style_from_record(b: &ComicBundle, l: &Lettering) -> LetteringStyle {
+    let mut style = style_for_project(b, l.kind);
     let s = &l.text_layout_settings;
     if let Some(font) = &s.font {
         style.text.family = font.clone();
@@ -307,7 +333,9 @@ fn add(s: &mut Session, p: &Value) -> Result<Value> {
     let panel = PanelId(super::panel::raw_id(p, "panel", C)?);
     let kind = kind_param(p, C)?;
     let overflow = overflow_param(p, C)?;
-    let style = style_with_overrides(style_of(kind), p, C)?;
+    // The project's chosen face, when it names one (schema §5.3, design §8.3), then the call's own
+    // `style` overrides on top of it.
+    let style = style_with_overrides(style_for_project(&open(s)?.bundle, kind), p, C)?;
     let (artboard_id, frame) = {
         let b = &open(s)?.bundle;
         let (page_of_panel, index) = locate_panel(b, panel)?;
@@ -588,7 +616,7 @@ fn set_text(s: &mut Session, p: &Value) -> Result<Value> {
         let b = &open(s)?.bundle;
         let (page, index) = locate_lettering(b, lettering_id)?;
         let l = &page_file(b, page)?.lettering[index];
-        (l.kind, l.overflow_policy, style_from_record(l))
+        (l.kind, l.overflow_policy, style_from_record(b, l))
     };
     comic_edit(s, "Set Lettering Text", |s| {
         if kind.is_spoken() {
@@ -633,7 +661,7 @@ fn set_style(s: &mut Session, p: &Value) -> Result<Value> {
             Some(id) => b.pages.values().flat_map(|f| f.dialogue.iter()).find(|d| d.id == id).map(|d| d.text.clone()).unwrap_or_default(),
             None => l.text.clone().unwrap_or_default(),
         };
-        (l.overflow_policy, words, style_from_record(l), l.text_layout_settings.clone())
+        (l.overflow_policy, words, style_from_record(b, l), l.text_layout_settings.clone())
     };
     let policy = if p.get("overflowPolicy").is_some() { overflow_param(p, C)? } else { current_policy };
     if let Some(font) = str_param(p, "font") {

@@ -1,0 +1,32 @@
+{
+  "id": 2,
+  "schema_version": 2,
+  "title": "R2",
+  "metadata": {
+    "author": null,
+    "language": null,
+    "genre": null,
+    "reading_direction": "ltr",
+    "created": "2026-10-12T14:48:18Z",
+    "updated": "2026-10-12T14:48:18Z"
+  },
+  "chapter_ids": [
+    4
+  ],
+  "character_ids": [],
+  "location_ids": [],
+  "style_profile_ids": [],
+  "asset_registry_id": 3,
+  "settings": {
+    "default_page_size": {
+      "width": 612.0,
+      "height": 792.0
+    },
+    "default_template": null,
+    "default_lettering_style": null
+  },
+  "visual_document": {
+    "relative_path": "document/comic.vectorcraft",
+    "format_version": 4
+  }
+}

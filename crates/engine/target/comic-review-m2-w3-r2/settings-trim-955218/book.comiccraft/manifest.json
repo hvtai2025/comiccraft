@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "bundle_id": 1,
+  "comic_id": 2,
+  "title": "R2",
+  "next_comic_id": 6,
+  "retired_artboard_ids": [],
+  "document": {
+    "relative_path": "document/comic.vectorcraft",
+    "format_version": 4
+  },
+  "files": {
+    "assets/index.json": {
+      "sha256": "df4d72de9f41c3396ed77de821b704c853599a45ad3b5f105ba6822ff23f64a2",
+      "bytes": 42
+    },
+    "document/comic.vectorcraft": {
+      "sha256": "4c4d9c10fa2005e1eff972d1699296a3c9d7817ca910a8fa62b7785ee7eac28b",
+      "bytes": 21337
+    },
+    "project.json": {
+      "sha256": "5c4e8b421d60f68bfe6eec9dcd67ad2eab6175a6244c74f35973239da3143346",
+      "bytes": 641
+    },
+    "provenance/generations.json": {
+      "sha256": "c6053172bea80dd5636b1f1d4ef7c91662acb135346e244709c553f01e543ecb",
+      "bytes": 59
+    },
+    "story/chapters.json": {
+      "sha256": "6a20a538df38df88cfbf5afb4f4747bdcd54916ee519edf49d4533ded44edaf4",
+      "bytes": 188
+    },
+    "story/characters.json": {
+      "sha256": "3318f8f0910f163f009f290df919aede396afa2d3e572481f9e68d8fbd9818f0",
+      "bytes": 46
+    },
+    "story/locations.json": {
+      "sha256": "0a53fdc06782937724c67faab1f859c5eb860596db81cf1adb4e151a836ed3a6",
+      "bytes": 45
+    },
+    "story/scenes.json": {
+      "sha256": "c8ee5e5879bdc62a9a1cc6cc5978973073845b4ef502351bcd7d841e38c0b960",
+      "bytes": 272
+    },
+    "story/styles.json": {
+      "sha256": "3b536dc9b9888bad8729965b457a07ad74fe57504130e1c9751a84e664961310",
+      "bytes": 42
+    }
+  },
+  "created": "2026-10-12T14:48:18Z",
+  "updated": "2026-10-12T14:48:18Z",
+  "app": {
+    "name": "ComicCraft",
+    "version": "0.8.0",
+    "schema": 2
+  }
+}

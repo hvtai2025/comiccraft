@@ -3882,12 +3882,15 @@ axis	Both	Les deux
 @msg	the PSD file is cut short	le fichier PSD est tronqué
 @msg	the PSD file's header is damaged	l'en-tête du fichier PSD est endommagé
 @msg	the PSD file's image data can't be read: {e}	les données d'image du fichier PSD ne peuvent pas être lues : {e}
+@msg	{cmd}: {what}, so {action} — a locked panel does not move, resize, take new artwork or go away. Unlock it with {remedy}, then retry	{cmd} : {what}, donc {action} — une case verrouillée ne se déplace pas, ne se redimensionne pas, ne reçoit pas de nouvelle illustration et ne disparaît pas. Déverrouillez-la avec {remedy}, puis réessayez
 	Add Lettering	Ajouter un lettrage
 	Add Panel	Ajouter une case
 	Apply Page Template	Appliquer un modèle de page
 	Comic	Bande dessinée
 	Delete Page	Supprimer la page
 	Delete Panel	Supprimer la case
+	Get Project Settings	Obtenir les paramètres du projet
+	Lock Panel	Verrouiller la case
 	Move Panel	Déplacer la case
 	New Comic Page	Nouvelle page de BD
 	New Comic Project	Nouveau projet de BD
@@ -3899,6 +3902,7 @@ axis	Both	Les deux
 	Set Lettering Style	Définir le style de lettrage
 	Set Lettering Text	Définir le texte du lettrage
 	Set Panel Shot	Définir le plan de la case
+	Set Project Settings	Définir les paramètres du projet
 	Set Reading Order	Définir l’ordre de lecture
 	Update Dialogue	Mettre à jour le dialogue
 	Validate Comic Project	Valider le projet de BD

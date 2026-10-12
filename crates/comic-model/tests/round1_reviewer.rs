@@ -34,7 +34,11 @@ fn fixture_root() -> PathBuf {
 
 /// A scratch directory under the target directory, so a test never writes outside the checkout.
 fn scratch(name: &str) -> PathBuf {
-    let dir = Path::new(env!("CARGO_TARGET_TMPDIR")).join(name);
+    // The pid keeps two *concurrent* runs of this package (this workspace has several agents in it)
+    // from clobbering each other's `target/tmp/<name>`; the suite's fixed scratch names made a
+    // simultaneous run of one test binary fail spuriously (M2-T1: two runs of this file, each
+    // deleting the other's fixture copy mid-test — `copy: … NotFound`, `Missing { path: … }`).
+    let dir = Path::new(env!("CARGO_TARGET_TMPDIR")).join(format!("{name}-{}", std::process::id()));
     fs::remove_dir_all(&dir).ok();
     fs::create_dir_all(&dir).expect("scratch directory");
     dir
@@ -309,7 +313,7 @@ fn rule_9_reports_a_symlink_that_leaves_the_bundle() {
     // not." The unit test for `resolve_path` covers this; rule 9's own behaviour — the asset is
     // reported unresolved and the rest of the validation continues — is what a caller sees.
     let (root, mut bundle) = loaded_fixture("r1-symlink");
-    let outside = root.parent().expect("a parent").join("r1-symlink-outside.png");
+    let outside = root.parent().expect("a parent").join(format!("r1-symlink-outside-{}.png", std::process::id()));
     fs::write(&outside, b"secret").expect("outside file");
     std::os::unix::fs::symlink(&outside, root.join("assets/panels/link.png")).expect("symlink");
 

@@ -5,6 +5,11 @@
 //! the stale `artboard_id` that a non-comic command can resurrect, a reading-order gap that one
 //! renumbering path repairs silently, a `Dialogue` two panels come to own, a mid-operation failure's
 //! atomicity, and the two guarantees whose *plausible but wrong* implementation the brief asks for.
+//!
+//! **§10–§11 are M2 W3's round-1 probes** (a later round, added by the same reviewer who owns this
+//! file): the lock table in `panel.rs`'s module doc row by row, including the four rows that must
+//! **not** refuse, and the `(rule, subject)` dedupe key M2-L1 is about — both driven by calling the
+//! commands, not by reading them. The count pin in §7 is M2 W3's too: the comic surface grew 19 → 22.
 // Integration tests: unwrapping and panicking on failure is fine here, unlike in shipped code.
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
@@ -539,16 +544,22 @@ fn r1_a_failure_after_a_partial_change_restores_document_selection_and_model() {
 
 // ---------- 7. the claims the existing sweeps must be able to see ----------
 
-/// §3 of the implementation: `has_comic` gates all nineteen, so a comic id is `Disabled` — never
+/// §3 of the implementation: `has_comic` gates all twenty-two, so a comic id is `Disabled` — never
 /// `Ok(Err(NoDocument))` — in a session with no document and in one with a plain document.
 #[test]
 fn r1_every_comic_command_is_disabled_without_a_project() {
     let ids: Vec<&str> = vectorcraft_engine::command_specs().iter().filter(|c| c.id.starts_with("comic.")).map(|c| c.id).collect();
-    assert_eq!(ids.len(), 19, "the surface is nineteen commands: {ids:?}");
+    // Pinned, not derived, and deliberately so: `assert_eq!(ids.len(), comic_ids().len())` would be
+    // `len == len` and would let a new `comic.*` command slip in uncatalogued. The number is the
+    // *catalog obligation* — every comic label needs a row in each menu-complete language, which
+    // `i18n::tests::complete_languages_translate_every_menu_string` enforces — so growing the surface
+    // must be a conscious edit to this line. M1 shipped 19; M2's W3 added `comic.panel.set_locked`,
+    // `comic.project.settings.get` and `comic.project.settings.set`.
+    assert_eq!(ids.len(), 22, "the surface is twenty-two commands: {ids:?}");
 
-    // Two of the nineteen are deliberately `always`-gated (`create` and `open` — a project has to
-    // start somewhere), which is a justifiable deviation from the report's "one predicate gates all
-    // nineteen". Neither may ever report `NoDocument`.
+    // Two of the twenty-two are deliberately `always`-gated (`create` and `open` — a project has to
+    // start somewhere), which is a justifiable deviation from the M1 report's *"one predicate gates
+    // all nineteen"* (M1 shipped nineteen; see the count below). Neither may ever report `NoDocument`.
     const ALWAYS: [&str; 2] = ["comic.project.create", "comic.project.open"];
     let mut empty = Session::new();
     for id in &ids {
@@ -713,4 +724,177 @@ fn r1_a_comic_only_edit_counts_as_unsaved_work() {
 
     s.execute("comic.reading_order.set", &json!({"page": page, "order": [panel]})).unwrap_or_else(|e| panic!("{e}"));
     assert!(s.doc().expect("a document").is_dirty(), "FAIL: a reading-order-only change is likewise invisible");
+}
+
+// ---------- 10. M2 W3: the lock table, row by row (design §6.2, schema §5.6) ----------
+
+/// The refusal a locked panel gets, asserted for **content**: it must say the panel is locked, name
+/// the panel, and name the one command that clears the lock. A command that refuses with a bare
+/// `Other("locked")` would pass "it is refused" and fail a creator.
+fn refused_by_the_lock(s: &mut Session, id: &str, params: Value, panel: u64) {
+    let err = match s.execute(id, &params) {
+        Ok(v) => panic!("{id} must be refused by the lock, but it returned {v}"),
+        Err(e) => e,
+    };
+    let message = err.to_string();
+    assert!(message.contains("locked"), "{id}: the refusal must say why: {message}");
+    assert!(message.contains(&format!("panel {panel}")), "{id}: it must name the locked panel: {message}");
+    assert!(message.contains("comic.panel.set_locked"), "{id}: and the one command that clears it: {message}");
+}
+
+fn frame_rect(s: &Session, panel: u64) -> [f64; 4] {
+    let frame = panel_record(s, panel).frame_node_id;
+    let b = s.doc().expect("a document").doc.node(frame).and_then(|n| n.geometric_bounds()).expect("the frame has geometry");
+    [b.x0, b.y0, b.width(), b.height()]
+}
+
+/// **All ten rows of the table in `crates/engine/src/cmd/comic/panel.rs`'s module doc, driven.**
+///
+/// M2 §5's risk is *"`locked` honoured in some commands and not others"* — a policy stated in one
+/// place and applied in three of five. The question is therefore not "does `move` refuse?" but
+/// *"does each command behave exactly as the table says"*, and **six of the ten rows are negatives**:
+/// four commands the lock must not touch at all, plus the two-page granularity that says a lock on
+/// one panel must not stop a *neighbour*. A wrong implementation that applied the policy one command
+/// too widely — the mirror image of the M1 §11.1 defect — passes every positive row here.
+///
+/// `comic.panel.add` is the row the implementer recorded as **claim only** (no test added a panel to
+/// a page that already holds a locked one); it is driven here, because "the page grows" is exactly
+/// what an over-applied lock would stop.
+#[test]
+fn r1_the_lock_table_holds_row_by_row_including_the_rows_that_must_not_refuse() {
+    let (mut s, root) = project("w3-lock-table");
+    let page = page_of(&mut s);
+    let locked = panel_on(&mut s, page, [40.0, 40.0, 200.0, 150.0]);
+    let free = panel_on(&mut s, page, [300.0, 40.0, 200.0, 150.0]);
+    let asset = add_asset(&mut s, &root, "assets/panels/table.png");
+    s.execute("comic.panel.set_locked", &json!({"panel": locked, "locked": true})).expect("lock one panel");
+
+    let locked_rect = frame_rect(&s, locked);
+    let free_rect = frame_rect(&s, free);
+    let nodes = doc(&s).node_count();
+
+    // --- the rows that refuse. `move`/`resize`/`replace_art`/`delete` on the locked panel only. ---
+    refused_by_the_lock(&mut s, "comic.panel.move", json!({"panel": locked, "dx": 25.0}), locked);
+    refused_by_the_lock(&mut s, "comic.panel.resize", json!({"panel": locked, "width": 90.0}), locked);
+    refused_by_the_lock(&mut s, "comic.panel.replace_art", json!({"panel": locked, "asset": asset}), locked);
+    refused_by_the_lock(&mut s, "comic.panel.delete", json!({"panel": locked}), locked);
+    // `comic.page.delete` deletes every panel of the page by the §11.1 policy, so **any** locked
+    // panel refuses it — and the refusal names *that* panel, not the first one.
+    refused_by_the_lock(&mut s, "comic.page.delete", json!({"page": page}), locked);
+    // `comic.page.template.apply` has three paths that all touch every panel (create, re-lay,
+    // replace); every one of them is refused on this page.
+    refused_by_the_lock(&mut s, "comic.page.template.apply", json!({"page": page, "template": "wide-top"}), locked);
+    refused_by_the_lock(&mut s, "comic.page.template.apply", json!({"page": page, "template": "two-tier", "replace": true}), locked);
+
+    // A refusal is a refusal and not a half-applied edit: nothing moved, nothing was placed or
+    // dropped, and no artwork was recorded.
+    assert_eq!(frame_rect(&s, locked), locked_rect, "the locked panel's frame never moved");
+    assert_eq!(doc(&s).node_count(), nodes, "no object was added or removed by a refusal");
+    assert!(panel_record(&s, locked).artwork_refs.is_empty(), "the artwork the refusal named was not recorded");
+    assert_eq!(open_comic(&s).bundle.pages[&vectorcraft_comic_model::PageId(page)].panels.len(), 2, "nothing was deleted");
+
+    // --- the granularity row: the lock is **per panel**, so the *unlocked* neighbour is untouched
+    // by it. A `move`/`resize`/`replace_art`/`delete` that consulted the page instead of the panel
+    // would refuse these, and that is the over-application M1 §11.1's shape predicts. ---
+    s.execute("comic.panel.move", &json!({"panel": free, "dx": 25.0})).expect("the unlocked panel still moves");
+    assert_eq!(frame_rect(&s, free), [free_rect[0] + 25.0, free_rect[1], free_rect[2], free_rect[3]], "and it moved");
+    assert_eq!(frame_rect(&s, locked), locked_rect, "while its locked neighbour did not");
+    s.execute("comic.panel.resize", &json!({"panel": free, "width": 120.0})).expect("the unlocked panel still resizes");
+    s.execute("comic.panel.replace_art", &json!({"panel": free, "asset": asset})).expect("the unlocked panel still takes artwork");
+
+    // --- the four rows the lock must **not** touch ---
+    // 1. the brief: no geometry, no object, no artwork — a lock covers the panel as drawn.
+    s.execute("comic.panel.set_shot", &json!({"panel": locked, "shot": "a locked panel's brief"})).expect("set_shot on a locked panel");
+    assert_eq!(panel_record(&s, locked).shot_description, "a locked panel's brief");
+    // 2. the words: a balloon of its own, moving no panel object.
+    s.execute("comic.lettering.add", &json!({"page": page, "panel": locked, "kind": "narration", "text": "caption", "at": [120.0, 100.0]}))
+        .expect("lettering.add on a locked panel");
+    // 3. the narrative order: page state, not the panel's geometry.
+    let order = vec![free, locked];
+    let out = s.execute("comic.reading_order.set", &json!({"page": page, "order": order})).expect("reading_order.set with a locked panel");
+    assert_eq!(out["reading_order"].as_array().map(|a| a.iter().filter_map(Value::as_u64).collect::<Vec<_>>()), Some(order));
+    assert_eq!(panel_record(&s, locked).reading_order_index, 1, "the locked panel really was renumbered");
+    // 4. `comic.panel.add`: a page grows, and the panel it adds is **created unlocked** — this is the
+    // row the implementer recorded as claim only.
+    let grown = panel_on(&mut s, page, [40.0, 250.0, 200.0, 150.0]);
+    assert!(!panel_record(&s, grown).locked, "comic.panel.add creates an unlocked panel even on a page that holds a locked one");
+    assert_eq!(open_comic(&s).bundle.pages[&vectorcraft_comic_model::PageId(page)].panels.len(), 3, "the page grew");
+    // …and the unlocked panel the table calls deletable really is deletable while its neighbour is
+    // locked — which is what makes the refusal *per panel* rather than per page.
+    s.execute("comic.panel.delete", &json!({"panel": free})).expect("the unlocked panel is still deletable");
+    s.execute("comic.panel.delete", &json!({"panel": grown})).expect("so is the one just added");
+
+    // And the lock survived all of it: the remedy is still one command away.
+    assert!(panel_record(&s, locked).locked);
+    assert_eq!(frame_rect(&s, locked), locked_rect, "none of the ten rows moved it");
+}
+
+/// The lock's own command is **never** refused — a remedy the lock blocked would be a dead end —
+/// and a panel that does not exist stays the *other* refusal, so the two are still distinguishable.
+#[test]
+fn r1_set_locked_is_never_itself_refused_and_a_missing_panel_is_not_a_lock_error() {
+    let (mut s, _root) = project("w3-lock-remedy");
+    let page = page_of(&mut s);
+    let panel = panel_on(&mut s, page, [40.0, 40.0, 200.0, 150.0]);
+    s.execute("comic.panel.set_locked", &json!({"panel": panel, "locked": true})).expect("lock");
+    // Locking an already-locked panel is accepted and is idempotent, not a refusal.
+    s.execute("comic.panel.set_locked", &json!({"panel": panel, "locked": true})).expect("lock again while locked");
+    assert!(panel_record(&s, panel).locked);
+    s.execute("comic.panel.set_locked", &json!({"panel": panel, "locked": false})).expect("unlock while locked");
+    assert!(!panel_record(&s, panel).locked);
+
+    // A panel that does not exist is **not** "locked": the lock's answer must not swallow the
+    // ordinary "no such panel", or a caller is told to clear a lock on a panel that is not there.
+    let missing = s.execute("comic.panel.set_locked", &json!({"panel": 9999, "locked": true})).expect_err("no such panel");
+    let message = missing.to_string();
+    assert!(!message.contains("is locked"), "a missing panel is not a locked one: {message}");
+    let moved = s.execute("comic.panel.move", &json!({"panel": 9999, "dx": 1.0})).expect_err("no such panel");
+    assert!(!moved.to_string().contains("is locked"), "and `move` says the same: {moved}");
+}
+
+// ---------- 11. M2 W3 / M2-L1: the `(rule, subject)` dedupe key, exercised ----------
+
+/// **The dedupe key, by calling both validators and deduplicating.**
+///
+/// `comic-layout`'s `validate::page` documents `(rule, subject)` as the key a caller running it
+/// beside `comic-model`'s validator deduplicates on, and `comic.project.validate` itself dedupes on
+/// that pair. M2-L1 was that this crate's *commands* spelled the same geometry fault `Panel[i]` — an
+/// index into a **filtered** rectangle vector — while both validators spell it `Panel(<id>)`, so a
+/// caller merging a command's warnings with `comic.project.validate`'s would report one fault twice.
+///
+/// So the test does exactly that merge and asserts the union has no more keys than the validator
+/// alone: under the old spelling the command's key is `Panel[0]`-shaped and the union is strictly
+/// larger. Reading the two spellings side by side does not test this; the union does.
+#[test]
+fn r1_a_geometry_fault_has_one_key_whether_the_command_or_the_validator_reports_it() {
+    let (mut s, _root) = project("w3-dedupe");
+    let page = page_of(&mut s);
+    let left = panel_on(&mut s, page, [40.0, 40.0, 200.0, 300.0]);
+    let right = panel_on(&mut s, page, [242.0, 40.0, 200.0, 300.0]);
+    // 2pt apart against the 6pt minimum `Limits::default()` uses, so `faults` reports it — the same
+    // arrangement the implementer's own L1 test drives.
+    let resized = s.execute("comic.panel.resize", &json!({"panel": right, "width": 200.0, "height": 300.0})).expect("comic.panel.resize");
+    let report = validate(&mut s);
+
+    // `rule` is `null` for the geometry half (`comic-layout`'s §12.1 findings carry no schema
+    // rule) and a number for the model's, so the key is `(rule, subject)` with the absent rule as
+    // `None` — the same pair `comic.project.validate` dedupes on.
+    let key = |f: &Value| (f["rule"].as_u64(), f["subject"].as_str().unwrap_or_default().to_string());
+    let command: std::collections::BTreeSet<(Option<u64>, String)> = resized["findings"].as_array().expect("findings").iter().map(key).collect();
+    let validator: std::collections::BTreeSet<(Option<u64>, String)> = report["findings"].as_array().expect("findings").iter().map(key).collect();
+
+    assert!(!command.is_empty(), "the arrangement is a fault, so the command reports it: {resized}");
+    assert!(command.iter().all(|(_, subject)| subject.starts_with("Panel(")), "a geometry subject is `Panel(<id>)`, never `Panel[<i>]`: {command:?}");
+    assert!(
+        command.iter().all(|(_, subject)| subject.contains(&format!("Panel({left})")) || subject.contains(&format!("Panel({right})"))),
+        "and it names a panel this page really has: {command:?}"
+    );
+
+    let unmatched: Vec<&(Option<u64>, String)> = command.difference(&validator).collect();
+    assert!(
+        unmatched.is_empty(),
+        "FAIL: M2-L1 — the command and `comic.project.validate` spell the same fault differently, so a caller \
+         deduplicating on `(rule, subject)` reports it twice: the command's {unmatched:?} appear in no validator finding"
+    );
+    assert_eq!(command.union(&validator).count(), validator.len(), "the union adds no key of its own: one fault, one key");
 }

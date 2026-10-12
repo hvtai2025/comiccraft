@@ -351,7 +351,7 @@ fn validate_point(field: &'static str, at: Point) -> Result<(), FitError> {
 /// The findings that are about the project's rulers rather than about the text: the face the kind
 /// asks for, and the tail a spoken balloon needs.
 fn ruler_findings(db: &FontDb, request: &LetteringRequest<'_>, subject: &str) -> Vec<Finding> {
-    let mut findings = super::fonts::missing_face_findings(&super::fonts::missing_faces(db, &[request.style.face()]), subject);
+    let mut findings = super::fonts::lettering_face_report(db, &[request.style.face()], subject);
     // A spoken kind must come back with a tail: the record cannot be written legally without
     // `tail_node_id` for a kind that has one (schema §6.4), and the module head promises "a tail
     // exactly for the kinds that have someone to point at".
@@ -926,5 +926,37 @@ mod tests {
         assert!(!plan.text_bounds.width().is_nan(), "the text was laid out either way");
         assert!(plan.text_bounds.width() > 0.0);
         assert!(plan.frame.is_closed());
+    }
+
+    #[test]
+    fn the_face_contract_holds_for_a_face_no_build_can_have() {
+        // The test above is *conditional* on the comic faces being absent, so in a build that embeds
+        // them it exercises nothing — M2 §4.3's point is that the empty case has to be **tested**
+        // rather than merely true of this machine. This one is not conditional: the family cannot
+        // exist in either configuration, so the same assertions hold whichever way `CRAFT_FONTS` is
+        // built, and they are the ones that go red if the plan ever names the face that stands in
+        // instead of the one the project asked for, or stops reporting at all.
+        let db = FontDb::global();
+        let mut request = speech("Look out!");
+        request.style.text.family = "No Such Lettering Face".to_string();
+        request.style.text.style = super::super::fonts::BOLD.to_string();
+        let bounds = new_balloon(db, &request).expect("planned").bounds;
+        for entry in ["new_balloon", "refit_balloon"] {
+            let plan = match entry {
+                "new_balloon" => new_balloon(db, &request).expect("planned"),
+                _ => refit_balloon(db, &request, bounds).expect("refitted"),
+            };
+            let reports = font_reports(&plan);
+            assert_eq!(reports.len(), 1, "{entry}: exactly one report, for the one face asked for: {reports:?}");
+            assert!(reports[0].contains("No Such Lettering Face Bold"), "{entry}: the requested face is named: {reports:?}");
+            assert!(reports[0].contains("missing"), "{entry}: with the exporter's own status: {reports:?}");
+            assert_eq!(plan.findings[0].subject, "lettering speech", "{entry}");
+            // And the layout ran anyway. A missing face is neither an error nor a refusal, so the
+            // creator gets a page *and* the message — never a page alone.
+            assert!(plan.fits(), "{entry}: {:?}", plan.outcome);
+            assert!(plan.frame.is_closed(), "{entry}");
+            assert!(plan.text_bounds.width() > 0.0 && plan.text_bounds.height() > 0.0, "{entry}: {:?}", plan.text_bounds);
+            assert_eq!(plan.tail.as_ref().map(|tail| tail.kind), Some(TailKind::Wedge), "{entry}: the balloon kept its tail");
+        }
     }
 }

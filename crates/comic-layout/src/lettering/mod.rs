@@ -45,11 +45,30 @@ pub mod tail;
 
 use vectorcraft_comic_model::LetteringKind;
 
-pub use fonts::{BOLD, DIALOGUE_FAMILY, DISPLAY_FAMILY, Face, ITALIC, MAX_FACES, MissingFace, REGULAR, missing_face_findings, missing_faces};
+pub use fonts::{
+    BOLD, DIALOGUE_FAMILY, DISPLAY_FAMILY, Face, ITALIC, MAX_FACES, MissingFace, REGULAR, lettering_face_report, missing_face_findings, missing_faces,
+};
 pub use outline::BalloonShape;
 pub use plan::{LetteringPlan, LetteringRequest, TextOwner, TextSource, new_balloon, refit_balloon};
 pub use style::{LetteringStyle, style_of};
 pub use tail::{Tail, TailKind};
+
+/// The six lettering kinds, in the schema's own order (schema §5.5).
+///
+/// One list, so that **"every lettering kind"** (M2 criterion 2) and **"the faces the kinds ask
+/// for"** (M2 criterion 5) are enumerated where the tests can reach them rather than hand-copied
+/// into each of them. The `every_kind_has_a_style_a_name_and_a_place_in_the_list` test below matches
+/// `LetteringKind` with no `_` arm, so a kind added to the schema makes this file stop compiling
+/// until the list, the style table and the criterion matrix have all grown — which is the only way a
+/// list of six can still be trusted to be a list of all of them.
+pub const LETTERING_KINDS: [LetteringKind; 6] = [
+    LetteringKind::Speech,
+    LetteringKind::Thought,
+    LetteringKind::Narration,
+    LetteringKind::Shout,
+    LetteringKind::Whisper,
+    LetteringKind::SoundEffect,
+];
 
 /// What each schema `LetteringKind` is drawn as.
 ///
@@ -99,14 +118,32 @@ impl LetteringKindExt for LetteringKind {
 mod tests {
     use super::*;
 
-    const KINDS: [LetteringKind; 6] = [
-        LetteringKind::Speech,
-        LetteringKind::Thought,
-        LetteringKind::Narration,
-        LetteringKind::Shout,
-        LetteringKind::Whisper,
-        LetteringKind::SoundEffect,
-    ];
+    /// The crate's own list, not a copy of it: a second array here is how the two drift.
+    const KINDS: [LetteringKind; 6] = LETTERING_KINDS;
+
+    #[test]
+    fn every_kind_has_a_style_a_name_and_a_place_in_the_list() {
+        // The match has no `_` arm on purpose: a kind added to the schema stops this compiling, so
+        // `LETTERING_KINDS` cannot quietly become a list of five of the seven. The index each kind
+        // gives back is then asserted against the list, so a *reordering* or a duplicate is caught
+        // too — and the integration tests that iterate the list are iterating every kind, which is
+        // what M2's criterion 2 ("every lettering kind") means by "every".
+        fn place(kind: LetteringKind) -> usize {
+            match kind {
+                LetteringKind::Speech => 0,
+                LetteringKind::Thought => 1,
+                LetteringKind::Narration => 2,
+                LetteringKind::Shout => 3,
+                LetteringKind::Whisper => 4,
+                LetteringKind::SoundEffect => 5,
+            }
+        }
+        assert_eq!(LETTERING_KINDS.map(place), [0, 1, 2, 3, 4, 5]);
+        for kind in KINDS {
+            assert_eq!(style_of(kind), kind.lettering_style(), "{kind:?}");
+            assert!(!kind.name().is_empty(), "{kind:?}");
+        }
+    }
 
     #[test]
     fn a_kind_has_a_tail_exactly_when_it_is_spoken() {

@@ -1,0 +1,233 @@
+diff --git a/docs/comiccraft-project-schema.md b/docs/comiccraft-project-schema.md
+index 027e1fe4..62c33d54 100644
+--- a/docs/comiccraft-project-schema.md
++++ b/docs/comiccraft-project-schema.md
+@@ -1,11 +1,14 @@
+ # ComicCraft Project Schema
+ 
+ **Document type:** Project and bundle format specification
+-**Status:** Frozen for M1 — version 1
++**Status:** Frozen for M2 — version 2
+ **Owner:** `schema-architect` · **Approved by:** `comiccraft-lead`
+ **Depends on:** [`comiccraft-design.md`](comiccraft-design.md) §5–§7 (authoritative for
+ meaning; this document fixes the wire format) · [`comiccraft-porting-audit.md`](comiccraft-porting-audit.md)
+ §4–§5 (the visual document and native format this sits beside)
++**Version history:** v1 frozen for M1 · **v2 for M2 adds exactly one field, `Panel.locked`
++(§6.2)**, with its migration (§11) and its fixtures (§11.1). No other field, rule or file
++changed with the bump.
+ 
+ ---
+ 
+@@ -17,8 +20,11 @@ contract. It does not restate the design's reasoning; where the two could be rea
+ differently, [`comiccraft-design.md`](comiccraft-design.md) decides the meaning and this
+ document is corrected.
+ 
+-It is **frozen at version 1** for M1. A field added after this point is a schema version
+-increment with a migration and a fixture (§11).
++It is **frozen at version 2** for M2, and was frozen at version 1 for M1. A field added
++after this point is a schema version increment with a migration and a fixture (§11). The v1 → v2
++increment spent its budget on one field — `Panel.locked` (§6.2) — and nothing else: no entity, no
++file and no rule was added with it, which is what keeps the migration small enough to test
++byte-for-byte (§11.1).
+ 
+ Two rules from the design are structural and cannot be relaxed by this document:
+ 
+@@ -34,7 +40,7 @@ Two rules from the design are structural and cannot be relaxed by this document:
+ 
+ | Version | Lives in | Meaning |
+ |---|---|---|
+-| `manifest.schema_version` | `manifest.json` | the comic bundle format (this document). Starts at `1` |
++| `manifest.schema_version` | `manifest.json` | the comic bundle format (this document). Starts at `1`; **`2`** is what this document fixes |
+ | `format::File.version` | `document/comic.vectorcraft` | VectorCraft's native document format. Read from `crates/format`, not set here |
+ | `manifest.archive_version` | a packaged `.comiccraft` archive | present only in the single-file export (design §7.5) |
+ 
+@@ -45,8 +51,14 @@ unchanged, and vice versa. Neither migration may touch the other's fields.
+ Readers:
+ 
+ - Refuse a `schema_version` **greater** than the one they implement, with an actionable
+-  error naming the required version. Never partially load.
+-- Accept any `schema_version` **less than or equal to** theirs, migrating forward (§11).
++  error naming the required version. Never partially load. This applies to **every file that
++  declares one**, not only to the manifest: a `pages/page-<id>.json` declaring a version the reader
++  does not implement may mean something else by its keys, and reading it forward would be exactly
++  the partial load the rule forbids. Rule 3 (§13) governs the other direction — a file declaring a
++  version *older* than the manifest's — and **reports** it, because that one is read forward.
++- Accept any `schema_version` **less than or equal to** theirs, migrating forward (§11). A migrated
++  load **reports** what it did (§11); it does not rewrite the bytes it read, and a save then writes
++  the version the writer implements (§11.1).
+ 
+ ---
+ 
+@@ -181,7 +193,7 @@ Because these are *names*, a project can choose different faces, and a build wit
+ 
+ ### 5.4 Story files
+ 
+-Each is `{ "schema_version": 1, "<entity>": [ … ], "unknown": { … } }` so a top-level unknown key
++Each is `{ "schema_version": 2, "<entity>": [ … ], "unknown": { … } }` so a top-level unknown key
+ survives and rule 3 can check the version against the manifest.
+ 
+ | File | Element | Fields (all required unless marked) |
+@@ -248,6 +260,7 @@ defect in this document:
+ | `StorageRef::Package` | Design §7.5 describes a packaged archive but does not name the variant; the export needs one so a path's base is explicit (rule 9) |
+ | `MediaMetadata` split into `mime`/`width`/`height`/`color_profile`/`dpi` | The design says "media metadata" without a shape |
+ | `ContinuityConstraints` as a named shape | Design §5.2 lists `continuity_constraints` as a panel field without a shape |
++| `Panel.locked` (§6.2, v2) | The porting plan §8 requires panel **locking** but places no field for it, and design §5.2's `Panel` list has none either. This document places it: a `bool` on the panel, which is the layer that owns the decision. It arrived with the v1 → v2 migration (§11), and it is the only field the bump added |
+ 
+ ### 5.7 Canonical form
+ 
+@@ -274,7 +287,7 @@ only in whitespace or number form is a writer bug, not a schema variation.
+ 
+ ```json
+ {
+-  "schema_version": 1,
++  "schema_version": 2,
+   "page": { … },
+   "panels": [ … ],
+   "dialogue": [ … ],
+@@ -318,8 +331,29 @@ detail, not a model change.
+ | `reading_order_index` | `u16` | yes | must agree with `Page.reading_order` |
+ | `continuity_constraints` | `ContinuityConstraints` | yes | §6.5 |
+ | `generation_status` | `GenerationStatus` | yes | `none` \| `queued` \| `running` \| `completed` \| `failed` |
++| `locked` | `bool` | yes | **v2.** Whether the creator pinned this panel against the commands that move, resize or delete it. `false` by default, and always written — a v1 file has no such key and reads as `false` (§11) |
+ | `unknown` | `Map` | no | |
+ 
++`locked` is the **comic layer's** record, and the one the comic commands consult. It is not a second
++authority over the document object's own lock flag (`crates/doc/src/node.rs:502`, which
++`crates/doc/src/hit.rs` applies to clicks and Select All): that flag is the *document* editor's
++session behaviour for a node, and this crate is L2 and never parses the document, so it cannot read
++it at all. The panel's field is what a bundle durably says about a locked panel, and it survives
++whatever happens to the frame object — a template re-apply, an artboard rebuild, a document written
++by another tool. Whether the engine also mirrors it onto the frame node is the command layer's
++decision and is outside this document (§6.2 is a wire-format statement, and this is the whole of
++it).
++
++**`locked` adds no referential rule.** Locking is not a relation: a locked panel makes nothing else
++illegal, references nothing, and a bundle full of locked panels is as valid as one with none. §13
++defines its rules as the deterministic consequences of a *reference* (rule 1), an id (2, 4, 17), a
++declared agreement (3, 5, 6, 8, 11, 13), a path (9) or a lifecycle (10, 14, 15, 16, 18) — none of
++which locking is. It constrains **commands** (what `comic.panel.move`/`resize`/`delete` may do), and
++a constraint on a command is enforced by that command, not reported by `comic.project.validate`,
++whose job is to tell a creator whether the *bundle* is coherent. §12.1's test for a rule is that it
++is a deterministic check on the bundle's own data; "this panel is locked" is true or false and
++inconsistent with nothing. So the rule set stays at eighteen.
++
+ `ArtworkRef` = `{ asset_id: AssetId, node_id: NodeId, role: ArtworkRole }` where
+ `ArtworkRole` is `primary` \| `background` \| `overlay`.
+ 
+@@ -375,7 +409,7 @@ These are **inputs to** `vectorcraft_text`; the measured result (`TextLayout.bou
+ ## 7. `assets/index.json`
+ 
+ ```json
+-{ "schema_version": 1, "assets": [ … ], "unknown": {} }
++{ "schema_version": 2, "assets": [ … ], "unknown": {} }
+ ```
+ 
+ | Field | Type | Req | Notes |
+@@ -422,7 +456,7 @@ cheap change detector, not an integrity guarantee.
+ ## 8. `provenance/generations.json`
+ 
+ ```json
+-{ "schema_version": 1, "jobs": [ … ], "decisions": [ … ], "unknown": {} }
++{ "schema_version": 2, "jobs": [ … ], "decisions": [ … ], "unknown": {} }
+ ```
+ 
+ ### 8.1 `GenerationJob`
+@@ -450,7 +484,7 @@ record, the bundle, an export or a log line.
+ 
+ Durable metadata for a job that is **in flight**, so an interrupted session can report what was
+ running rather than losing it (design §10.3). One file per job, `jobs/job-<JobId>.json`, holding
+-a wrapper `{ "schema_version": 1, "job": { … }, "unknown": {} }` whose `job` is a §8.1
++a wrapper `{ "schema_version": 2, "job": { … }, "unknown": {} }` whose `job` is a §8.1
+ `GenerationJob`. The wrapper is the same shape every other file uses (§5.4, §6, §7, §8), which is
+ what lets rule 3 check this file's version — §8.1's entity has no `schema_version` of its own.
+ 
+@@ -568,6 +602,32 @@ A migration must:
+ - **Preserve unknown fields** — never silently discard them.
+ - Ship with a fixture for every previous version, exercised in CI.
+ 
++**A migration that succeeds is reported too.** §11's third bullet is about data the migration
++cannot handle, and that is an error; but a *successful* migration still moved the project, and a
++caller that was not told would discover it when the next save wrote a format the creator never
++chose. `crates/comic-model` therefore returns the report as a **value** — a `Migration` per step,
++carrying the version pair and one actionable note per observable effect (which field a step added,
++how many entities took its default, anything the step would otherwise have had to guess about) — on
++the loaded bundle. It is deliberately **not** a §14 `Finding`: findings are the inconsistencies of a
++load, and a bundle read forward is not inconsistent, only older.
++
++**v1 → v2.**
++One field: `Panel.locked` (§6.2), default `false`. A v1 file has no such key, so the value itself
++comes from the field's serde default at parse time — that is the reader half of §5.7, and a
++migration cannot be the thing that supplies it, because after parsing a `false` from the key and a
++`false` from its absence are the same value. What the step does is the part a default cannot: it
++states the field it added and its default in one place, **counts** the panels that took it, and
++refuses to be silent about the one input a default would silently *accept* — a v1 bundle that
++**declares** `locked`, which no v1 writer could have written, and which is preserved and reported as
++the hand-edit it is. (After parsing, `locked: false` is indistinguishable from the key's absence, so
++only a truthy value is reportable; the limit is stated rather than papered over.)
++
++The load reads a v1 bundle as v2 **in memory only**: the bytes on disk are untouched, so the frozen
++v1 fixture stays byte-identical and the migration has something left to be tested against. The
++write side is what moves the version, and the writer writes the version it implements on **every**
++file that declares one (§5.4, §7, §8.3, rule 3) — a v2 manifest over v1 page files would be rule 3's
++own contradiction, in the bytes the save just wrote.
++
+ `crates/format` behaviour is **not** changed by ComicCraft. If the document itself needs a
+ migration, that is an upstream change with an upstream test.
+ 
+@@ -578,11 +638,25 @@ crates/comic-model/tests/fixtures/
+ ├── v1/
+ │   └── minimal.comiccraft/      # the frozen v1 example: 1 chapter, 1 scene, 1 page, 3 panels,
+ │                                #   2 speech balloons, 1 caption, 1 linked asset, 1 job
+-└── (v2/ … added with each version)
++└── v2/
++    └── minimal.comiccraft/      # the v1 example read forward: every file declares
++                                 #   `schema_version: 2` and every panel carries `locked: false`.
++                                 #   Derived, never hand-edited — it is what saving v1 produces
+ ```
+ 
+-Every fixture must load, validate and round-trip byte-identically after a save, with ids
+-unchanged. The v1 fixture is the regression anchor for the whole M1 surface.
++The **fixture at the version the code writes** must load, validate and round-trip
++byte-identically after a save, with ids unchanged: that is v2 today, and it is the anchor for
++§5.7's canonical form. A fixture for an **older** version cannot round-trip byte-identically under
++code that writes a newer one — the writer writes the version it implements (§2) — and pretending
++otherwise would mean freezing a format nobody may write. Its job is the migration: it loads, it
++gains the newer version's defaults, the load reports that, and **saving it produces the current
++fixture byte for byte**. v1 is the migration anchor and stays byte-frozen; a schema bump never
++rewrites history.
++
++Both are exercised in CI: `crates/comic-model/tests/fixture_v1.rs` (the migration, and that the
++frozen bytes never move) and `crates/comic-model/tests/fixture_v2.rs` (the round trip, the default,
++the field's round trip, and the refusals). The v2 fixture has a generator, named in that file's
++header and ignored by default, so it is reproducible rather than hand-maintained.
+ 
+ ---
+ 
+@@ -612,6 +686,11 @@ carries it. This is the list rule 1's reference walk skips, deliberately.
+ `comic.project.validate` checks these and **reports**; it never repairs. Each is a
+ deterministic rule from design §12.1.
+ 
++**v2 added a field and no rule.** `Panel.locked` (§6.2) is not a reference, an id, a declared
++agreement, a path or a lifecycle, so none of the eighteen below can say anything about it, and none
++was added for it — see §6.2 for the argument against a "locked panels are consistent" rule. The
++count stays at eighteen.
++
+ | # | Rule |
+ |---|---|
+ | 1 | Every reference resolves: every `*_ids` entry **and** every singular foreign key (`Chapter.project_id`, `Scene.chapter_id`, `Page.chapter_id`, `Panel.page_id`, `Panel.scene_id`, `ArtworkRef.asset_id`, `Lettering.dialogue_id`, `GenerationJob.target_panel_id`, `ReviewDecision.superseded_asset_id`, …). A key that is **`null` is not a reference** and is skipped, exactly as rule 12 does for a narration speaker. The plural glob alone left every singular key ungoverned. **`retired_artboard_ids` is not a reference list**: it holds artboard ids that must *not* resolve (rule 4) |
+@@ -665,6 +744,9 @@ A load is complete only when:
+    protocol (§8.3) — the third cause is benign and expected, so it is
+    **reported as an inconsistency and the load continues** — it must not be fatal, or a crash in
+    the window between step 4 and step 5 of a save would leave a project nobody could open.
++   The same read also refuses a **file** that declares a greater `schema_version` than this build
++   implements (§2): that is the one refusal here that is fatal, because reading such a file would be
++   the partial load §2 forbids.
+ 2. The document loads through `crates/format` and its `Artboard.id`s are readable.
+ 3. The comic files parse, with unknown fields preserved.
+ 4. `next_comic_id` is repaired upward if it is not greater than every id present.
+@@ -684,4 +766,4 @@ bundle and repair it rather than being locked out, and so the crash window in §
+ | S1 | **Closed** by rule 15: `PageSize` is in document points, mirroring `Artboard.rect`, and an artboard rect that differs is a warning because the artboard *is* the page's size. A UI path assuming pixels is a UI bug, not a schema question | closed |
+ | S2 | Whether `provenance/` should be split per job at scale, or stay one file | `schema-architect`, at M4 |
+ | S3 | `archive_version` numbering for the packaged export (design §7.5) | `publishing-engineer`, at M7 |
+-| S4 | `schema_version` 2 will be needed by whichever of M3–M7 first adds a field; the migration and fixture land with it | the owning agent, at that milestone |
++| S4 | **Closed at M2**: v2 landed with `Panel.locked` (§6.2), a v1 → v2 migration and both fixtures (§11.1). The next version is a fresh decision; a bump spends its budget on one field, and the migration step is where it is recorded | closed |

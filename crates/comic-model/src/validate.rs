@@ -433,24 +433,10 @@ fn rule_3_versions_and_identity(bundle: &ComicBundle, out: &mut Vec<Finding>) {
         ));
     }
     // The subject is the file's **real** path, not its template: a creator told that
-    // "`jobs/job-<JobId>.json` declares 2" cannot tell which of several job files to fix.
-    let mut declared: Vec<(String, u32)> = vec![
-        ("project.json".to_string(), bundle.project.schema_version),
-        ("story/chapters.json".to_string(), bundle.chapters.schema_version),
-        ("story/scenes.json".to_string(), bundle.scenes.schema_version),
-        ("story/characters.json".to_string(), bundle.characters.schema_version),
-        ("story/locations.json".to_string(), bundle.locations.schema_version),
-        ("story/styles.json".to_string(), bundle.styles.schema_version),
-        ("assets/index.json".to_string(), bundle.assets.schema_version),
-        ("provenance/generations.json".to_string(), bundle.provenance.schema_version),
-    ];
-    for (id, file) in &bundle.pages {
-        declared.push((ComicBundle::page_file_key(*id), file.schema_version));
-    }
-    for (id, file) in &bundle.jobs {
-        declared.push((ComicBundle::job_file_key(*id), file.schema_version));
-    }
-    for (what, found) in declared {
+    // "`jobs/job-<JobId>.json` declares 2" cannot tell which of several job files to fix. The list
+    // is `ComicBundle::declared_versions`'s, which §2's refusal walks too, so a file can never be
+    // governed by one and invisible to the other.
+    for (what, found) in bundle.declared_versions() {
         if found != version {
             out.push(Finding::error(Some(3), what, format!("declares `schema_version` {found} but the manifest declares {version}")));
         }
@@ -907,6 +893,7 @@ mod tests {
                     exceptions: vec![],
                 },
                 generation_status: GenerationStatus::None,
+                locked: false,
                 unknown: unknown(),
             },
             Panel {
@@ -928,6 +915,7 @@ mod tests {
                     exceptions: vec![],
                 },
                 generation_status: GenerationStatus::Completed,
+                locked: false,
                 unknown: unknown(),
             },
             Panel {
@@ -949,6 +937,7 @@ mod tests {
                     exceptions: vec![],
                 },
                 generation_status: GenerationStatus::None,
+                locked: false,
                 unknown: unknown(),
             },
         ];

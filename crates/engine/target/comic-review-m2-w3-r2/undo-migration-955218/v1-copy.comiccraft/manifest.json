@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "bundle_id": 20,
+  "comic_id": 1,
+  "title": "Minimal v1 fixture",
+  "next_comic_id": 22,
+  "retired_artboard_ids": [],
+  "document": {
+    "relative_path": "document/comic.vectorcraft",
+    "format_version": 4
+  },
+  "files": {
+    "assets/index.json": {
+      "sha256": "3d49783a1eb6fa12093edd6a1e8ad6ff4f5526d436b18d6f5d92365d63cd6d09",
+      "bytes": 622
+    },
+    "assets/panels/panel-1.png": {
+      "sha256": "c54af4e9162be74adff0711701a4f1f656dc6a49f8c6acd9f9120aef38476081",
+      "bytes": 149
+    },
+    "document/comic.vectorcraft": {
+      "sha256": "27f7f2887e4ced3dd088214189ff17a8a76e16617714e869d44f4ebdad59e7b4",
+      "bytes": 52374
+    },
+    "jobs/job-18.json": {
+      "sha256": "79daf912f08c3441d8d86c49acd5908539f2a9d38ef534da78b4c70cc77b387c",
+      "bytes": 719
+    },
+    "pages/page-21.json": {
+      "sha256": "701fb0495ac3a16a45c8167c1d5ea38aec7de55df132cfd84b3fdccdab59cf2e",
+      "bytes": 277
+    },
+    "pages/page-8.json": {
+      "sha256": "efebecd4bbb33ec86a4e4758e9d4ff4d5a364385a57b3672b24d7ec283c4053e",
+      "bytes": 4168
+    },
+    "project.json": {
+      "sha256": "05d9db24892851eea601e7104c47c8356433b032167e9cdb5bffa03a66978e42",
+      "bytes": 727
+    },
+    "provenance/generations.json": {
+      "sha256": "44377affdc2ad504eb3635fde5cf420f211079d005ce545899306f472e263e38",
+      "bytes": 1048
+    },
+    "story/chapters.json": {
+      "sha256": "9d985a42e259740dbc692089accdf29ac6074eebb9258f3e373b0b3bb0b40ef0",
+      "bytes": 274
+    },
+    "story/characters.json": {
+      "sha256": "421b287cd230d8a75adf42602001d175e9442799b0d658c30be70ef68f645873",
+      "bytes": 356
+    },
+    "story/locations.json": {
+      "sha256": "66a68a19b5ff82233f94f4414067f4aed9eb4414824cb8163006713c8562457b",
+      "bytes": 197
+    },
+    "story/scenes.json": {
+      "sha256": "ed202b6b83fb9d6e553e5714ef2a25f04381d9eec2422067d3b3082c16facc7f",
+      "bytes": 386
+    },
+    "story/styles.json": {
+      "sha256": "e2d66eeb67e1adc2109f385d3819890a83782cecc25e329ed09755a991094dad",
+      "bytes": 336
+    }
+  },
+  "created": "2026-10-11T06:00:00Z",
+  "updated": "2026-10-12T14:48:18Z",
+  "app": {
+    "name": "ComicCraft",
+    "version": "0.8.0",
+    "schema": 2
+  }
+}

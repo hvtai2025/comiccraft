@@ -1,0 +1,11 @@
+{
+  "schema_version": 2,
+  "locations": [
+    {
+      "id": 6,
+      "name": "Rooftop",
+      "description": "A tar-and-gravel roof above the harbour.",
+      "reference_asset_ids": []
+    }
+  ]
+}

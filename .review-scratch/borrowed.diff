@@ -1,0 +1,129 @@
+diff --git a/crates/comic-model/tests/schema_contract.rs b/crates/comic-model/tests/schema_contract.rs
+index d3901b27..65eb4bea 100644
+--- a/crates/comic-model/tests/schema_contract.rs
++++ b/crates/comic-model/tests/schema_contract.rs
+@@ -1,6 +1,6 @@
+ //! Reviewer tests (`code-reviewer`, M0 round 1).
+ //!
+-//! The implementer's inline tests pin `SCHEMA_VERSION == 1` against a *literal*, which
++//! The implementer's inline tests pin the version against a *literal*, which
+ //! restates the constant rather than checking the contract. The contract the schema freezes
+ //! is: the version this crate implements must equal the version `docs/comiccraft-project-schema.md`
+ //! declares, in every place it declares it. These tests read the frozen document, so a bump
+@@ -48,12 +48,24 @@ fn schema_version_matches_every_example_in_the_frozen_document() {
+ 
+ #[test]
+ fn schema_version_matches_the_document_that_declares_it_frozen() {
+-    // schema §1: "It is **frozen at version 1** for M1."
++    // schema §1: "It is **frozen at version 2** for M2, and was frozen at version 1 for M1." The
++    // phrase is built from the constant rather than repeated, so the two sides still cannot move
++    // one without the other — which is the whole point of reading the document here.
+     let doc = schema_doc();
+-    assert!(
+-        doc.contains("frozen at version 1"),
+-        "the schema document no longer declares itself frozen at version 1; SCHEMA_VERSION must be revisited"
+-    );
++    let declared = format!("frozen at version {SCHEMA_VERSION}");
++    assert!(doc.contains(&declared), "the schema document no longer declares itself `{declared}`; SCHEMA_VERSION must be revisited");
++}
++
++#[test]
++fn the_document_places_the_v2_field_on_the_panel_and_gives_it_no_rule() {
++    // schema §6.2 documents v2's one field, and §13 gains no rule for it. A rule row for `locked`
++    // would be a referential rule where none can exist — locking relates nothing to anything — so
++    // the table shape (`| `locked` |`) is what this refuses to find under §13, prose apart.
++    let doc = schema_doc();
++    assert!(doc.contains("| `locked` | `bool` | yes |"), "§6.2 must document v2's field with its type");
++    let rules = doc.split("## 13. Referential rules").nth(1).expect("§13 is in the document");
++    let rules = rules.split("## 14.").next().expect("§13 ends at §14");
++    assert!(!rules.contains("`locked` |"), "§13 must gain no rule for `locked`");
+ }
+ 
+ #[test]
+diff --git a/crates/doc/tests/schema_claims.rs b/crates/doc/tests/schema_claims.rs
+index e97268ab..e22a5fa4 100644
+--- a/crates/doc/tests/schema_claims.rs
++++ b/crates/doc/tests/schema_claims.rs
+@@ -166,6 +166,19 @@ fn schema_doc() -> String {
+     std::fs::read_to_string(SCHEMA_DOC).unwrap_or_else(|e| panic!("the frozen schema doc must be readable at {SCHEMA_DOC}: {e}"))
+ }
+ 
++/// The `schema_version` the document's own examples declare, as written.
++///
++/// Read out of the document rather than hard-coded, because the number is not this file's subject:
++/// the *shape* is. A version bump is a migration with its own contract, and the half that pins the
++/// number against the code lives where the constant does — `crates/comic-model/tests/schema_contract.rs`,
++/// which fails if any example disagrees with `SCHEMA_VERSION`. What this file checks is that the
++/// sections that describe a versioned file still *show* it (and agree with each other); a bump must
++/// not quietly drop the wrapper from one of them.
++fn declared_version(doc: &str) -> String {
++    let at = doc.find("\"schema_version\":").expect("the document declares a version");
++    doc[at + "\"schema_version\":".len()..].chars().skip_while(|c| c.is_whitespace()).take_while(char::is_ascii_digit).collect()
++}
++
+ /// The rule numbers in the §13 referential-rule table, in table order.
+ fn referential_rule_numbers(doc: &str) -> Vec<u32> {
+     let table = doc
+@@ -426,7 +439,7 @@ fn rule_3_names_every_file_that_declares_a_schema_version() {
+     // `project.json`, `pages/page-<id>.json`, `assets/index.json` and `provenance/generations.json`.
+     let doc = schema_doc();
+     let section54 = doc.split_once("### 5.4 Story files").expect("§5.4 exists").1.split_once("### 5.5").expect("§5.5 follows §5.4").0;
+-    assert!(section54.contains("\"schema_version\": 1"), "§5.4 must still declare the story files versioned");
++    assert!(section54.contains(&format!("\"schema_version\": {}", declared_version(&doc))), "§5.4 must still declare the story files versioned");
+     let story_files: Vec<String> = section54
+         .lines()
+         .filter_map(|l| {
+@@ -1318,7 +1331,7 @@ fn the_jobs_file_wrapper_carries_the_schema_version_rule_three_checks() {
+     let jobs = jobs.split_once("\n## 9.").expect("§9 follows §8.3").0;
+     let flat = flattened(jobs);
+     assert!(
+-        flat.contains(r#"{ "schema_version": 1, "job": { … }, "unknown": {} }"#),
++        flat.contains(&format!(r#"{{ "schema_version": {}, "job": {{ … }}, "unknown": {{}} }}"#, declared_version(&doc))),
+         "rule 3 lists every `jobs/job-<id>.json` among the files that declare `schema_version`, so \
+          §8.3 has to show the file's wrapper (version, entity, unknown) — a bare `GenerationJob` \
+          leaves the bytes undetermined. §8.3 text: {jobs:?}"
+diff --git a/crates/mcp/tests/comic_headless.rs b/crates/mcp/tests/comic_headless.rs
+index fbe5bbc0..10509253 100644
+--- a/crates/mcp/tests/comic_headless.rs
++++ b/crates/mcp/tests/comic_headless.rs
+@@ -111,8 +111,14 @@ fn prepare_linked_asset(root: &std::path::Path, id: u64) {
+     let bytes = vectorcraft_format::base64_decode(PLATE_PNG).expect("the embedded png decodes");
+     assert_eq!(bytes.len(), 75, "the constant is the 75-byte plate its sha256 below was measured on");
+     std::fs::write(assets.join("plate.png"), &bytes).expect("the linked asset's file");
++    // Rule 3 requires every file that declares a `schema_version` to declare the manifest's, and
++    // this fixture is the writer's own job done by hand — so it takes the version from the bundle it
++    // is being written into instead of a literal a schema bump would leave stale (v2's migration
++    // changed nothing about the asset registry, but the *number* moved).
++    let manifest: Value = serde_json::from_slice(&std::fs::read(root.join("manifest.json")).expect("manifest.json")).expect("the manifest is JSON");
++    let schema_version = manifest["schema_version"].as_u64().expect("the manifest declares a schema_version");
+     let index = json!({
+-        "schema_version": 1,
++        "schema_version": schema_version,
+         "assets": [{
+             "id": id,
+             "asset_type": "source",
+@@ -175,13 +181,13 @@ fn acceptance_12_the_essential_operations_succeed_through_mcp_headless() {
+ 
+     // ---------- the comic commands are discoverable, and honest about being disabled ----------
+     let before = comic_ids(&mut s, next(), false);
+-    assert_eq!(before.len(), 19, "nineteen comic.* commands over MCP: {before:?}");
++    assert_eq!(before.len(), 22, "twenty-two comic.* commands over MCP: {before:?}");
+     assert!(before.iter().all(|c| c.starts_with("comic.")), "{before:?}");
+     let none_enabled = comic_ids(&mut s, next(), true);
+     assert_eq!(
+         none_enabled,
+         ["comic.project.create", "comic.project.open"],
+-        "of the nineteen, only the two that open or create a project are enabled without one: {none_enabled:?}"
++        "of the twenty-two, only the two that open or create a project are enabled without one: {none_enabled:?}"
+     );
+     let refused = run_err(&mut s, next(), "comic.page.create", json!({}));
+     assert!(refused.contains("no comic project open"), "the refusal names the way out: {refused}");
+@@ -191,7 +197,7 @@ fn acceptance_12_the_essential_operations_succeed_through_mcp_headless() {
+         run(&mut s, next(), "comic.project.create", json!({"path": root.to_string_lossy(), "title": "MCP book", "pageSize": [612.0, 792.0]}));
+     assert_eq!(created["artboards"].as_u64(), Some(1), "a project open, and its document has an artboard");
+     let enabled = comic_ids(&mut s, next(), true);
+-    assert_eq!(enabled.len(), 19, "with a project open, all nineteen are enabled: {enabled:?}");
++    assert_eq!(enabled.len(), 22, "with a project open, all twenty-two are enabled: {enabled:?}");
+ 
+     let one = run(&mut s, next(), "comic.page.create", json!({}))["page"].as_u64().expect("page 1");
+     let two = run(&mut s, next(), "comic.page.create", json!({"size": [300.0, 400.0], "template": "two-tier"}))["page"].as_u64().expect("page 2");

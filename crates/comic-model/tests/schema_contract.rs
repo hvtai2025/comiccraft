@@ -1,6 +1,6 @@
 //! Reviewer tests (`code-reviewer`, M0 round 1).
 //!
-//! The implementer's inline tests pin `SCHEMA_VERSION == 1` against a *literal*, which
+//! The implementer's inline tests pin the version against a *literal*, which
 //! restates the constant rather than checking the contract. The contract the schema freezes
 //! is: the version this crate implements must equal the version `docs/comiccraft-project-schema.md`
 //! declares, in every place it declares it. These tests read the frozen document, so a bump
@@ -48,12 +48,24 @@ fn schema_version_matches_every_example_in_the_frozen_document() {
 
 #[test]
 fn schema_version_matches_the_document_that_declares_it_frozen() {
-    // schema §1: "It is **frozen at version 1** for M1."
+    // schema §1: "It is **frozen at version 2** for M2, and was frozen at version 1 for M1." The
+    // phrase is built from the constant rather than repeated, so the two sides still cannot move
+    // one without the other — which is the whole point of reading the document here.
     let doc = schema_doc();
-    assert!(
-        doc.contains("frozen at version 1"),
-        "the schema document no longer declares itself frozen at version 1; SCHEMA_VERSION must be revisited"
-    );
+    let declared = format!("frozen at version {SCHEMA_VERSION}");
+    assert!(doc.contains(&declared), "the schema document no longer declares itself `{declared}`; SCHEMA_VERSION must be revisited");
+}
+
+#[test]
+fn the_document_places_the_v2_field_on_the_panel_and_gives_it_no_rule() {
+    // schema §6.2 documents v2's one field, and §13 gains no rule for it. A rule row for `locked`
+    // would be a referential rule where none can exist — locking relates nothing to anything — so
+    // the table shape (`| `locked` |`) is what this refuses to find under §13, prose apart.
+    let doc = schema_doc();
+    assert!(doc.contains("| `locked` | `bool` | yes |"), "§6.2 must document v2's field with its type");
+    let rules = doc.split("## 13. Referential rules").nth(1).expect("§13 is in the document");
+    let rules = rules.split("## 14.").next().expect("§13 ends at §14");
+    assert!(!rules.contains("`locked` |"), "§13 must gain no rule for `locked`");
 }
 
 #[test]

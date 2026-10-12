@@ -1,0 +1,18 @@
+{
+  "schema_version": 2,
+  "page": {
+    "id": 8,
+    "chapter_id": 4,
+    "scene_ids": [
+      5
+    ],
+    "artboard_id": 2,
+    "page_number": 2,
+    "panel_ids": [],
+    "reading_order": [],
+    "status": "draft"
+  },
+  "panels": [],
+  "dialogue": [],
+  "lettering": []
+}

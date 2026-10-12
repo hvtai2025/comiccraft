@@ -44,7 +44,7 @@ pub fn specs() -> Vec<CommandSpec> {
             "Open Comic Project",
             ["Window", "Comic"],
             None,
-            "{path: the bundle directory} read the bundle and its visual document and open them as a new tab. A damaged bundle opens with its findings rather than being refused (schema §14) → {root, comic_id, title, pages, warnings, findings}. Not an undo step",
+            "{path: the bundle directory} read the bundle and its visual document and open them as a new tab. A damaged bundle opens with its findings rather than being refused (schema §14) → {root, comic_id, title, pages, migrations: [{from, to, notes, summary}] what §11's migrations did to an **older** bundle, in order — empty for a current one — migrationsNote: the sentence that goes with a non-empty list (null when there is none), warnings: the document's own from `crates/format`, findings}. A migration is a value and not a `finding`: a bundle read forward is older, not inconsistent, and `comic.project.save` writes this build's schema version, which is why it retires the entry. Not an undo step",
             always,
             open
         ),
@@ -65,9 +65,27 @@ pub fn specs() -> Vec<CommandSpec> {
             "Validate Comic Project",
             [],
             None,
-            "{} run comic-model's eighteen referential rules, comic-layout's checks over the loaded pages, and report the artboard rect behind every page as information. Never repairs → {findings: [{rule, severity, subject, message}], errors, warnings, geometry: [{page, artboard_id, rect}], notChecked: [{what, why}], severityErrorBlocksSave: false}",
+            "{} run comic-model's eighteen referential rules, comic-layout's checks over the loaded pages, and report the artboard rect behind every page as information. Never repairs → {findings: [{rule, severity, subject, message}], errors, warnings, geometry: [{page, artboard_id, rect}], notChecked: [{what, why}], migrations: [{from, to, notes, summary}] plus migrationsNote, severityErrorBlocksSave: false}. The migrations are the **load's** (see comic.project.open) and are not findings: a bundle read forward is older, not inconsistent. Geometry findings name their panel as `Panel(<id>)` — the spelling `comic-layout`'s own page check uses — so a caller deduplicating on `(rule, subject)` sees one fault once",
             has_comic,
             validate
+        ),
+        cmd!(
+            query "comic.project.settings.get",
+            "Get Project Settings",
+            ["Window", "Comic"],
+            None,
+            "{} read the project's defaults (schema §5.3) → {default_page_size: {width, height} or null, default_template or null, default_lettering_style or null}. `default_lettering_style` is the face the project letters its text in; `comic.project.settings.set` is how it is chosen. A query: it changes nothing and is not an undo step",
+            has_comic,
+            settings_get
+        ),
+        cmd!(
+            "comic.project.settings.set",
+            "Set Project Settings",
+            ["Window", "Comic"],
+            None,
+            "{defaultLetteringStyle?: a face name (a string) to letter new balloons in, or null to clear it, defaultPageSize?: {width, height} or [width, height] in points, or null to clear it} set the project's defaults (schema §5.3). An omitted key is left alone; null clears it. `default_lettering_style` is read by the lettering commands — the family half of every kind's default face (design §8.3) — so a named face reaches the plan, the record's `text_layout_settings.font` and the missing-face report, and a project that names none keeps ADR-017's faces; `default_page_size` is what comic.page.create uses with no `size`, and what comic-model's rule 15 compares a page's artboard against. `default_template` is **deliberately not settable here**: nothing reads it (recorded as M2-W3-F2 in docs/reviews/M2-command-engineer-locking.md), and a setting no command reads is worse than one that is absent. → {default_page_size, default_template, default_lettering_style} after the change. One undo step",
+            has_comic,
+            settings_set
         ),
     ]
 }
@@ -226,7 +244,7 @@ fn create(s: &mut Session, p: &Value) -> Result<Value> {
     s.add_document(doc, Some(document_file));
     {
         let st = s.doc_mut()?;
-        st.comic = Some(Arc::new(OpenComic::new(root.clone(), bundle, Vec::new())));
+        st.comic = Some(Arc::new(OpenComic::new(root.clone(), bundle, Vec::new(), Vec::new())));
         // The bundle it just wrote is the saved state: a project nobody has edited since is not
         // unsaved work (`is_dirty` reads the model as well as the document).
         st.mark_comic_saved();
@@ -251,7 +269,7 @@ fn open(s: &mut Session, p: &Value) -> Result<Value> {
     if !root.is_dir() {
         return Err(bad(C, format!("`{path}` is not a bundle directory")));
     }
-    let LoadedBundle { bundle, findings, .. } = load(&root).map_err(|e| EngineError::Other(format!("{path}: {e}")))?;
+    let LoadedBundle { bundle, findings, migrations, .. } = load(&root).map_err(|e| EngineError::Other(format!("{path}: {e}")))?;
     let document_file = document_path(&root, &bundle.project.visual_document.relative_path);
     let name = document_file.to_string_lossy().into_owned();
     let bytes = super::super::fileio::read_file(&name)?;
@@ -261,10 +279,16 @@ fn open(s: &mut Session, p: &Value) -> Result<Value> {
     let comic_id = bundle.project.id.0;
     let title = bundle.project.title.clone();
     let root_string = root.to_string_lossy().into_owned();
+    // What the load did to an older bundle, carried to the caller (W1's hand-off): `comic-model`
+    // reports a migration as a **value** rather than a §14 finding — a bundle read forward is older,
+    // not inconsistent — so if no command shows it, nobody is told that opening this project has
+    // already moved it forward.
+    let migrations_value = migrations_json(&migrations);
+    let migrations_note_value = migrations_note(&migrations);
     s.add_document(doc, Some(name));
     {
         let st = s.doc_mut()?;
-        st.comic = Some(Arc::new(OpenComic::new(root, bundle, findings.clone())));
+        st.comic = Some(Arc::new(OpenComic::new(root, bundle, findings.clone(), migrations)));
         // What the bundle on disk holds is what this opened: nothing is unsaved yet.
         st.mark_comic_saved();
     }
@@ -273,6 +297,8 @@ fn open(s: &mut Session, p: &Value) -> Result<Value> {
         "comic_id": comic_id,
         "title": title,
         "pages": pages,
+        "migrations": migrations_value,
+        "migrationsNote": migrations_note_value,
         "warnings": warnings,
         "findings": findings_json(&findings),
     }))
@@ -342,6 +368,12 @@ fn save(s: &mut Session, p: &Value) -> Result<Value> {
         oc.bundle.files_of_record = record;
     }
     let files = write_bundle(&mut oc.bundle, &root, payload, &stamp)?;
+    // The migration is spent. §11 requires a read-forward to be reported, and it was — at
+    // `comic.project.open` — but this save has now written this build's `schema_version`, so a later
+    // `comic.project.validate` still saying "read forward" would be asserting a fact about the file
+    // that is no longer true. (That is M2-L3's shape: a message explaining a cause it has not
+    // checked.) So the record of the load is retired by the write that makes it stale.
+    oc.migrations.clear();
     {
         let st = s.doc_mut()?;
         st.mark_saved();
@@ -463,6 +495,11 @@ fn validate(s: &mut Session, _: &Value) -> Result<Value> {
     findings.sort_by(|a, b| (a.rule.unwrap_or(0), &a.subject, &a.message).cmp(&(b.rule.unwrap_or(0), &b.subject, &b.message)));
     let errors = findings.iter().filter(|f| f.is_error()).count();
     let warnings = findings.len() - errors;
+    // The load's migrations, as information beside the findings (M2 §7.5, W1's hand-off) rather than
+    // *as* findings: a migrated bundle is older, not inconsistent, and counting it as an error would
+    // make `errors` depend on the age of the file. `comic.project.save` clears them, because a save
+    // writes this build's version.
+    let migrations = super::open(s)?.migrations.clone();
     Ok(json!({
         "findings": findings_json(&findings),
         "errors": errors,
@@ -473,8 +510,69 @@ fn validate(s: &mut Session, _: &Value) -> Result<Value> {
             "rect": [g.rect.x0, g.rect.y0, g.rect.width(), g.rect.height()],
         })).collect::<Vec<_>>(),
         "notChecked": not_checked,
+        "migrations": migrations_json(&migrations),
+        "migrationsNote": migrations_note(&migrations),
         "severityErrorBlocksSave": false,
     }))
+}
+
+// ---------- comic.project.settings ----------
+
+/// The project's defaults, as JSON (schema §5.3).
+fn settings_json(s: &ProjectSettings) -> Value {
+    json!({
+        "default_page_size": s.default_page_size.map(|z| json!({ "width": z.width, "height": z.height })),
+        "default_template": s.default_template,
+        "default_lettering_style": s.default_lettering_style,
+    })
+}
+
+/// A name-valued optional setting: absent leaves it, `null` clears it, a string sets it.
+///
+/// A blank name is refused rather than treated as "clear": `comic-layout`'s face filter skips an
+/// empty family (it is not a font, and `text.missingFonts` skips it too), so `""` would silently
+/// mean the *default* face while looking like a chosen one. `null` says that on purpose.
+fn optional_name(p: &Value, key: &str, cmd: &str) -> Result<Option<Option<String>>> {
+    match p.get(key) {
+        None => Ok(None),
+        Some(Value::Null) => Ok(Some(None)),
+        Some(Value::String(s)) if !s.trim().is_empty() => Ok(Some(Some(s.clone()))),
+        Some(Value::String(_)) => Err(bad(cmd, format!("`{key}` is blank: give a face name, or null to clear the setting"))),
+        Some(_) => Err(bad(cmd, format!("`{key}` must be a face name (a string), or null to clear it"))),
+    }
+}
+
+fn settings_get(s: &mut Session, _: &Value) -> Result<Value> {
+    let b = &super::open(s)?.bundle;
+    Ok(settings_json(&b.project.settings))
+}
+
+fn settings_set(s: &mut Session, p: &Value) -> Result<Value> {
+    const C: &str = "comic.project.settings.set";
+    // `page_size_param` answers `None` for both "absent" and "null", so the two are told apart by
+    // whether the key is there at all.
+    let size_present = p.get("defaultPageSize").is_some();
+    let size = page_size_param(p, "defaultPageSize", C)?;
+    let style = optional_name(p, "defaultLetteringStyle", C)?;
+    // A `set` that sets nothing is refused rather than answered with `Ok`: a caller who mistyped the
+    // key would otherwise be told the change was made while the settings came back untouched.
+    if !size_present && style.is_none() {
+        return Err(bad(
+            C,
+            "give `defaultLetteringStyle` (a face name, or null to clear it) or `defaultPageSize` ([width, height], or null to clear it); `comic.project.settings.get` shows the current values",
+        ));
+    }
+    comic_edit(s, "Set Project Settings", |s| {
+        let oc = open_mut(s)?;
+        let settings = &mut oc.bundle.project.settings;
+        if size_present {
+            settings.default_page_size = size;
+        }
+        if let Some(style) = style.clone() {
+            settings.default_lettering_style = style;
+        }
+        Ok(settings_json(settings))
+    })
 }
 
 fn describe_rect(r: Rect) -> String {

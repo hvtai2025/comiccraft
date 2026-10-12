@@ -54,6 +54,7 @@ pub mod entities;
 pub mod error;
 pub mod ids;
 pub mod json;
+pub mod migrate;
 pub mod validate;
 
 #[cfg(test)]
@@ -71,13 +72,16 @@ pub use ids::{
     ReviewDecisionId, SceneId, StyleProfileId,
 };
 pub use json::{join_relative, path_within, scan_tree, sha256_hex, to_canonical_bytes};
+pub use migrate::{Migration, migrate};
 pub use validate::{Finding, PageGeometry, Severity, ValidationInput, page_geometry, validate};
 
 /// The comic bundle schema version this crate implements.
 ///
 /// Must equal `manifest.schema_version` in `docs/comiccraft-project-schema.md` §2. Bumping it
-/// requires a migration and a fixture for the previous version (schema §11).
-pub const SCHEMA_VERSION: u32 = 1;
+/// requires a migration and a fixture for the previous version (schema §11); v2 is `Panel.locked`
+/// (§6.2), and [`migrate`] is its v1 → v2 step, `tests/fixtures/v1/` its previous-version fixture
+/// and `tests/fixtures/v2/` the canonical form it writes.
+pub const SCHEMA_VERSION: u32 = 2;
 
 #[cfg(test)]
 mod tests {
@@ -85,9 +89,12 @@ mod tests {
 
     #[test]
     fn schema_version_matches_the_frozen_schema() {
-        // The schema document freezes version 1 for M1; a change here must come with a
-        // migration and a fixture, so this test makes an accidental bump loud.
-        assert_eq!(SCHEMA_VERSION, 1);
+        // The schema document is frozen at the version this crate implements; the anti-drift half
+        // of this test is `tests/schema_contract.rs`, which reads the document. v1 → v2 is the one
+        // deliberate bump so far (`Panel.locked`, §6.2) and it came with a migration
+        // (`migrate::migrate`) and both fixtures (§11.1), so this line makes the next bump loud:
+        // an accidental change here is a bundle format nobody migrated.
+        assert_eq!(SCHEMA_VERSION, 2);
     }
 
     #[test]

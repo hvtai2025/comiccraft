@@ -1,0 +1,214 @@
+    Finished `test` profile [optimized + debuginfo] target(s) in 0.19s
+     Running unittests src/lib.rs (target/debug/deps/vectorcraft_comic_model-dfca3afc275bb2cd)
+
+running 74 tests
+test bundle::tests::a_directory_without_a_manifest_is_not_a_bundle ... ok
+test bundle::tests::a_newer_schema_version_is_refused_and_an_older_one_is_accepted ... ok
+test bundle::tests::a_save_refuses_a_timestamp_that_is_not_canonical ... ok
+test bundle::tests::a_version_with_no_migration_step_refuses_rather_than_guesses ... ok
+test bundle::tests::allocation_issues_from_the_manifest_and_never_repeats ... ok
+test bundle::tests::a_refused_save_leaves_the_model_and_the_directory_as_it_found_them ... ok
+test bundle::tests::a_load_reports_a_files_mismatch_rather_than_refusing ... ok
+test bundle::tests::a_migration_is_reported_and_a_current_bundle_is_not ... ok
+test bundle::tests::a_missing_collection_file_opens_as_an_empty_collection_with_a_finding ... ok
+test bundle::tests::retiring_an_artboard_is_append_only_and_unique ... ok
+test bundle::tests::the_counter_is_never_lowered ... ok
+test bundle::tests::the_counter_is_repaired_upward_over_every_kind_present ... ok
+test bundle::tests::the_file_name_for_an_id_is_the_one_the_parser_reads ... ok
+test bundle::tests::a_missing_identity_file_still_refuses ... ok
+test bundle::tests::page_and_job_file_names_parse_the_number_not_the_string ... ok
+test entities::tests::a_closed_value_type_has_nowhere_to_keep_an_extra_key ... ok
+test bundle::tests::a_save_writes_the_manifest_only_after_every_content_file ... ok
+test entities::tests::an_unknown_field_survives_a_round_trip_on_an_entity ... ok
+test entities::tests::a_reading_direction_defaults_to_left_to_right ... ok
+test bundle::tests::a_stray_json_file_in_pages_is_a_finding_not_a_lockout ... ok
+test bundle::tests::a_save_writes_the_manifest_last_and_describes_every_content_file ... ok
+test entities::tests::canonical_timestamps_are_the_one_form ... ok
+test entities::tests::enums_use_the_snake_case_wire_names ... ok
+test entities::tests::lettering_kinds_split_into_spoken_and_self_texted ... ok
+test bundle::tests::a_save_keeps_a_declared_file_this_version_does_not_own ... ok
+test entities::tests::only_generated_and_edited_assets_require_provenance ... ok
+test bundle::tests::declared_versions_covers_every_file_that_declares_one ... ok
+test entities::tests::only_the_two_terminal_job_statuses_are_terminal ... ok
+test entities::tests::optional_fields_are_written_as_null_rather_than_omitted ... ok
+test entities::tests::storage_refs_name_their_base ... ok
+test ids::tests::allocation_issues_each_value_once ... ok
+test ids::tests::allocation_refuses_the_end_of_the_range_rather_than_reusing_max ... ok
+test entities::tests::field_order_is_the_order_the_schema_declares ... ok
+test ids::tests::every_kind_is_a_bare_number_and_round_trips ... ok
+test bundle::tests::the_writer_refuses_a_timestamp_that_is_not_canonical_anywhere_in_the_model ... ok
+test bundle::tests::a_save_removes_a_page_file_the_bundle_no_longer_has ... ok
+test ids::tests::repair_at_the_top_of_the_range_saturates_instead_of_wrapping ... ok
+test ids::tests::repair_only_ever_moves_the_counter_up ... ok
+test json::tests::an_f64_is_written_with_its_decimal_point_and_an_integer_without ... ok
+test json::tests::canonical_bytes_are_two_space_indented_with_a_trailing_newline ... ok
+test bundle::tests::two_files_for_one_page_id_are_reported_rather_than_collapsed ... ok
+test json::tests::a_symlink_out_of_the_base_is_refused ... ok
+test json::tests::map_keys_are_sorted_but_an_integral_number_stays_integral ... ok
+test json::tests::sha256_is_lowercase_hex ... ok
+test tests::comic_id_is_a_bare_number_not_a_string ... ok
+test tests::schema_version_matches_the_frozen_schema ... ok
+test tests::comic_id_serializes_transparently ... ok
+test bundle::tests::a_save_keeps_a_page_file_the_generation_of_record_never_wrote ... ok
+test tests::the_public_names_the_other_implementations_compile_against_are_exported ... ok
+test bundle::tests::a_corrupt_collection_file_is_still_fatal ... ok
+test json::tests::the_tree_excludes_the_manifest_exports_and_the_staging_directory ... ok
+test json::tests::an_escaping_path_is_never_resolved ... ok
+test validate::tests::a_reference_that_does_not_resolve_is_reported_but_nothing_is_repaired ... ok
+test validate::tests::a_page_is_never_offered_a_retired_artboard ... ok
+test bundle::tests::an_unknown_key_on_a_manifest_file_entry_survives_a_save ... ok
+test validate::tests::a_clean_bundle_has_no_findings ... ok
+test validate::tests::rule_10_requires_provenance_exactly_where_it_belongs ... ok
+test validate::tests::rule_13_compares_the_parsed_number_and_rule_14_warns_about_an_orphan ... ok
+test validate::tests::rule_15_warns_when_a_page_artboard_differs_from_the_default ... ok
+test validate::tests::rule_12_lets_narration_be_null_and_checks_only_the_set_values ... ok
+test validate::tests::rule_1_checks_the_kind_of_the_entity_a_reference_names ... ok
+test validate::tests::rule_2_reports_a_duplicate_within_a_kind_and_across_kinds ... ok
+test validate::tests::rule_4_reports_a_missing_artboard_and_a_retired_one ... ok
+test validate::tests::rule_16_and_rule_17_report_an_unknown_algorithm_and_a_repeated_retirement ... ok
+test validate::tests::the_page_geometry_report_names_every_artboard_and_skips_a_retired_one ... ok
+test validate::tests::rule_18_reports_a_terminal_job_file_and_accepts_awaiting_review ... ok
+test validate::tests::rule_6_reports_a_reading_order_that_is_not_a_permutation_and_an_index_that_disagrees ... ok
+test validate::tests::rule_3_reports_a_version_or_identity_that_disagrees_with_the_manifest ... ok
+test validate::tests::the_manifest_comic_id_is_a_copy_not_a_second_entity ... ok
+test validate::tests::rule_9_reports_a_hash_mismatch_a_missing_file_and_an_escaping_path ... ok
+test validate::tests::rule_5_and_rule_11_report_denormalised_disagreement ... ok
+test validate::tests::rule_7_reports_a_visual_reference_that_is_not_in_the_document ... ok
+test validate::tests::rule_8_holds_dialogue_id_and_text_to_their_kinds ... ok
+test validate::tests::a_validation_of_a_saved_bundle_matches_the_one_of_the_model ... ok
+
+test result: ok. 74 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/fixture_v1.rs (target/debug/deps/fixture_v1-0b4b26073dff4536)
+
+running 15 tests
+test every_artifact_reference_in_the_fixture_resolves_to_a_real_file ... ok
+test the_fixture_is_a_bundle_and_not_a_document ... ok
+test the_fixtures_severity_vocabulary_is_the_one_the_caller_reports ... ok
+test the_fixture_is_the_bundle_the_schema_describes ... ok
+test the_fixtures_job_is_not_terminal_so_its_file_belongs_in_jobs ... ok
+test the_fixture_is_migrated_by_the_load_and_the_report_says_what_it_did ... ok
+test the_fixture_refuses_a_newer_schema_version ... ok
+test a_v1_bundle_that_declares_locked_is_reported_rather_than_honoured_in_silence ... ok
+test the_fixture_validates_with_no_findings ... ok
+test a_load_of_the_v1_fixture_writes_nothing ... ok
+test a_newer_version_declared_by_a_file_is_refused_rather_than_read_partially ... ok
+test a_save_leaves_the_in_memory_model_at_the_version_it_wrote ... ok
+test a_second_save_of_a_migrated_bundle_is_a_fixed_point ... ok
+test the_fixture_preserves_the_unknown_field_a_newer_build_wrote ... ok
+test saving_the_v1_fixture_produces_the_v2_fixture_byte_for_byte ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/fixture_v2.rs (target/debug/deps/fixture_v2-981e07440952ccc6)
+
+running 8 tests
+test regenerate_the_v2_fixture ... ignored, writes tests/fixtures/v2/; run with --ignored when the v2 canonical form changes
+test the_v2_fixture_is_the_version_this_crate_implements_and_is_not_migrated_again ... ok
+test the_v2_fixture_validates_with_no_findings ... ok
+test a_v2_panel_without_the_key_loads_as_unlocked_and_reports_the_stale_manifest ... ok
+test the_v2_fixture_round_trips_byte_identically_and_a_second_save_moves_nothing ... ok
+test a_saved_lock_does_not_reach_the_visual_document_or_another_file ... ok
+test a_locked_value_the_code_cannot_represent_is_refused_rather_than_mis_read ... ok
+test a_locked_panel_round_trips_as_locked_and_unlocking_round_trips_back ... ok
+
+test result: ok. 7 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/m2_w1_migration_review.rs (target/debug/deps/m2_w1_migration_review-48b2e2726eb3bc31)
+
+running 6 tests
+test a_v2_manifest_over_a_v1_page_file_is_rule_3s_finding_not_a_refusal ... ok
+test the_migrations_count_is_the_panels_that_took_the_default_and_nothing_else ... ok
+test locking_changes_no_rule_verdict_and_a_broken_panel_is_broken_locked_or_not ... ok
+test a_v1_bundle_that_declares_locked_keeps_it_through_a_migrated_save ... ok
+test a_failed_write_leaves_the_model_at_the_version_it_read_not_the_one_it_would_have_written ... ok
+test a_migrated_save_declares_one_version_in_every_versioned_file_on_disk ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/round1_reviewer.rs (target/debug/deps/round1_reviewer-49f900521b787e49)
+
+running 19 tests
+test finding_4_a_refused_save_cleans_up_its_staging_directory ... ok
+test finding_1_a_scene_page_id_that_names_a_panel_is_not_a_page_and_must_be_reported ... ok
+test a_crash_before_step_4_leaves_the_previous_generation_untouched ... ok
+test a_crash_between_step_4_and_step_5_is_survivable_and_reports_the_mismatch ... ok
+test finding_2_two_page_files_for_one_page_id_must_not_be_silently_collapsed ... ok
+test finding_1_a_lettering_page_id_that_names_a_lettering_is_not_a_page_and_must_be_reported ... ok
+test rule_9_embedded_is_a_key_not_a_path ... ok
+test a_truncated_manifest_is_the_one_commit_point_that_is_fatal ... ok
+test rule_3_checks_the_version_every_jobs_file_declares ... ok
+test finding_3_the_writer_must_not_emit_a_non_canonical_timestamp ... ok
+test a_generated_asset_with_provenance_and_consent_round_trips ... ok
+test the_fixture_has_no_unintended_unknown_keys ... ok
+test finding_4_a_refused_save_does_not_leave_the_model_mutated ... ok
+test rule_9_package_resolves_against_the_archive_root_and_nothing_else ... ok
+test rule_9_reports_a_symlink_that_leaves_the_bundle ... ok
+test finding_5_an_unknown_key_in_a_manifest_file_entry_is_discarded_by_a_save ... ok
+test the_reviewers_own_harness_sees_the_fixture_it_thinks_it_does ... ok
+test the_window_between_the_prune_and_the_manifest_write_is_survivable ... ok
+test the_prune_step_removes_a_deleted_page_and_leaves_assets_alone ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/round2_reviewer.rs (target/debug/deps/round2_reviewer-673c4bf5bfd7f1ca)
+
+running 18 tests
+test finding_1_a_stray_json_file_in_pages_is_a_fatal_load_error ... ok
+test a_failure_after_staging_still_removes_the_staging_directory_and_stays_loadable ... ok
+test rule_3_names_the_file_that_declares_the_wrong_version ... ok
+test a_carried_over_entry_key_survives_load_save_load ... ok
+test no_non_canonical_timestamp_can_reach_the_disk_at_all ... ok
+test both_halves_of_the_files_mismatch_are_the_same_non_blocking_severity ... ok
+test a_failure_in_step_4_leaves_the_previous_manifest_untouched ... ok
+test the_duplicate_resolves_the_same_way_on_every_load ... ok
+test the_carry_over_cannot_resurrect_a_key_for_a_file_that_no_longer_exists ... ok
+test the_reader_accepts_a_timestamp_the_writer_refuses ... ok
+test the_speaker_reference_is_rule_12s_and_not_rule_1s ... ok
+test the_duplicate_is_reported_against_the_file_that_loses_and_the_sorted_first_wins ... ok
+test finding_2_a_save_deletes_a_declared_json_file_it_does_not_own ... ok
+test two_job_files_for_one_job_id_are_reported_too ... ok
+test the_two_derived_timestamps_are_replaced_by_now_and_are_not_refused ... ok
+test every_way_a_save_can_refuse_leaves_the_whole_model_and_the_whole_directory_untouched ... ok
+test every_timestamp_the_writer_emits_verbatim_is_checked ... ok
+test rule_1_checks_every_reference_slot_against_its_own_kind ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/round3_reviewer.rs (target/debug/deps/round3_reviewer-7309b805d89a567c)
+
+running 8 tests
+test an_absent_declared_collection_file_is_reported_by_both_halves_and_they_say_different_things ... ok
+test a_directory_where_a_collection_file_belongs_is_fatal_and_not_an_empty_collection ... ok
+test a_corrupt_collection_file_is_fatal_and_is_not_loaded_as_an_empty_one ... ok
+test every_collection_file_absent_at_once_still_opens_and_no_consequence_is_silent ... ok
+test a_missing_asset_registry_leaves_every_dangling_asset_reference_to_rule_1 ... ok
+test an_absent_undeclared_collection_file_is_reported_once_and_only_by_the_model_half ... ok
+test the_asset_files_a_save_still_writes_are_unaffected_by_an_absent_registry ... ok
+test a_stray_job_file_is_a_finding_not_a_lockout_and_a_save_leaves_it_where_it_is ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/schema_contract.rs (target/debug/deps/schema_contract-64c6e84bff687d73)
+
+running 9 tests
+test an_empty_or_degenerate_id_input_is_refused ... ok
+test an_id_past_the_u64_boundary_is_refused_rather_than_wrapped ... ok
+test comic_id_accepts_only_the_bare_integer_shape ... ok
+test comic_id_display_matches_the_wire_form ... ok
+test comic_id_round_trips_at_the_u64_boundary ... ok
+test ids_compare_and_sort_the_way_the_schema_declares_them ... ok
+test schema_version_matches_every_example_in_the_frozen_document ... ok
+test schema_version_matches_the_document_that_declares_it_frozen ... ok
+test the_document_places_the_v2_field_on_the_panel_and_gives_it_no_rule ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vectorcraft_comic_model
+
+running 1 test
+test crates/comic-model/src/lib.rs - (line 35) - compile ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.61s; merged doctests compilation took 0.58s
