@@ -1,16 +1,30 @@
 # ComicCraft
-## Porting Plan: VectorCraft → ComicCraft
+## Porting Plan: VectorCraft → ComicCraft (Node.js + HTML/JavaScript)
 
-**Status:** Finalized (v1.0) — ready to execute
+**Status:** Revised for a lightweight implementation path
 **Base repository:** `https://github.com/storytold/vectorcraft`
-**Baseline:** `3da4080b` (`main`, clean tree) — workspace `0.8.0`, edition 2024, MSRV 1.95, MIT OR Apache-2.0
-**Target repository:** a new `comiccraft` fork of that baseline
-**Primary objective:** Transform VectorCraft into an agent-native, story-to-comic production studio while preserving its vector editing engine, document reliability, rendering, file interoperability, and automation capabilities.
+**Baseline:** `3da4080b` (`main`, clean tree) — read-only behavioural reference
+**Target architecture:** `Node.js` backend + `client-side HTML/JavaScript` frontend — no framework, no bundler, no build step
+**Primary objective:** Build a comic editor and AI-assisted production workflow that is fast to develop and run on a modest laptop, without carrying a heavy Rust toolchain or native desktop application requirement.
 **Companions:** [`comiccraft-design.md`](comiccraft-design.md) · [`comiccraft-porting-audit.md`](comiccraft-porting-audit.md)
 
-> The design in [`comiccraft-design.md`](comiccraft-design.md) is finalized and the
-> baseline audit is complete, so this plan no longer asks the reader to verify
-> assumptions: it names the commits, crates, commands and gates it depends on.
+> **Why this stack.** The product is a document editor that must work offline, keep an undo
+> history, and be drivable by agents through one command surface. None of that needs a
+> framework: it needs a DOM, a canvas, and a Node process. So the frontend is plain HTML,
+> CSS and ES modules the browser runs as-is, and the backend is a Node.js process that
+> serves those files and exposes the command API. There is no transpile step, no bundler
+> and no framework runtime — `git clone && node server.js` is the whole setup.
+
+### What changed, and why (three revisions)
+
+| Revision | Stack | Why it changed |
+|---|---|---|
+| v1.0 | Rust workspace — 3 new crates on the VectorCraft fork, `cargo xtask ci` gate | The original plan. Sound architecture, but a ~1.95 MSRV toolchain, a rustup install, a `target/` tree and a full CI run per iteration |
+| v1.1 | TypeScript + Next.js + React | React and a bundler were assumed necessary for an editor UI |
+| **v1.2 (this)** | **Node.js backend + vanilla HTML/JS frontend** | A canvas editor is mostly imperative drawing and hit-testing, which is what a framework makes *harder*, not easier. Dropping React/Next removes the bundler, the JSX transform, the hydration model and the server/client boundary, and leaves one executable artifact |
+
+The architecture — the domain model, the command surface, the bundle format, the validation
+gate and the milestone sequence — is unchanged across all three. Only the runtime changed.
 
 ---
 
@@ -31,225 +45,309 @@ AI-generated output must remain editable. The system must never require regenera
 
 ### Core design principle
 
-**VectorCraft owns vector editing and document rendering. ComicCraft owns comic semantics, narrative structure, AI orchestration, and publishing workflows.**
+**The reference implementation (VectorCraft) is the authority on how vector editing and
+document rendering behave. ComicCraft owns comic semantics, narrative structure, AI
+orchestration, and publishing workflows.**
 
-Do not rewrite the existing editor engine unless a specific comic requirement cannot be supported through an extension.
+The reference tree is read, not imported: it answers *"how should this behave?"* and
+supplies the bundle format. No ComicCraft code links against it, and no build step compiles
+it.
 
 ---
 
 ## 2. Repository strategy
 
-### 2.1 Fork rather than rewrite
+### 2.1 Replace the Rust-heavy baseline with a Node.js + vanilla-JS implementation
 
-Fork VectorCraft and create a dedicated ComicCraft repository. **That fork does not
-exist yet**; creating it is the first task of M0. The planning documents currently
-live under `comiccraft/porting_plan_and_design/` in the ComicLab site repository and
-belong in the fork once it exists.
+The original VectorCraft-based plan was useful as an architectural reference, but the
+execution model is now intentionally lighter: a Node.js backend and a framework-free
+browser client, sharing one plain-JavaScript domain model, instead of a multi-crate Rust
+workspace.
 
-The baseline is already recorded
-([`comiccraft-porting-audit.md`](comiccraft-porting-audit.md)); M0 confirms and
-extends it rather than re-deriving it:
+The shape of the repository follows from that:
 
-- **Pin the baseline commit:** `3da4080b` on `main`, a clean working tree,
-  `origin = https://github.com/storytold/vectorcraft`.
-- **Record the workspace layout, dependencies, public APIs, native format, command
-  registry and MCP protocol:** done — audit §3–§10. Re-verify only what drifted.
-- **Run the existing CI suite and save its result:** `cargo xtask ci` runs `fmt`,
-  `clippy`, `test`, `assets`, `brands`, `layers` and `wasm`
-  (`xtask/src/main.rs:175-205`). Save the passing output as the baseline evidence, and
-  record how long it takes — it is the gate every later commit must pass.
-- **Create a baseline branch and preserve the upstream remote**, so divergence is
-  measurable (`git rev-list --count upstream/main..HEAD`) rather than estimated.
-- **Record licensing and attribution obligations:** code and original assets are
-  MIT OR Apache-2.0; fonts live in `storytold/craft-fonts` and never in this
-  repository; every asset file needs a row in `ASSETS.md`; the ArtCraft marks are
-  trademarks and ComicCraft must ship its own original branding
-  (`AGENTS.md:14-48`).
+- `server/` — the Node.js process: HTTP API, static file serving, command execution,
+  background jobs, bundle read/write, PDF and image export.
+- `public/` — the client, exactly as it runs in the browser: `index.html`, CSS, and ES
+  modules. No JSX, no transpile, no bundle.
+- `shared/` — the domain model, command definitions and validation **imported unchanged by
+  both sides**.
+- `schema/` — the versioned JSON Schemas and a fixture per version.
+- `test/` — `node --test` suites.
+- `reference/vectorcraft/` — the audited Rust baseline, read-only.
 
-The workspace is `crates/*` + `apps/{vectorcraft, vectorcraft-cli, vectorcraft-web}` +
-`xtask`, with the dependency layering enforced by `cargo xtask layers`
-(`xtask/src/layers.rs:9-57`). Preserve these boundaries; the new comic crates slot
-into them rather than replacing them (design §4).
+**Why sharing matters here.** The same `shared/` module that validates a bundle on the
+server also runs in the browser to validate before saving. That is one implementation of
+the rules, not two, and it is only possible because neither side needs a build step or a
+framework transform to consume it.
 
-### 2.2 Avoid a premature mass rename
+§4 gives the authoritative structure and the dependency direction.
 
-Do not rename every crate, module, and internal symbol in the first milestone.
+This is a port rather than a fork of the Rust workspace. The goal is a faster, more
+maintainable implementation that still preserves the product requirements and the
+editorial workflow from the original design.
 
-First establish a working ComicCraft product using the existing engine. Rename user-facing branding, application metadata, project templates, and documentation incrementally.
+### 2.2 Maintain product intent while simplifying the stack
 
-Internal package renaming should occur only when it provides a concrete maintenance or distribution benefit.
+The original architecture goals remain valid:
 
-### 2.3 Preserve upstream compatibility
+- Keep the static marketing site on Cloudflare Pages.
+- Run the editor and API on a separate subdomain (`app.comiclab.io.vn`).
+- Keep local-first editing and document state management simple enough to run on a normal
+  laptop.
+- One language, one runtime, one dependency tree — JavaScript on Node.js.
 
-Keep upstream changes isolated and easy to merge.
+The project no longer tries to inherit a Rust-native engine, a framework, or a bundler as
+the initial implementation path. Concretely, the deliberate omissions are:
 
-- Maintain an upstream tracking branch.
-- Prefer new comic-specific crates over invasive changes to core crates.
-- Avoid changing existing command semantics.
-- Add regression tests for every modification to shared engine behavior.
-- Document unavoidable upstream divergence.
+| Not used | Because |
+|---|---|
+| Rust / cargo | Toolchain weight; a native build for every change |
+| React, Vue, Svelte | The editor is imperative canvas and DOM work; a virtual DOM adds a transform and a rendering model to fight |
+| Next.js | Its value is SSR and routing; this app is a client-side editor and an API |
+| Webpack, Vite, esbuild | Browsers run ES modules natively; a bundler buys nothing at this size |
+| TypeScript build step | Types are *checked* via JSDoc (`tsc --checkJs`) and never emitted — see §17.1 |
+| A database (for v1) | A comic project is a directory bundle; a filesystem is enough until a feature needs otherwise |
 
-**Known unavoidable divergence, decided up front (ADR-014).** The command registry is
-a fixed concatenation inside the engine crate and no public hook exists for another
-crate to register commands (`crates/engine/src/cmd/mod.rs:85-132`). Comic commands are
-therefore additive modules inside `crates/engine` — `crates/engine/src/cmd/comic/*.rs`,
-each contributing `specs()` — which is the only way the desktop UI, the control
-channel, the CLI and MCP can all reach them through one registry
-(`crates/engine/src/lib.rs:1071-1095`).
+### 2.3 Avoid a premature mass rename
 
-The divergence is small and mechanical, and it is bounded by three rules:
+Do not rename every symbol in the first milestone.
 
-1. Additive only. No existing command's id, parameters, enablement or behaviour
-   changes.
-2. One module per command group, so a merge conflict is confined to the single
-   `command_specs()` line that lists them.
-3. An optional upstream contribution — a generic command-group registration seam —
-   is tracked as a follow-up. If it lands, comic modules stop being a divergence at
-   all.
+First establish a working ComicCraft product on the new stack. Rename user-facing branding,
+application metadata, project templates and documentation incrementally.
 
-The same reasoning applies to the UI: comic panels are added inside
-`crates/ui-egui` (`panels/comic/`) rather than a new UI crate, because egui/eframe are
-permitted only at L6 (`xtask/src/layers.rs:88-90`) and a separate UI crate would need a
-same-layer edge to `ui-egui`.
+Internal package renaming should occur only when it provides a concrete maintenance or
+distribution benefit.
+
+### 2.4 The Rust baseline is a reference, and the record of M0–M2 stands
+
+The earlier Rust milestones are **not deleted and not invalidated**. They are the evidence
+behind several claims this plan still relies on, and they are the behavioural reference for
+the port:
+
+| Rust milestone | What it produced | Status | What the new stack takes from it |
+|---|---|---|---|
+| M0 (`86bd47ef`) | The frozen bundle schema v1, the three comic crate skeletons, the baseline CI gate, the M1 hand-proof | **Complete** | The bundle shape, the id-link rules, the migration policy — i.e. `docs/comiccraft-project-schema.md` becomes the input to `schema/` |
+| M1 (`b68150ba`) | Comic page vertical slice: bundle, artboards as pages, panels, artwork, lettering, undo, save/reopen, PNG and PDF out; 12 acceptance tests | **Complete** | The acceptance criteria of the vertical slice are re-run as the new slice's definition of done |
+| M2 | Panel templates and validation warnings, all lettering kinds with overflow policy, tail preservation on a move, explicit reading order, the `CRAFT_FONTS`-empty contract, the golden render | **Features landed, milestone not closed** — five review records incomplete and the gate not re-run on a quiescent tree | The layout, lettering, reading-order and validation *rules* — these are pure logic and port directly |
+
+**What this means for the plan.** The milestone documents under `docs/milestones/` stay as
+the historical record of the Rust implementation and keep their commit hashes. Nothing in
+the new plan depends on `cargo`, on the Rust toolchain, or on that tree compiling. The Rust
+workspace is retained read-only so that questions of the form *"does the reference
+implementation do X?"* remain answerable — that is its whole remaining job.
+
+**The build cache was deleted, deliberately (2026-10-18).** `comiccraft/target/` held
+**157 GB** — 43% of everything used on the development machine — and `craft-fonts/target/`
+another 231 MB. Both were cargo build output, both were gitignored, and both were removed.
+
+Two consequences, stated so nobody rediscovers them as surprises:
+
+1. **`cargo xtask ci` on the reference tree is no longer cheap.** It will not fail, but it
+   will rebuild the whole workspace, which took hours rather than minutes. Nothing in the
+   plan asks for it — M0 step 3 now says the reference gate result is *already recorded* in
+   `docs/ci-baseline-3da4080b.md` and must not be re-run. M2's one open item ("the gate has
+   not been re-run on a quiescent tree") is therefore **closed by decision rather than by
+   execution**: M2 stays unclosed as history, and its rules port to the new M2 regardless.
+2. **The evidence survived.** `target/` also held 58 gate, mutation-test and MCP-transcript
+   logs that the review records and `docs/ci-m2-w3.md` cite by path — 3.5 MB in total. They
+   were kept **at their exact cited paths**, so every reference still resolves, and
+   `target/mut-r2/mut.py` — the mutation tool a review record names as a reproduction
+   step — was kept with them. Only regenerable output was removed.
+
+   **Those files are now the fragile part**, because they sit in a directory everyone
+   expects to be disposable: a `cargo clean` would erase them silently.
+   `target/README.md` says so at the point of danger, and the runs it lists are the only
+   raw record of their gate and mutation results. Two cited paths are missing and were
+   missing before this cleanup — `target/review-bak/` and `target/r2-baseline.sha256` —
+   so nothing above is incomplete because of it.
+
+**Why the pivot happened.** The Rust workspace requires a toolchain the developer's laptop
+cannot carry comfortably (the M0 record shows a ~1.95 MSRV, a rustup install, and a full
+`cargo xtask ci` per iteration), and it puts the product behind a native build for every
+change. The product goals — editable AI output, semantic comic state, agent-human parity —
+were never Rust-specific. They are expressed as a typed command surface, a versioned JSON
+bundle and a validation gate; all three are language-neutral, so they move.
 
 ---
 
 ## 3. Target architecture
 
-Four logical layers, mapped onto the enforced layer numbers
-(`xtask/src/layers.rs:9-57`). The design document's §4 gives the crate-by-crate view;
-this is the dependency view.
+Two runtimes, one language, one shared domain:
 
-### Layer A — Existing VectorCraft foundation
+```text
+┌─ Browser ────────────────────────────────┐   ┌─ Node.js ────────────────────────────┐
+│ public/  index.html + ES modules         │   │ server/  HTTP API + static serving   │
+│   editor/  canvas, hit-test, undo stack  │◄──┤   commands/  registry + dispatcher   │
+│   ui/      panels, story navigator       │   │   jobs/      generation, render, exp │
+│   storage/ IndexedDB + local bundle      │   │   storage/   bundle read/write, R2   │
+└──────────────┬───────────────────────────┘   └──────────────┬───────────────────────┘
+               │            both import ↓                       │
+               └────────────► shared/ ◄──────────────────────────┘
+                       domain model · commands · validation · schema
+```
 
-Preserve, and do not duplicate:
+`shared/` is the load-bearing idea: the same modules validate a project in the browser
+before saving and on the server before writing, so a rule is implemented once. This works
+because nothing in `shared/` is transpiled, polyfilled or framework-bound — it is ES
+modules with no imports outside `shared/`.
 
-- Geometry, paths, vector shapes, transformations — `geom`, `pathops` (L0, L2).
-- Document model, layers, groups, artboards — `doc` (L1).
-- Text layout and typography — `text` (L2).
-- Live, non-destructive effects — `effects` (L2).
-- Raster image placement and image operations — `doc` + `object.cropImage`.
-- Rendering and compositing — `render` (L3).
-- Undo/redo and document history — `engine` (L5).
-- Native file persistence — `format` (L3).
-- SVG, PDF and raster import/export — `svg`, `pdf`, `render::encode` (L3).
-- Command registry and automation interfaces — `engine` (L5).
-- Desktop, CLI, web and MCP infrastructure — `apps/*`, `mcp` (L6).
+### Layer A — The client (`public/`)
 
-### Layer B — Comic domain model
+Plain HTML, CSS and ES modules. It owns:
 
-**New crate `crates/comic-model` (L2).** The project bundle schema, stable comic ids,
-narrative entities, page/panel records, lettering records, asset provenance records,
-schema migrations, and the bundle reader/writer — no network, no AI, no UI. It depends on
-`doc` (for `NodeId`) and `geom`, and on nothing else in the workspace.
+- the story navigator and chapter management,
+- the page canvas (Canvas 2D for rendering, SVG where vector output is the product),
+- hit-testing, selection, transform handles and the undo stack,
+- panel placement and balloon editing,
+- the review queue and AI suggestion surfacing,
+- publishing and export controls.
 
-This model must be independent of the GUI and must not rely on layer names, object
-names or arbitrary vector shapes to recover narrative meaning. A page's identity is a
-comic `PageId`, its artboard is reached by `Page.artboard_id`, and every visual object
-is reached by `NodeId` (design §5.2.1).
+It holds **no authoritative business logic**: it calls commands, renders the result, and
+keeps view state (zoom, scroll, selection) that is deliberately not persisted. View state
+must never leak into the bundle — that rule is inherited from the reference design, where
+selection was session state rather than document state.
 
-### Layer C — Comic operations and AI services
+### Layer B — The domain model (`shared/domain/`)
 
-**New crates `crates/comic-ai` (L3) and `crates/comic-layout` (L4).** Comic-specific
-operations:
+The authoritative project model, as plain JavaScript with JSDoc types:
 
-- Story decomposition and storyboard planning.
-- Character bible and continuity constraints.
-- Page and panel layout, templates, gutters, reading order.
-- Lettering placement, fitting and overflow policy.
-- Image generation, regeneration and variation, through provider adapters.
-- Deterministic and assisted validation.
-- Batch rendering and publishing.
+- `ComicProject`, `Chapter`, `Scene`, `Page`, `Panel`, `Dialogue`, `Lettering`
+- stable ids and schema versioning,
+- narrative ordering and continuity rules,
+- panel layout maths, templates and reading order,
+- lettering fitting and overflow policy,
+- asset metadata and provenance,
+- serialization and migration.
 
-`comic-layout` is deterministic and testable headlessly; it owns the layout maths and
-the export assembly and returns a plan, and the engine command modules apply that plan
-to the document so the result is one undoable operation (design §11.2). It never calls
-back into the engine — the arrow points one way. `comic-ai` owns provider-neutral
-request building, capability descriptors and the job state machine, and knows nothing
-about `doc`, `render` or the UI.
+It is pure: no DOM, no `fetch`, no `node:fs`. Everything it needs (a text-measurement
+function, a clock, an id generator) is injected by the caller, which is what makes it
+testable in `node --test` and identical on both sides.
 
-**Commands are additive engine modules (L5)** — `crates/engine/src/cmd/comic/*.rs`.
-This is the only route to GUI, control channel, CLI and MCP, and it is the documented
-divergence described in §2.3.
+### Layer C — AI orchestration and jobs (`server/jobs/`)
 
-### Layer D — Comic studio interface
+Server-side only, because provider keys must never reach the browser:
 
-Comic panels and views are added **inside `crates/ui-egui`** (L6) as a panel family
-(`crates/ui-egui/src/panels/comic/`), registered through `UI_COMMANDS`
-(`crates/ui-egui/src/menus.rs:1-20`), reading engine state and acting only through
-`app.run(id, params)`. They surface:
+- story analysis and storyboard planning,
+- prompt orchestration and provider adapters,
+- the job state machine (submit, poll, succeed, fail, supersede),
+- continuity checks and assisted validation,
+- the review/approval flow.
 
-- Story and chapter navigator.
-- Character and asset library.
-- Storyboard view, built on `Renderer::render_thumbnail(doc, NodeId, size)`.
-- Page thumbnails and the artboard/page navigator.
-- Comic page canvas.
-- Panel properties.
-- Balloon and lettering tools.
-- AI generation queue and review controls.
-- Validation and publication panel.
+Providers sit behind adapters so a provider change never touches the domain model.
 
-The existing vector tools stay available as an advanced editing mode.
+### Layer D — Persistence, rendering and export (`server/storage/`)
 
-**Layering rule:** nothing in Layer B or C may depend on `egui`, `eframe`, `winit`,
-`egui_kittest` or `rfd` — the layer check enforces it (`xtask/src/layers.rs:88-90`), and
-it is what keeps the comic core usable from the CLI and MCP.
+- bundle read/write to the filesystem in development, and to object storage in deployment,
+- asset storage and hashing,
+- canvas rendering for thumbnails and page images (via a headless canvas),
+- PDF assembly for print output,
+- schema migration on open, and validation before save,
+- export packaging.
+
+The bundle format is the reference design's: a directory holding a manifest, the comic
+project, story files, per-page comic files, one visual document, the asset registry,
+provenance and job metadata.
+
+### Layer E — The command surface, and the one route through it
+
+Every comic operation is a **command** with a stable id, a declared parameter schema and a
+JSON result. Commands are defined once in `shared/commands/` and executed through one
+dispatcher, exposed on three transports:
+
+- **in-process** in the browser, for the UI's own actions;
+- **HTTP** (`POST /api/comic/<command>`) for anything the browser delegates to the server;
+- **MCP** for agents and CLIs.
+
+A command applies domain changes and produces **one** document mutation, applied inside a
+single undoable transaction (design §11.2). No command calls back into the UI — the arrow
+points one way.
+
+**Why the same code path matters.** A click, an agent call over MCP and a `curl` all
+produce byte-identical results, because all three reach the same dispatcher and the same
+domain functions. The earlier Rust plan achieved this with one in-process registry and two
+adapters; here it falls out of the fact that the browser and the server can run the same
+module.
+
+**Layering rule:** `shared/` must not import from `public/` or `server/`, and must not
+reference `document`, `window`, `fetch`, `process` or `node:*`. The client must not import
+from `server/`. These are enforced by an ESLint boundary rule plus a unit test that asserts
+`shared/` has no forbidden global reference — a rule that only lives in a document is the
+thing this section replaces.
 
 ---
 
 ## 4. Workspace structure
 
-The baseline workspace is the source of truth. Three crates are added, two surfaces
-are extended, and existing crates keep their layer.
+One repository, one language, no build step. Directories are used where a package manager
+would normally be: a folder is a boundary only if its import rules differ.
 
 ```text
-comiccraft/                              # fork of vectorcraft @ 3da4080b
-├── apps/
-│   ├── vectorcraft/                     # desktop app (rebranded to ComicCraft)
-│   ├── vectorcraft-cli/                 # batch + agent workflows, `mcp`, `run`
-│   └── vectorcraft-web/                 # wasm build, deterministic surface only
-├── crates/
-│   ├── geom/ color/                     # L0  unchanged
-│   ├── doc/                             # L1  unchanged — VISUAL DOCUMENT
-│   ├── text/ effects/ pathops/ brush/ trace/ plugins/    # L2  unchanged
-│   ├── comic-model/                     # L2  NEW — bundle schema, ids, narrative, provenance
-│   ├── render/ svg/ pdf/ format/ cad/ eps/ metafile/     # L3  unchanged
-│   ├── comic-ai/                        # L3  NEW — provider adapters, job state machine
-│   ├── comic-layout/                    # L4  NEW — layout, templates, lettering policy,
-│   │                                    #         validation, publishing assembly
-│   ├── tools/                           # L4  extended with comic tool state machines
-│   ├── engine/                          # L5  extended: cmd/comic/*.rs (additive)
-│   ├── ui-egui/                         # L6  extended: panels/comic/* (additive)
-│   ├── mcp/                             # L6  unchanged — comic commands appear automatically
-│   └── testkit/ affinity/               # unchanged (testkit: dev-dependency only)
-├── xtask/                               # layers.rs gains the three new crates
-└── docs/
-    ├── comiccraft-porting-audit.md      # = the baseline audit
-    ├── comiccraft-project-schema.md     # M0 deliverable: the bundle schema
-    ├── comiccraft-command-api.md        # the comic.<group>.<verb> command reference
-    ├── comiccraft-ai-workflow.md        # provider interfaces, jobs, provenance
-    └── comiccraft-publishing.md         # export presets, print rules
+comiccraft/
+├── server.js                     # the entry point — `node server.js`
+├── server/
+│   ├── http.js                   # routes: static, /api/comic/<command>, /api/jobs/<id>
+│   ├── commands/                 # server-only command handlers (fs, export, jobs)
+│   ├── jobs/                     # generation queue, render and export runners
+│   ├── storage/                  # bundle read/write, assets, object storage adapter
+│   ├── export/                   # PDF assembly, raster encode, package archive
+│   └── ai/                       # provider adapters + prompt builders (keys live here)
+├── public/
+│   ├── index.html                # the only HTML page; the app is a client-side editor
+│   ├── app.js                    # boot: load bundle, mount the editor, wire commands
+│   ├── editor/                   # canvas render, hit-test, selection, undo stack
+│   ├── ui/                       # story navigator, panels, dialogs, review queue
+│   ├── storage/                  # IndexedDB + local file handles
+│   └── styles/                   # CSS, no preprocessor
+├── shared/
+│   ├── domain/                   # AUTHORITATIVE MODEL — the rules, pure JavaScript
+│   ├── commands/                 # command definitions + parameter schemas + the dispatcher
+│   ├── validate/                 # validators, used before save on either side
+│   └── ids.js                    # id allocation, shared by both runtimes
+├── schema/                       # JSON Schema per bundle version + a fixture each
+├── test/                         # `node --test` suites
+├── assets/                       # ComicCraft's own brand assets
+├── reference/vectorcraft/        # the audited Rust baseline — read-only (see §2.4)
+├── docs/
+│   ├── comiccraft-porting-audit.md
+│   ├── comiccraft-project-schema.md
+│   ├── comiccraft-command-api.md
+│   ├── comiccraft-ai-workflow.md
+│   └── comiccraft-publishing.md
+└── package.json                  # dependencies: fastify only, for v1
 ```
 
-Three new crates, not twelve. The earlier draft proposed `comic-lettering`,
-`comic-assets`, `comic-workflow`, `comic-validation` and `comic-publish`; each of those
-is a module inside one of the three, because every extra crate is another layer
-declaration, another manifest and another CI surface.
+**Dependency direction.** Strictly downward, and there are only three rules:
 
-The layers are chosen so that **every dependency points downward**: `comic-model` (L2)
-sits above `doc` (L1), `comic-ai` (L3) above `comic-model`, and `comic-layout` (L4)
-above the renderers and exporters it assembles. That avoids every same-layer edge, and
-therefore every hand-maintained `INTRA_LAYER_ORDER` entry
-(`xtask/src/layers.rs:65-84`) — a same-layer dependency is only legal there if the pair
-is listed.
+```text
+public/  ──► shared/        (imported by the browser over HTTP)
+server/  ──► shared/        (imported by Node by relative path)
+public/  ──✗  server/       (never — the reverse edge does not exist)
+shared/  ──✗  public/, server/, node:*, DOM globals
+```
 
-**Adding the crates is a concrete task, not a formality:** `cargo xtask layers` fails
-on any crate it does not know about (`xtask/src/main.rs:109-139`), so
-`xtask/src/layers.rs` gains three `Class::Layer(n)` entries. That edit belongs in the
-same commit that adds each crate.
+`shared/` is the root. `server/` and `public/` are siblings that never import each other;
+anything they both need lives in `shared/`.
 
-Before creating a crate, check whether the responsibility fits inside one of the three.
-Do not introduce a crate for every concept merely to match a diagram.
+**Enforcement, not convention.** Three mechanisms, all in `npm run verify`:
+
+1. An ESLint `no-restricted-imports` rule forbids `public/` importing `server/` and forbids
+   `shared/` importing either.
+2. A unit test walks `shared/` and fails on a forbidden global (`document`, `window`,
+   `process`, `fetch`) or a `node:` import. Textual rules are checked by running them.
+3. A test asserts every module in `shared/` is importable in a bare Node context with no
+   DOM — which is the same thing the browser requires, expressed the other way around.
+
+**The dependency list is deliberately one line.** `fastify` for HTTP, and nothing else at
+runtime. Everything else — the test runner, the argument parser, the file watcher, the
+crypto, the JSON handling — is in Node's standard library. New dependencies are a
+deliberate decision recorded in the commit, not an accident.
+
+**The Rust baseline is a reference, not a dependency.** `reference/vectorcraft/` holds the
+audited baseline (`3da4080b`) for reading only: its behaviour, its file format and the
+reuse report are cited throughout this plan, but no module imports it, no build step
+compiles it, and it is excluded from every toolchain command. It exists so that "does the
+baseline behave this way?" stays an answerable question.
 
 ---
 
@@ -258,6 +356,13 @@ Do not introduce a crate for every concept merely to match a diagram.
 This is the most important architectural task, and the schemas are now fixed in
 [`comiccraft-design.md`](comiccraft-design.md) §5. This section states the model and
 the invariants; the design document states the fields.
+
+> **Reading note for the new stack.** Sections 5–14 were written against the Rust
+> reference implementation and still cite it by path (`crates/doc/src/node.rs`,
+> `crates/format`) where a claim was verified against real code. Read those citations as
+> *evidence for the rule*, not as a build dependency: the rules live in `shared/domain/`,
+> and `docs/comiccraft-project-schema.md` — the M0 deliverable — is the frozen input they
+> are ported from.
 
 ### 5.1 Entity hierarchy
 
@@ -292,9 +397,10 @@ Three corrections to the earlier draft, all argued in the design document:
 
 Every persistent entity has:
 
-- A stable id that is never reused: `NodeId(u64)` for visual objects
-  (`crates/doc/src/node.rs:19-20`), `Artboard.id: u32` for pages' artboards, and comic
-  newtypes over `u64` allocated from a persisted counter for everything else.
+- A stable id that is never reused. Ids are strings with a type prefix (`page_`, `panel_`,
+  `balloon_`), allocated from a counter persisted in the manifest. Document node ids stay
+  **numeric** so a bundle round-trips through the reference format without renumbering.
+  Ids are never random and never derived from an array index.
 - A schema version, at the bundle level and per migrated schema.
 - Creation and modification metadata.
 - Explicit references to related entities — never a duplicated field, and never an
@@ -326,12 +432,18 @@ Do not create two independent, conflicting copies of the same geometry.
 
 **Finalized in [`comiccraft-design.md`](comiccraft-design.md) §7.** In summary: a
 directory bundle holds a manifest, the comic project, the story files, per-page comic
-files, one visual document (`.vectorcraft`, artboards = pages), the asset registry,
-provenance and durable job metadata (ADR-012). The visual document is written through
-the native format unchanged; the comic schema is versioned separately in the manifest
-and never overloads `crates/format` (ADR-013). Saving is ordered so the manifest is
-written last and never references partially written data, and every schema has an
-identified version with fixtures for each previous version.
+files, one visual document (artboards = pages), the asset registry,
+provenance and durable job metadata (ADR-012). The visual document keeps the reference
+format's shape — it is read and written by `shared/domain/format/` — while the comic schema
+is versioned separately in the manifest and never overloads that format (ADR-013). Saving is
+ordered so the manifest is written last and never references partially written data, and
+every schema has an identified version with fixtures for each previous version.
+
+The same bundle is the unit of storage on both sides: in the browser it is an in-memory
+object persisted to IndexedDB or downloaded as a folder, and on the server it is a
+directory. The module that serializes it is the same one in both cases, so a bundle saved
+locally opens on the server unchanged — and there is no separate "export format" to keep in
+sync.
 
 The earlier draft's "prefer a versioned container" wording is superseded by that
 decision; a single-file archive is an export (`File ▸ Package Project`), specified in
@@ -341,42 +453,60 @@ design §7.5 and delivered in Phase 7, not the working format.
 
 ## 6. Phase 0 — Baseline (M0)
 
-**Goal:** Stand up the fork on a pinned baseline and freeze the project schema.
+**Goal:** Stand up the repository on the new stack and freeze the project schema.
 
 **Status: the audit half is done.** [`comiccraft-porting-audit.md`](comiccraft-porting-audit.md)
-*is* the repository architecture report, the dependency and API map and the comic
+*is* the reference architecture report, the dependency and API map and the comic
 feature gap analysis, with `path:line` citations for every claim. The original tasks 1,
-2, 3, 4 and 8 are complete; what remains is mechanical and can proceed without further
-investigation.
+2, 3, 4 and 8 are complete against the reference implementation; what remains is porting
+work with a known target, not investigation.
+
+> **Status and gate conventions for §6–§14.** These sections are the behavioural
+> specification of the product, written when the reference implementation *was* the
+> implementation. Read them as follows:
+>
+> - **Behaviour, exit criteria and acceptance tests are normative** and carry over
+>   unchanged.
+> - **Where the work lands** is now `shared/`, `public/` or `server/` per §4, not a crate.
+> - **Every gate that says `cargo xtask ci`, `cargo xtask layers`, `cargo xtask wasm` or
+>   `cargo xtask brands` is `npm run verify`**, except the single M0 step below that runs
+>   the reference gate to record a baseline.
+> - **Every `Status:` line describing the Rust fork's progress is historical**, and is
+>   summarised in §2.4 instead. What M0–M2 achieved in Rust is the target the port must
+>   reach, not progress this plan has already banked.
+> - **`crates/*` citations** are evidence for a rule, per §5's reading note.
 
 Remaining tasks:
 
-1. Create the `comiccraft` fork at `3da4080b`, add the upstream remote, create the
-   baseline branch, and move these planning documents into the fork.
-2. Run `cargo xtask ci` on the untouched baseline and save the output. This is the
-   pre-change evidence and the timing reference for design §14.
-3. Build a minimal document through the command API and export it, exercising M1's
-   acceptance path by hand before automating it: `artboard.new`, place an image
-   (`object.cropImage` and the clip-rectangle command for cropping and clipping), add
-   an area text object, then `document.serialize`, `document.export` and the PDF
-   export of all artboards. Confirm that cropping, clipping, typography and PDF page
-   geometry behave as the audit §7–§9 says they do.
-4. Add the three crate skeletons and their `xtask/src/layers.rs` entries, then confirm
-   `cargo xtask layers`, `cargo xtask wasm` and `cargo xtask brands` still pass.
-5. Write `docs/comiccraft-project-schema.md`: the bundle schema — manifest,
-   `project.json`, per-page files, the artboard/`NodeId` link rules, id allocation and
-   migration rules, with a fixture per version. It must not contradict design §5.
+1. Create the repository layout of §4 and confirm `node server.js` serves `public/`.
+2. **Port the schema, then prove it.** Move `docs/comiccraft-project-schema.md` into
+   `schema/v1/` as JSON Schema plus one fixture per entity, and implement
+   `shared/domain/validate.js` against it — this is task 5 below, promoted, because
+   everything else is written against it.
+3. Record the *reference* baseline once, for comparison: the Rust tree's gate result is
+   already saved in `docs/ci-baseline-3da4080b.md`. Do not re-run it — it is evidence,
+   not a step.
+4. Prove M1's acceptance path by hand against the reference, then re-prove it in the new
+   stack: `artboard.new`, place an image (crop with `object.cropImage`, clip with the
+   clip-rectangle command), add an area text object, `document.serialize`,
+   `document.export`, and the PDF export of all artboards. Confirm that cropping,
+   clipping, typography and PDF page geometry behave as the audit §7–§9 says they do.
+   Then repeat each step through `shared/commands` and record any difference as a finding.
+5. Make `npm run verify` green: type check (JSDoc, no emit), lint including the
+   `shared/` boundary rule, the layering unit test, `node --test`, and the fixture
+   validation.
 
 Deliverables:
 
-- `docs/comiccraft-porting-audit.md` — **done** (this audit).
-- `docs/comiccraft-project-schema.md` — the approved, frozen initial project schema.
-- The baseline `cargo xtask ci` report.
-- Three empty comic crates, registered in the layer table.
+- `docs/comiccraft-porting-audit.md` — **done** (the reference audit).
+- `schema/v1/*.schema.json` and a fixture per entity — the frozen initial project schema.
+- The reference baseline gate report, already recorded (`docs/ci-baseline-3da4080b.md`).
+- `shared/domain/validate.js` plus its tests, and a green `npm run verify`.
 
-**Exit criteria:** the fork builds and passes the full gate unmodified; the schema is
-approved and frozen for M1; and a three-panel page can be created and exported by hand
-through commands, with the output checked against the audit.
+**Exit criteria:** the repository installs with `npm install` and runs with `node server.js`
+on a machine with no Rust toolchain; the schema is approved and frozen for M1; and a
+three-panel page can be created and exported by hand through commands, with the output
+checked against the audit.
 
 ---
 
@@ -423,10 +553,10 @@ Use existing artboards and document objects where they fit. Add specialized comi
     a page and adding another must not silently re-point a stale `Page.artboard_id`.
 12. The same essential operations succeed through `mcp --headless`.
 
-**Exit criteria:** every test above passes; `cargo xtask ci` is green including the
-layer, brand, asset and wasm gates; and the reuse report of §18 has been produced.
+**Exit criteria:** every test above passes; `npm run verify` is green including the
+boundary, brand, asset and fixture gates; and the reuse report of §18 has been produced.
 
-**Gate:** `cargo xtask ci`. **Do not start AI image-generation integration until this
+**Gate:** `npm run verify`. **Do not start AI image-generation integration until this
 milestone passes.**
 
 ---
@@ -478,16 +608,16 @@ Support user-defined reading order and validation for supported writing directio
 
 Panel shapes, borders, image transforms, cropping, clipping and locking are engine
 features already (design §8.2). What Phase 2 builds is the *comic* layer over them:
-`comic-layout`'s templates and gutter maths, the lettering policy layer over
-`text::layout_with` (`Lettering.overflow_policy`, design §8.3), the
-`comic.lettering.*` commands, and the reading-order model. Lettering must work with
-`CRAFT_FONTS` empty and report a missing font rather than substituting silently.
+`shared/domain/layout`'s templates and gutter maths, the lettering policy layer over the
+injected text-measurement function (`Lettering.overflow_policy`, design §8.3), the
+`comic.lettering.*` commands, and the reading-order model. Lettering must work with no
+fonts configured and report the missing font rather than substituting silently.
 
 **Exit criteria:** panels can be created from templates, reordered and resized with
 validation warnings; every lettering kind renders, wraps, detects overflow and applies
 its policy; moving a balloon preserves or updates its tail without detaching it; and
 reading order is explicit, editable and validated independently of panel coordinates.
-Lettering tests pass with `CRAFT_FONTS` empty. **Gate:** `cargo xtask ci`, plus
+Lettering tests pass with no fonts configured. **Gate:** `npm run verify`, plus
 golden-render tests for one representative page.
 
 ---
@@ -526,7 +656,7 @@ A revision to one scene should not silently overwrite unrelated pages.
 ids or explicit id-mapping instructions — never prose the editor has to parse; every
 proposal is reviewable and reversible before it becomes authoritative; a change to one
 scene provably leaves unrelated pages untouched (asserted by comparing the bundles);
-and regenerating descriptions preserves approved content. **Gate:** `cargo xtask ci`,
+and regenerating descriptions preserves approved content. **Gate:** `npm run verify`,
 plus an id-stability test across regenerate-and-accept cycles.
 
 ---
@@ -584,22 +714,24 @@ Use explicit generation states such as queued, running, completed, failed, and a
 
 ### The dependency that has to be decided here
 
-The workspace has **no networking dependency** (audit §12.4), so this phase begins by
-choosing and gating an HTTP client (ADR-015): MIT/Apache-class licence, a feature that
-is off for wasm, unreachable from `crates/doc` and `crates/format`, and credentials
-outside the bundle. Decide this before writing provider code, not after.
+The stack deliberately has **no AI provider dependency** at M0, so this phase begins by
+choosing one (ADR-015): a permissive-licence client library, called **only** from
+`server/ai/`, never reachable from `shared/` or `public/`, and with credentials read from
+the environment and never written into the bundle. Decide this before writing provider
+code, not after. Provider code must not run in the browser — keys must never reach it —
+which the boundary test enforces by forbidding `fetch` and provider SDKs in `shared/`.
 
-Jobs are **pollable**, not push-based, because MCP accepts and ignores progress and
-cancellation notifications (`crates/mcp/src/server.rs:167-168`) — `comic.job.status`
-is the interface, `comic.job.apply` reconciles against the document revision, and a
-result that no longer matches is reported rather than applied (design §10.3).
+Jobs are **pollable**, not push-based: MCP accepts and ignores progress and
+cancellation notifications, so `comic.job.status` is the interface, `comic.job.apply`
+reconciles against the document revision, and a result that no longer matches is
+reported rather than applied (design §10.3).
 
 **Exit criteria:** `comic.job.submit` returns a job id and never blocks; status,
 cancellation and application are separate commands; `comic.job.apply` refuses to
 overwrite a target changed since `target_revision` and reports the conflict; a failed
 or cancelled job leaves the project and approved artwork untouched; every asset records
 provider, model and request; and the whole project still opens, edits and exports with
-no provider configured. **Gate:** `cargo xtask ci`, `cargo xtask wasm` with providers
+no provider configured. **Gate:** `npm run verify`, with providers
 disabled, and a test that a job result cannot overwrite newer approved state.
 
 ---
@@ -617,26 +749,26 @@ earlier draft's `comic.balloon.*` and `comic.caption.*` names are replaced:
 balloons, captions and sound effects are one `Lettering` entity, so they are one
 command group. No `comic.*` id exists at the baseline, so there is no collision.
 
-These commands are **new**, and the registry has no external registration hook, so they
-are added as additive modules in `crates/engine/src/cmd/comic/*.rs` (ADR-014, §2.3).
-That is the only route by which the GUI, the control channel, the CLI and MCP all reach
-them through one path (`crates/engine/src/lib.rs:1071-1095`).
+These commands are **new**. They are defined once in `shared/commands/` and registered in
+one place, so the browser UI, the HTTP API and MCP all reach them through one dispatcher
+(§3 Layer E). This is the same property the reference achieved with a single in-process
+registry — the difference is that here it needs no divergence from anything, because a
+registry in a shared module is the natural shape rather than an addition to a fixed list.
 
 ### Command requirements
 
 Each command must:
 
-- Accept validated structured parameters — the same schema as `CommandSpec.params`,
-  validated by the engine's own helpers, returning `EngineError::BadParams` on bad
-  input (`crates/engine/src/cmd/mod.rs:287-320`).
+- Accept validated structured parameters, checked against the command's declared schema
+  before the handler runs, returning a typed `BadParams` failure rather than throwing.
+  The parameter schema is the same object the UI and MCP read.
 - Reference entities by stable id: comic ids, `NodeId`, `artboard_id`.
-- Return structured results and actionable `EngineError`s.
+- Return a structured result or a typed, actionable error.
 - Respect document history and undo/redo, as one step per user action.
 - Avoid destructive side effects by default.
 - Be safe to retry where practical, and state clearly where it is not.
-- Expose its schema to automation clients — it does so for free, since MCP's
-  `command_list` and `tools/list` read the registry
-  (`crates/mcp/src/tools.rs:650-741`).
+- Expose its schema to automation clients — it does so for free, because MCP's
+  `tools/list` and the HTTP route are both generated from the same registry.
 - Have unit and integration tests, plus a malformed-input case in the command sweep.
 
 Separate deterministic editing commands from expensive AI operations: a command that
@@ -645,9 +777,9 @@ job and returns a job id. Every command is `enabled`-gated on an open comic proj
 
 **Exit criteria:** `mcp --headless` lists every comic command with its parameter
 documentation; a deterministic command produces identical results when replayed; an
-agent can complete M1's acceptance list end-to-end with no human interaction; and no
-malformed parameter set can panic the command sweep. **Gate:** `cargo xtask ci`
-including the fuzz targets.
+agent can complete M1's acceptance list end-to-end with no human interaction; and a
+malformed parameter set must not crash the dispatcher. **Gate:** `npm run verify`,
+including the property tests that feed malformed parameters to every registered command.
 
 ---
 
@@ -689,10 +821,12 @@ Do not require users to approve every small deterministic edit. Use approval gat
 
 ### How this is implemented
 
-Panels live inside `crates/ui-egui` (`panels/comic/`) and are registered through
-`UI_COMMANDS` (`crates/ui-egui/src/menus.rs:1-20`), because egui/eframe are permitted
-only at L6 (`xtask/src/layers.rs:88-90`). They read engine state and act only through
-`app.run(id, params)`; no comic logic lives in a panel. The storyboard and page
+Studio panels live in `public/ui/` and are mounted by `public/app.js`. They read project
+state from the store and act **only** by dispatching commands through `shared/commands`;
+no comic logic lives in a panel. This is the same rule the reference enforced by having
+its panels call `app.run(id, params)` — the enforcement mechanism differs (here: a lint
+rule and a review check that no panel imports `shared/domain` internals directly), the
+rule does not. The storyboard and page
 navigator are new work — the baseline has document tabs and an artboard navigator but
 no sequential view (audit §10) — and the storyboard's thumbnails come from
 `Renderer::render_thumbnail(doc, NodeId, size)`.
@@ -705,7 +839,7 @@ with panels that would need the file system or a provider hidden rather than bro
 balloon, caption and image selection behaviour works by direct manipulation; proposed
 changes, pending generations, approved artwork, user modifications and validation
 warnings are visually distinct; and a panel's edit and the equivalent command produce
-the same document state. **Gate:** `cargo xtask ci` plus a UI check
+the same document state. **Gate:** `npm run verify` plus a UI check
 (`--control` with `ui.screenshot`) for the new panels.
 
 ---
@@ -756,7 +890,7 @@ validation gate in front of export, and the book-level assembly. This is also wh
 bleed and marks; a missing font or asset fails the export with an actionable error
 instead of exporting silently wrong; the packaged archive round-trips (package, unpack,
 reopen, compare); and editable project data is independent of every rendered output.
-**Gate:** `cargo xtask ci` plus golden-render and PDF-geometry tests.
+**Gate:** `npm run verify` plus golden-render and PDF-geometry tests.
 
 ---
 
@@ -810,8 +944,8 @@ Do not declare production readiness until:
 - AI jobs can fail or be retried without corrupting the project.
 - Licensing and asset provenance requirements are documented.
 - The artboard-id hazard of design §5.3.1 has an automated test.
-- The project opens, validates and exports with no provider configured and with
-  `CRAFT_FONTS` empty.
+- The project opens, validates and exports with no provider configured and with no
+  fonts installed.
 
 **Build the representative test book from M1 onward, not here.** The three-panel page
 is a unit test; a chapter with recurring characters, irregular panels, long dialogue
@@ -821,88 +955,126 @@ the end of the project when it is expensive.
 
 **Exit criteria:** the automated suite covers every item in the list above, including
 failure paths (interrupted save, provider failure, cancelled job, missing asset,
-missing font, deleted artboard); `cargo xtask ci` is green, including the fuzz,
-layer, brand, asset and wasm gates; `vectorcraft-cli perf` shows no regression against
-the baseline timings saved in M0; and the human and agent walkthroughs both complete
+missing font, deleted artboard); `npm run verify` is green, including the boundary,
+brand, asset and fixture gates; the page-load and render timings show no regression
+against the numbers recorded at M1; and the human and agent walkthroughs both complete
 on the test book. **Gate:** the full release checklist in `docs/releasing.md`.
 
 ---
 
 ## 15. Implementation order
 
-One milestone per phase, M0–M8. The previous table listed ten milestones against nine
-phases, put the command API before the story workflow while the phases put it after,
-and carried an "M3 Versioned comic project model" that no phase owned. All three are
-fixed here.
+One milestone per phase, M0–M8, expressed for the Node.js + vanilla-JS stack. The phase
+*content* is unchanged from §6–§14 — those sections remain the behavioural specification —
+but every deliverable below names where it lands and a gate that runs on a laptop in
+seconds.
 
-| Milestone | Phase | Deliverable | Priority | Exit gate |
-|---|---|---|---|---|
-| M0 | 0 | Fork on the pinned baseline, frozen project schema, three crate skeletons registered in the layer table | P0 | `cargo xtask ci` green on the untouched baseline |
-| M1 | 1 | Three-panel page: bundle, artboards as pages, panels, artwork, lettering, undo, save/reopen, PNG and PDF out | P0 | the twelve acceptance tests of Phase 1 |
-| M2 | 2 | Panel engine, templates, gutters, lettering policy, reading order | P0 | lettering tests pass with `CRAFT_FONTS` empty; golden render |
-| M3 | 3 | Story import to schema-validated storyboard, with review | P1 | id stability across regenerate-and-accept |
-| M4 | 4 | Character bible, provider adapters, pollable jobs | P1 | no job can overwrite newer approved state |
-| M5 | 5 | Completed agent surface: parameter docs, batch operations, MCP and CLI parity | P0 | `mcp --headless` completes M1's list unaided |
-| M6 | 6 | Comic studio UI panels | P1 | M1's operations reachable without an agent |
-| M7 | 7 | Rendering and publishing: presets, validation gate, package export | P1 | PDF page geometry and package round trip |
-| M8 | 8 | Quality assurance, performance and release hardening | P1 | the release criteria of Phase 8 |
+| Milestone | Phase | Deliverable | Lands in | Priority | State | Exit gate |
+|---|---|---|---|---|---|---|
+| M0 | 0 | Repo skeleton, `shared/domain` conversion of the frozen schema, `schema/` with JSON Schema v1 + a fixture per entity, `npm run verify` | `shared/`, `schema/` | P0 | **Done** | `npm run verify` green — **3 s** |
+| M1 | 1 | Three-panel page vertical slice: bundle open/save, artboards as pages, panels, artwork, lettering, undo, PNG and PDF out | `shared/`, `public/`, `server/` | P0 | **Done** | the twelve acceptance tests of Phase 1, passing in `node --test` |
+| M2 | 2 | Panel engine, templates, gutters, lettering policy, reading order | `shared/domain/` | P0 | **Rules done and tested**; the extended panel tools are not | lettering policy tests pass with no fonts configured; the golden render matches its fixture |
+| M3 | 3 | Story import to schema-validated storyboard, with review | `shared/`, `server/ai`, `public/ui` | P1 | Not started | id stability across regenerate-and-accept |
+| M4 | 4 | Character bible, provider adapters, pollable jobs | `server/ai`, `server/jobs` | P1 | Not started | no job can overwrite newer approved state |
+| M5 | 5 | Completed agent surface: parameter docs, batch operations, MCP parity | `shared/commands`, `server/` | P0 | Not started — the registry, HTTP and CLI are in | the MCP server completes M1's operation list unaided |
+| M6 | 6 | Studio UI complete: story navigator, storyboard, canvas tools, review queue | `public/` | P1 | Editor, navigator, inspector and reading order are in | M1's operations are reachable without an agent |
+| M7 | 7 | Rendering and publishing: presets, validation gate, package export | `server/export` | P1 | SVG, PNG and PDF out are in | PDF page geometry and package round trip |
+| M8 | 8 | Quality assurance, performance and release hardening | all | P1 | Not started | the release criteria of Phase 8 |
 
-Two orderings are deliberate:
+**M0 and M1 are complete; the report is
+[`docs/milestones/M0-M1-node.md`](milestones/M0-M1-node.md).** It records the gate output
+verbatim, the nine defects the work found and what each one says, and what is deliberately not
+done — including that `public/` is outside the strict type check and why.
 
-- **The schema and the first page are developed together, M0 → M1.** A data model is
-  only tested by real editing behaviour, so the schema is frozen in M0 and put under
-  load immediately in M1. The old "M3 Versioned comic project model" is gone because
-  the bundle is built in M1 — there is no later step for it.
-- **Commands ship with each feature; M5 completes the surface.** Every phase adds its
-  own commands, because that is the only way to test them. M5 is therefore not "add
-  commands" but "finish the agent surface": parameter documentation, batch operations,
-  retry semantics, MCP and CLI end-to-end coverage, and `docs/comiccraft-command-api.md`.
+Three orderings are deliberate:
 
-**Parallel work.** `comic-model`, `comic-ai` and the UI panels are independent after
-M1 and can proceed in parallel. `comic-layout` depends on `comic-model`. Every change
-that touches `crates/engine/src/cmd/comic/` must be serialized through one coordinating
-agent, because the registry is a shared surface. Give each parallel agent its own
-`CARGO_TARGET_DIR` (`AGENTS.md:50`).
+- **The schema and the first page are developed together, M0 → M1.** A data model is only
+  tested by real editing behaviour, so the schema is frozen in M0 and put under load
+  immediately in M1. There is no separate "versioned project model" milestone because the
+  bundle is built in M1.
+- **Commands ship with each feature; M5 completes the surface.** Every phase adds its own
+  commands, because that is the only way to test them. M5 is therefore not "add commands"
+  but "finish the agent surface": parameter documentation, batch operations, retry
+  semantics, MCP end-to-end coverage, and `docs/comiccraft-command-api.md`.
+- **M6 is not the only place a human can work.** In the Rust plan the UI was a late
+  milestone layered on a headless engine, so an agent was the only way to exercise M1. Here
+  M1 already ships a working page in the browser and M6 completes the surrounding studio.
+  This remains the biggest scheduling difference from v1.0.
+
+**What the Rust milestones contribute to sequencing.** M0–M2 in Rust are done (M2 has
+unfinished review records, listed in `docs/milestones/M2.md` §8). Their rules port
+directly, so the new M0–M2 are *port* milestones with a known target rather than design
+milestones — the risk that remains is porting fidelity, not design uncertainty.
+
+**One milestone report per port, not per stack.** The reports are dated and name the stack they
+describe, because the same milestone number means two different implementations: `M0.md` and
+`M1.md` are the Rust record, `M0-M1-node.md` is this one.
+
+**Parallel work.** After M1 the surfaces are independent: story/AI (`server/ai`, M3–M4),
+the agent surface (`shared/commands`, M5), the studio UI (`public/`, M6) and publishing
+(`server/export`, M7). `shared/domain` is the shared surface and is single-writer.
+Because there is no build step there is no compiled artifact to race on: two agents running
+tests in the same checkout cannot invalidate each other's output, so no per-agent cache
+directory is needed.
 
 ---
 
 ## 16. Scope boundaries
 
-### Reuse — verified to exist (audit §11)
+### Behaviour the reference implementation already exhibits (audit §11)
 
-- Vector editing: `geom`, `pathops`, `doc` objects, groups, compound paths.
-- Text and typography: `text` layout, wrapping, overflow, shrink-to-fit, fonts.
-- Live, non-destructive effects: `effects`.
-- Rendering and compositing: `render`, including clip groups, masks, blends.
-- Document history and undo: `engine`.
-- Existing file-format support: `format`, `svg`, `pdf`, and raster encoding.
-- Command registry, control channel, MCP and CLI: `engine`, `ui-egui::control`, `mcp`,
-  `vectorcraft-cli`.
-- Established testing utilities: `testkit` golden renders, the CLI integration tests,
-  the fuzz targets, and `vectorcraft-cli perf`.
+These capabilities were verified to exist in the audited baseline. The new stack
+does not inherit the code, but it inherits the *behaviour* — and where a behaviour is
+subtle (text wrapping, blend modes, PDF geometry), the reference tree is the tie-breaker.
+
+- Vector editing: paths, path boolean operations, objects, groups, compound paths.
+- Text and typography: layout, wrapping, overflow, shrink-to-fit, font handling.
+- Live, non-destructive effects.
+- Rendering and compositing, including clip groups, masks, blends.
+- Document history and undo.
+- File-format support: SVG, PDF, raster encoding.
+- A command registry, a control channel, MCP and a CLI.
+- Golden-render testing.
+
+### Re-implemented in the new stack
+
+Each row names what replaces the reference crate. This is the port backlog, and the
+`new code?` column is the honest answer to "how much of this is genuinely new".
+
+| Behaviour | Reference | New home | New code? |
+|---|---|---|---|
+| Path geometry, transforms | `geom`, `pathops` | `shared/domain/geom` — explicit matrix maths; SVG path data for interchange | Maths is new but conventional; `Path2D` supplies curves |
+| Document model, groups | `doc` | `shared/domain/document` | New; the node/link rules come from `comiccraft-project-schema.md` |
+| Text layout, wrapping, overflow | `text` | `shared/domain/lettering` over an **injected** measure function | New logic, no font files; the browser supplies metrics, tests supply a stub |
+| Effects, blends | `effects` | canvas 2D composites and SVG filters; the effect set is deliberately smaller | Reduced scope, recorded as a known gap |
+| Rendering, compositing | `render` | canvas 2D in `public/editor`; headless canvas in `server/export` | New |
+| Undo/redo, history | `engine` | `public/editor/history.js` — command-pattern transactions | New, small |
+| SVG, PDF, raster out | `svg`, `pdf`, `render::encode` | browser SVG serialization + `server/export` for print PDF via a headless canvas | New |
+| Command registry | `engine` | `shared/commands` | New, small — see §3 Layer E |
+| MCP, CLI | `mcp`, `vectorcraft-cli` | an MCP server over the same command definitions | New, thin |
 
 ### Build
 
 - Comic project, story and asset schemas, with ids and migrations.
 - Panel semantics, templates, gutters and reading order.
-- Lettering semantics and the fitting/overflow policy over `text`.
-- Storyboard and page navigation (none exists; the baseline has tabs and an artboard
-  navigator only).
+- Lettering semantics and the fitting/overflow policy.
+- Storyboard and page navigation.
 - Character continuity and asset provenance.
 - AI generation orchestration, provider adapters and the job lifecycle.
 - Comic-specific validation.
 - Publishing presets and book assembly.
 
-### Do not reuse
+### Do not carry over
 
-- `Document::unknown` and `Document::extra` are for round-tripping **foreign** data
-  (`crates/doc/src/lib.rs:662-676`). They are not a place to store comic metadata.
-- `crates/format` is not extended with a comic section (ADR-013).
-- `Node.name` is not an identifier: it is user-editable and not unique.
-- `crates/affinity`, `cad`, `eps` and `metafile` are unrelated importers/exporters;
-  leave them alone.
+- The reference tree's `Document.unknown` / `Document.extra` round-trip pockets are for
+  **foreign** data. They are not a place to store comic metadata.
+- The reference format must not be extended with a comic section (ADR-013). The comic
+  schema is versioned in the manifest.
+- A node's `name` is not an identifier: it is user-editable and not unique.
 - The ArtCraft brand assets in `docs/brand/` are trademarks and must not be reused;
-  ComicCraft ships original branding.
+  ComicCraft ships original branding. The `craft-fonts` repository stays the font home,
+  and no font file enters this repository — see §17.1.
+- The Rust workspace is not a build dependency and is never added to a `package.json`.
 
 ### Defer
 
@@ -922,81 +1094,96 @@ Do not expand scope until the initial page workflow is reliable.
 
 The coding agent must follow these rules:
 
-1. Read `AGENTS.md` and the relevant crate documentation before making changes.
-2. Inspect actual code and tests before assuming a feature exists. The baseline audit
-   is the starting point, but it describes `3da4080b` and the fork will drift.
+1. Read `AGENTS.md` (ComicCraft's contract) and the relevant directory's documentation
+   before making changes. The reference tree's own contract is
+   `docs/reference/vectorcraft-agents.md` and does **not** apply to ComicCraft work.
+2. Inspect the reference implementation in `reference/vectorcraft/` before assuming a
+   behaviour exists, and inspect the JavaScript before assuming it is implemented. The
+   baseline audit describes `3da4080b` and its claims are about Rust code.
 3. Write a short implementation plan before each milestone.
-4. Keep changes small and scoped to the relevant crate.
+4. Keep changes small and scoped to one directory.
 5. Avoid broad refactors while implementing comic features.
-6. Run targeted tests after each change.
-7. Run the repository's required CI checks before completing a milestone.
+6. Run targeted tests after each change (`node --test test/<file>`).
+7. Run `npm run verify` before completing a milestone.
 8. Add tests for new commands and persistence behaviour.
 9. Update documentation and the milestone's status alongside the implementation.
 10. Report completed behaviour separately from planned or partially implemented behaviour.
 11. Do not silently overwrite user content or approved assets.
-12. Preserve the ability to merge upstream VectorCraft improvements.
 
 ### 17.1 Repository constraints that apply to every change
 
-These are enforced, not advisory. `cargo xtask ci` runs `fmt`, `clippy`, `test`,
-`assets`, `brands`, `layers` and `wasm`, stopping at the first failure
-(`xtask/src/main.rs:175-205`).
+These are enforced by tooling, not advisory. `npm run verify` runs, in order: the type
+check, ESLint, the layering test, the unit tests, the schema-fixture validation, and a
+smoke test that boots the server and serves `index.html`. It stops at the first failure.
 
-- **No panics.** `unwrap()`, `expect()`, `panic!`, `unreachable!`, `todo!` and
-  `unimplemented!` are denied outside tests, and `unsafe_code` is denied workspace-wide
-  (`Cargo.toml:84-96`). New crates inherit the workspace lints — set
-  `[lints] workspace = true` in each new `Cargo.toml`.
-- **Register every new crate** in `xtask/src/layers.rs`, including any same-layer
-  ordering it needs, or `cargo xtask layers` fails.
-- **Never break wasm.** `cargo xtask wasm` is part of the gate, and provider code is
-  feature-gated off for it.
-- **No vendor names in user-visible text.** Command labels, parameter docs, panel text
-  and MCP tool definitions are scanned by `cargo xtask brands`
-  (`xtask/src/brands.rs:14-29`).
-- **Every asset needs a row in `ASSETS.md`,** and no Adobe iconography or GPL/AGPL code
-  may enter the repository (`AGENTS.md:14-34`).
-- **Fonts go to `storytold/craft-fonts`, never here,** and everything must build and
-  test with `CRAFT_FONTS` empty (`AGENTS.md:31`).
-- **One task id per commit**, and the commit passes `cargo xtask ci`.
-- **Parallel agents:** separate `CARGO_TARGET_DIR` each (`AGENTS.md:50`), and edit only
-  the crates you own.
+- **JSDoc types are checked, never emitted.** `tsc --checkJs --noEmit` runs over `shared/`,
+  `server/` and `public/` with `strict` on, plus `noUncheckedIndexedAccess` and
+  `exactOptionalPropertyTypes`. There is no build output: the browser and Node both run the
+  source. A type error is a failed gate, not a warning.
+- **No `any` and no silent coercion.** `@typescript-eslint/no-explicit-any` fails lint,
+  `@ts-ignore` is banned (use `@ts-expect-error` with a reason), and a domain function that
+  can fail returns a typed `Result` — it does not throw and it does not return `undefined`
+  to mean "invalid".
+- **Layer boundaries are lint rules and a test.** `shared/` may not import from `public/`,
+  `server/`, a `node:` builtin, or reference `document`, `window`, `process` or `fetch`; the
+  client may not import from `server/`. A unit test asserts this by walking the tree, so a
+  new file cannot quietly break the rule that makes the shared domain shareable.
+- **Every bundle schema version has a fixture, and the fixtures are validated.** A schema
+  change without a migration and a fixture fails `verify`. This is the load-bearing gate of
+  the repository, inherited from the reference's per-version fixture rule.
+- **No vendor names in user-visible text.** Command labels, parameter documentation, UI
+  copy and MCP tool definitions are scanned by `npm run check:brands`.
+- **Every asset has a row in `ASSETS.md`** and no third-party iconography or GPL/AGPL code
+  enters the repository.
+- **No font files in this repository.** Fonts live in the `craft-fonts` repository and are
+  referenced by URL. Every lettering test must pass with **no fonts configured**: the
+  measurement function is injected, so tests supply a deterministic stub and the browser
+  supplies real metrics. A test that needs a font installed is a broken test.
+- **One runtime dependency.** `fastify`, and nothing else, without a recorded decision.
+  A new production dependency is a commit that states what it replaces from the standard
+  library.
+- **One task id per commit**, and the commit passes `npm run verify`.
+- **Parallel agents:** one writer per directory tree. `shared/domain` and `shared/commands`
+  are the shared surfaces and are single-writer; `public/` is partitioned by feature
+  directory, and two agents must not edit `public/app.js` concurrently.
 
-For parallel work, assign independent modules to separate agents. Keep shared schema
-changes, command registration, and UI integration under one coordinating agent to avoid
-conflicting edits — in this fork that means `crates/engine/src/cmd/comic/` is
-single-writer.
-
-`crates/comic-layout` carries three concerns, so it has three module-tree owners rather
-than one crate owner: layout and templates, lettering and fitting, and publishing and
-export. Its `lib.rs`, `Cargo.toml` and any shared type belong to the coordinating agent.
-The concrete team — nine agents, their module trees and the surfaces they must not touch —
-is defined in `.github/agents/` and `.github/instructions/comiccraft-work.instructions.md`;
-that ownership table is the source of truth for who may edit what.
+`shared/domain` carries three concerns that are genuinely separable — narrative structure,
+panel layout, and lettering/fitting — so it has three module-tree owners rather than one
+owner. Its `index.js` and any shared type belong to the coordinating agent. The concrete
+team, its module trees and the surfaces each owner must not touch are defined in
+`.github/agents/` and `.github/instructions/comiccraft-work.instructions.md`; that ownership
+table is the source of truth for who may edit what.
 
 ---
 
 ## 18. First task for the coding agent
 
-**Task: stand up the fork and land M0. Do not start comic features yet.**
+**Task: stand up the repository and land M0. Do not start comic features yet.**
 
-The audit and design are complete, so this is no longer a research task. Do exactly
-this:
+The audit, the design and the frozen schema are complete, so this is a porting task, not a
+research task. Do exactly this:
 
-1. Create the `comiccraft` fork at `3da4080b`, add the upstream remote, create the
-   baseline branch, and move `comiccraft/porting_plan_and_design/` into it.
-2. Run `cargo xtask ci` on the untouched baseline and save the output with its timings.
-3. Write `docs/comiccraft-project-schema.md`: the bundle schema from design §7.1 — the
-   manifest, `project.json`, per-page files, the `NodeId`/`artboard_id` link rules and
-   id allocation, migration rules, and a fixture per version. It must not contradict
-   design §5.
-4. Add `crates/comic-model`, `crates/comic-ai` and `crates/comic-layout` as empty,
-   documented crates with `[lints] workspace = true`, registered in
-   `xtask/src/layers.rs`, and confirm `cargo xtask ci` still passes.
-5. Prove the M1 acceptance path by hand through commands (Phase 0, task 3) and record
-   the result, including anything that behaved differently from the audit.
+1. Create the repository layout of §4 — `server/`, `public/`, `shared/`, `schema/`,
+   `test/`, `docs/` — with `package.json` listing `fastify` as the only runtime dependency,
+   and `server.js` serving `public/` and answering `/api/health`.
+2. Move the reference tree to `reference/vectorcraft/` and confirm nothing imports it.
+   Record the exact commit it was taken from.
+3. Port the frozen schema: read `docs/comiccraft-project-schema.md` and produce
+   `schema/v1/*.schema.json` plus one fixture per entity, and
+   `shared/domain/validate.js` that validates a bundle against it. The document is the
+   authority; where it is ambiguous, the reference implementation settles it and the
+   resolution is recorded as a finding.
+4. Add `npm run verify` and make it green: type check (JSDoc, no emit), lint including the
+   layering rule, the layering unit test, `node --test`, and the schema-fixture
+   validation.
+5. Prove the M1 path by hand through commands — create a project, add a page with three
+   panels, place and clip an image, add lettering, save, reopen, export PNG and PDF — and
+   record what behaved differently from the audit. A difference is a finding, not a
+   failure.
 
 Then stop and report, without starting M1's implementation.
 
-**Success condition:** a reviewer can approve M1 using the schema document, the
-baseline CI report, and a demonstrated three-panel page exported to PDF through
-commands — without needing to guess how the existing codebase works.
+**Success condition:** a reviewer can approve M1 using the schema files, a green
+`npm run verify`, and a demonstrated three-panel page exported to PDF — with a working tree
+that installs in one `npm install` and runs with one `node server.js`, on a laptop that has
+never had a Rust toolchain on it.

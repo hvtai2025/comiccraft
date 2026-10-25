@@ -1,0 +1,76 @@
+# The ComicCraft gate, in CI.
+#
+# This is the same `npm run verify` the local gate runs and the verify skill records as
+# evidence (plan §17.1). There is no build step and no compiled output, so this job is
+# short: install, then verify.
+#
+# Deliberately absent:
+#   - no Rust toolchain is installed, and nothing here may require one
+#   - no font files are fetched; lettering must pass with no fonts configured
+#   - no browser is launched; the shared-boundary test proves both runtimes instead
+#
+# Two Node versions on purpose: the floor the project declares (22) and the current release,
+# because a stack with one runtime dependency still breaks on a runtime change.
+name: Verify
+
+on:
+  push:
+    branches: [main]
+    # The reference tree is read-only and never built, so its changes cannot affect the gate.
+    paths-ignore: ["reference/**", "docs/**", "**/*.md"]
+  pull_request:
+    paths-ignore: ["reference/**", "docs/**", "**/*.md"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: verify (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          # The reference checkout is large and is never built or imported. Skipping it makes
+          # this job's cost independent of the reference tree's size, and proves the gate does
+          # not secretly depend on it.
+          sparse-checkout: |
+            /*
+            !/reference
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Confirm no Rust toolchain is needed
+        run: |
+          if [ -f Cargo.toml ] || [ -d crates ]; then
+            echo "::warning::a Cargo workspace is present at the root; the gate must not use it"
+          fi
+          command -v cargo >/dev/null 2>&1 && echo "cargo is present on this runner (unused)" || echo "no cargo, as intended"
+
+      - run: npm ci
+
+      - name: Verify
+        run: npm run verify
+
+      - name: Upload gate evidence
+        if: always()
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        with:
+          name: verify-node-${{ matrix.node }}
+          path: |
+            docs/ci-*.md
+          if-no-files-found: ignore
+          retention-days: 14

@@ -91,10 +91,10 @@ value_of() { sed -E 's/^[^:]*:[[:space:]]*//' | tr -d '\r' | sed -E 's/[[:space:
 
 # Join a field whose value continues below it, so a record that writes either
 #   Unit tests:
-#     crates/x.rs — cargo test — 3 passed
+#     test/x.test.js — node --test — 3 passed
 # or
 #   Unit tests:
-#   - crates/x.rs — cargo test — 3 passed
+#   - test/x.test.js — node --test — 3 passed
 # is read as one value instead of an empty one. Continuation lines are indented lines and
 # list items; a new "Key:" line or any other line ends the value.
 flatten_block() {

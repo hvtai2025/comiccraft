@@ -1,81 +1,185 @@
-# VectorCraft — instructions for agents
+# ComicCraft — instructions for agents
 
-VectorCraft is a clean-room, open-source, Rust-native vector illustration app targeting Adobe Illustrator parity (and beyond). It runs natively on macOS, Windows and Linux, and on the web via WASM. Siblings: `../photocraft` (Photoshop-class) and `../pdfcraft` (Acrobat-class); same conventions.
+ComicCraft turns prompts, scripts and existing stories into **editable** comic books.
 
-Formerly **DrawCraft** (renamed 2026-10-01): old `.drawcraft` files and `"format": "drawcraft"` headers still open (`vectorcraft_format::LEGACY_EXTENSION`), and preferences migrate from the old config folder. Keep those paths working; use the new name everywhere else.
+The stack is a **Node.js backend plus a client-side HTML/JavaScript frontend**, sharing one
+plain-JavaScript domain that both runtimes import unchanged. No Rust. No framework. No
+bundler. No build step.
+
+> The audited VectorCraft baseline is a **read-only reference** in `reference/vectorcraft/`.
+> It answers *"how should this behave?"* and it supplies the bundle format. It is never
+> imported, never compiled, and never listed as a dependency.
+> Its own agent contract is preserved at
+> [`docs/reference/vectorcraft-agents.md`](docs/reference/vectorcraft-agents.md).
 
 ## Start every session here
-1. Read the [honest assessment in `ROADMAP.md`](ROADMAP.md#honest-assessment-2026-10-05): where we stand by dimension, **where we're lacking** (the prioritized gap list) and **where we're going**. Unless the user gives you a task, pick work from that list.
-2. Read `plan/STATUS.md` (local session notes, may lag the ROADMAP), then the task in `plan/execution-plan.md` §3 and the relevant `plan/architecture.md` section. Behaviour reference: public documentation only (see Clean-room below); `plan/illustrator/*.md` holds notes from it.
-3. Follow the autonomous operation protocol (`plan/execution-plan.md` §7): orient → plan → implement + test → verify → record → commit. Don't stop to ask unless §7 lists the decision as the user's.
 
-`plan/` is gitignored (local only).
+1. Read [`docs/comiccraft-porting-plan.md`](docs/comiccraft-porting-plan.md) —
+   **§2** (why this stack), **§3** (the layers), **§4** (the workspace and the dependency
+   rules), **§17.1** (what the gate enforces), then the phase you are working in and its
+   exit criteria. The exit criteria are the definition of done; do not substitute your own.
+2. Read [`docs/comiccraft-design.md`](docs/comiccraft-design.md) §4, §5, §6, §7 and §10 —
+   the sections that constrain code.
+3. Read [`docs/comiccraft-porting-audit.md`](docs/comiccraft-porting-audit.md) for what the
+   reference implementation does, with `path:line` citations into it.
+4. Read [`.github/instructions/comiccraft-work.instructions.md`](.github/instructions/comiccraft-work.instructions.md)
+   — the ownership table. One writer per module tree.
+
+Then: **orient → plan → implement + test → verify → record → commit.** Do not stop to ask
+unless the decision is the user's to make.
+
+## Running it
+
+```sh
+npm install                 # fastify, and nothing else at runtime
+node server.js              # serves public/ and the command API on :3000
+npm run verify              # the gate — seconds, not minutes
+node --test test/<file>     # one suite
+```
+
+**Node 22 or newer.** The gate must never need a Rust toolchain, a font file, or a browser.
+A test that requires any of the three is a broken test.
 
 ## Non-negotiables
-- **Clean-room: never use Adobe software (absolute rule, from the project owner).** Adobe's Terms of Use forbid reverse engineering, including observing a program's inputs and outputs to recreate it. So:
-  - Never launch, run, script, automate (COM, AppleScript, ExtendScript, UI automation), screenshot or measure Illustrator or any other Adobe application, and never compare our output against one. Don't make test files with them, not even "synthetic" ones.
-  - Never read, disassemble or copy anything inside an Adobe install (binaries, plug-ins, presets, procsets, resources, help files, fonts, ICC profiles).
-  - Never copy Adobe-authored code or text into this repo, tests included: no PostScript procsets or prologs (AGM, CoolType, the Illustrator prologs), no sample files. Write test inputs from scratch from the public specifications (PostScript Language Reference, PDF / ISO 32000, TIFF, EPSF/DCS).
-  - Behaviour comes only from public documentation (helpx, published specs, public forum posts), cited by URL, and from files users send us that they own (used locally, never committed). Never copy Adobe icons, artwork, presets or wording beyond feature names.
-  - If a task seems to need any of this, stop and say so instead. `cargo xtask cleanroom` (run by `cargo xtask ci`) fails on Adobe copyright notices and on fixtures made with Adobe applications.
-  - Never copy GPL/AGPL code (Inkscape, lib2geom…).
-- **Assets: no Adobe iconography or images — ever (absolute rule, from the project owner).**
-  - Never add, copy, trace, redraw-from, embed or ship any icon, image, artwork, cursor, preset, swatch/brush/symbol/pattern/style library, ICC profile or screenshot from Adobe products or from any other source whose licence doesn't allow it.
-  - Every image, icon, font or other asset must be one of:
-    - original work created for VectorCraft by a contributor (who licenses it MIT OR Apache-2.0);
-    - OSI open source;
-    - public domain / CC0;
-    - Creative Commons with redistribution allowed.
-  - **Every asset file must have a row in [`ASSETS.md`](ASSETS.md)** (path, author, source URL, licence, notes). Put licence texts next to the assets (e.g. `assets/fonts/OFL-*.txt`) and summarize them in `NOTICE`.
-  - `cargo xtask assets` (run by `cargo xtask ci`) fails on any unattributed asset.
-  - **Fonts live in [storytold/craft-fonts](https://github.com/storytold/craft-fonts), never in this repo** (rules: craftrules [`standards/fonts.md`](https://github.com/storytold/craftrules/blob/main/standards/fonts.md)). Never commit a font file here; add new fonts to craft-fonts. The app uses it only through the optional `CRAFT_FONTS_DIR` build option (`CRAFT_FONTS_DIR="$PWD/../craft-fonts" cargo xtask ci`; use an absolute path), read by `crates/text/build.rs` into `vectorcraft_text::CRAFT_FONTS`; never add it to a `Cargo.toml`. Everything must build, test and run with `CRAFT_FONTS` empty, and tests of its glyphs skip when it is. Details: `docs/development.md` › Fonts.
-  - Code and original assets are MIT OR Apache-2.0 (`LICENSE-MIT`, `LICENSE-APACHE`, `NOTICE`). The ArtCraft logos in `docs/brand/` are trademarks, not open source, under `docs/brand/LICENSE-brand.txt`: never modify them or use them outside VectorCraft.
-  - Prefer art generated in code for defaults (swatches, brushes, symbols, patterns, cursors). If the provenance of an asset is unclear, don't add it.
-  - Reference screenshots of Illustrator stay local under the gitignored `plan/` and are never committed, published or used as assets.
-- **Never crash: no panics in shipped code.** A crash loses the user's unsaved work. Files, pasted data, MCP and control messages, and command params are all untrusted input.
-  - Fallible work returns `Result` (or `Option`); callers handle it or propagate it with `?`. Failures reach the user as an error message (`EngineError` for commands, the crate's own error type or `String` below the engine), never as an abort.
-  - Workspace clippy lints ban these outside tests, so `cargo xtask ci` fails on them: `unwrap()`, `expect()`, `panic!`, `unreachable!`, `todo!`, `unimplemented!`. Use instead: `?`, `.ok_or(…)?`, `let … else { return … }`, `if let`, `unwrap_or` / `unwrap_or_default` / `unwrap_or_else`, `.first()` / `.last()` / `.split_last()`, and a real error for a match arm you believe is impossible.
-  - Don't panic implicitly either: use `.get(i)` instead of `v[i]` or `&s[a..b]` when the index comes from data. Don't divide integers by something that can be zero, cap sizes and counts read from input (allocations, images, loops), and check that floats are finite before casting them or looping on them.
-  - Don't silence errors just to satisfy the lint: use `let _ =` or `.ok()` only where ignoring the failure is the right behaviour, with a comment saying why.
-  - Tests may unwrap and panic (`#[test]`, `#[cfg(test)]`, `tests/`, `testkit`). Integration-test files start with an `#![allow(…)]` for that.
-  - `vectorcraft_engine::guard` is the last line of defence. Every entry point (commands, tool events, MCP requests, the UI frame, control requests) catches a panic, rolls the document back and reports an internal error. It exists for bugs and doesn't replace `Result`: wasm aborts on panic, so the web app has no safety net.
-  - Untrusted input is fuzzed (`engine/tests/import_fuzz.rs`, `engine/tests/command_sweep.rs`, `format/tests/prop_format.rs`, `mcp/tests/protocol_props.rs`). Extend these when you add an importer, a parser or a protocol method.
-- **Everything is a command.** User-visible behaviour = a command in `crates/engine/src/cmd/*` (id, label, menu path, shortcut, params doc, `enabled`, `run`) + tests. Tools emit commands (Begin/Preview/Commit). UI-only commands live in `crates/ui-egui/src/menus.rs` (`UI_COMMANDS`). The control channel and MCP reach all of them.
-- **Layering** is enforced by `cargo xtask layers`. Nothing below L6 depends on egui/eframe/winit/rfd.
-- **The UI is thin**: panels read engine state and act through `app.run(id, params)`. Colours come from `theme::Tokens`.
-- **Rust only** (no handwritten JS/TS). **Never break wasm** (`cargo xtask wasm`).
-- **Shared test corpora.** Real-file test oracles (Photoshop-authored PSDs, etc.) live in [`storytold/photocraft-corpus`](https://github.com/storytold/photocraft-corpus), explained in [craftrules `standards/test-corpora.md`](https://github.com/storytold/craftrules/blob/main/standards/test-corpora.md). Never commit large binary fixtures to this repo; fetch them pinned by commit and sha256-verified, as PhotoCraft does with `cargo xtask corpus`.
-- **Quality gates** before every commit: `cargo xtask ci` (fmt, clippy -D warnings including the no-panic lints, tests, layers, wasm). One task id per commit (`M2.1: pen tool`).
 
-## Running and looking at the app
-- `cargo run --release -p vectorcraft -- --control 7979 [file.svg|file.vectorcraft]` (sibling apps' agents use the same default port: if the log says it failed to bind, pick another port — otherwise your requests reach a different app).
-- Drive it: JSON lines on `127.0.0.1:7979`, e.g. `{"id":1,"method":"engine.execute","params":{"command":"shape.rectangle","params":{"x":10,"y":10,"width":100,"height":50}}}` then `{"id":2,"method":"ui.screenshot","params":{"path":"/tmp/shot.png"}}`. Methods: `crates/ui-egui/src/control.rs`.
-- **For UI work, look at the result** (take `ui.screenshot`, read the PNG) and compare with the public documentation (`plan/illustrator/02-ui-ux.md` notes). `ui.screenshot` needs a presented frame: if it errors (screen locked), check the art with `ui.render` / `vectorcraft-cli run … --export x.png`, and cover panels with a headless egui frame test (see `panels/transparency.rs` tests).
-- **Performance:** `vectorcraft-cli perf` checks the budgets (render/pan/zoom, hit test, save/open, SVG, Pathfinder) on a synthetic 50k-path document; `vectorcraft-cli bench FILE` times one file. Run them before and after renderer, format or geometry changes, on an idle machine (the report warns when the load average makes timings noise).
-- MCP: `vectorcraft-cli mcp` (see `docs/mcp.md`).
-- Shell gotcha: `mv`/`cp` are aliased interactive here — use `/bin/mv -f` / `/bin/cp -f`.
-- Parallel agents: separate `CARGO_TARGET_DIR` per agent; edit only the crates you own; write manifests atomically. Each target dir grows to ~30 GB: delete yours when you finish (a full disk fails links with `errno=28`).
+### The three structural rules
 
-## Roadmap
-`ROADMAP.md` (committed) is the shared picture of where VectorCraft stands. It holds status, the honest assessment (by dimension, the gap list, the direction), milestones, the parity table and time-to-parity estimates.
-- When a task lands, update it in the same PR: the milestone row, the parity-table row (score, missing items, hours), "Shipped so far", and the gap list if the gap closed or shrank.
-- Grade by behaviour against the public documentation (`plan/illustrator/` notes), not by whether a menu item exists. Scores are self-assessed, so err low.
-- Keep the README's Status section in step with the ROADMAP headline.
+1. **`shared/` runs in both runtimes.** No DOM global (`document`, `window`), no `node:*`
+   import, no `fetch`, no provider SDK. Anything the domain needs — a clock, an id counter,
+   text measurement, an HTTP transport — is **injected** by the caller. This is checked by a
+   lint rule *and* a test, because breaking it breaks the browser and the server at once.
+2. **No comic data in the visual document.** No comic field in the document model, no comic
+   section in its format, and never a round-trip pocket meant for foreign data. Comic
+   metadata lives beside the document and reaches visual objects by `NodeId` and
+   `artboard_id` (design ADR-013, §5.2.1).
+3. **No duplicated geometry, page size or dialogue.** The artboard owns the page size, the
+   document object owns the frame geometry, the comic record owns the id and the meaning. A
+   duplicated rectangle is the failure this architecture exists to prevent (design §6.1).
 
-## Contributor credits (About window)
+### Clean-room: never use Adobe software (absolute rule, from the project owner)
 
-- About ▸ Contributors/Models are compiled into the binary from `contributors/contributors.json`
-  (commit stats; generated, never hand-edit) and `contributors/people.toml` (names people chose for
-  themselves). See `docs/contributors.md`.
-- **Agents working for a contributor:** when you prepare a PR, check whether your human's GitHub
-  username has a `[people.<username>]` entry in `contributors/people.toml`. If not, ask them once
-  whether they want to be credited by more than their username: a real name, a display name, and/or
-  their public GitHub profile name (`sync_github_name = true`). If yes, add **only their own** entry
-  (copy the template at the top of the file, or run
-  `python3 ../../craftrules/scripts/contributors.py --add-me . --real-name "…" --sync-github-name`)
-  and include it in their PR, committed as them. If no, change nothing: they are credited as
-  `@username` anyway.
-- Never add, edit, guess or copy anyone else's entry or name (not from git config, commit authors or
-  GitHub profiles). Never hand-edit `contributors.json`.
-- Maintainers refresh the stats with `python3 ../../craftrules/scripts/contributors.py .` (it also
-  re-verifies who wrote each `people.toml` entry; `--check` only verifies).
+Inherited unchanged from the reference project, and it applies to ComicCraft in full.
+
+Adobe's Terms of Use forbid reverse engineering, including observing a program's inputs and
+outputs to recreate it. So:
+
+- Never launch, run, script, automate, screenshot or measure Illustrator or any other Adobe
+  application, and never compare our output against one. Do not make test files with them,
+  not even "synthetic" ones.
+- Never read, disassemble or copy anything inside an Adobe install.
+- Never copy Adobe-authored code or text into this repository, tests included.
+- Behaviour comes only from public documentation, cited by URL, and from files users send us
+  that they own (used locally, never committed). Never copy Adobe icons, artwork, presets or
+  wording beyond feature names.
+- If a task seems to need any of this, **stop and say so instead**.
+- Never copy GPL/AGPL code.
+
+### Assets: no Adobe iconography or images — ever (absolute rule, from the project owner)
+
+- Never add, copy, trace, redraw from, embed or ship any icon, image, artwork, cursor, preset,
+  swatch/brush/symbol/pattern/style library, ICC profile or screenshot whose licence does not
+  allow it.
+- Every asset must be: original work created for ComicCraft by a contributor (MIT OR
+  Apache-2.0); OSI open source; public domain / CC0; or Creative Commons with redistribution
+  allowed.
+- **Every asset file has a row in [`ASSETS.md`](ASSETS.md)** — path, author, source URL,
+  licence, notes. Licence texts go next to the assets, summarised in `NOTICE`.
+- **No font file ever enters this repository.** Fonts live in
+  [`storytold/craft-fonts`](https://github.com/storytold/craft-fonts) and are referenced by
+  URL. Every lettering test passes with **no fonts configured**, because text measurement is
+  injected — tests supply a deterministic stub.
+- Code and original assets are MIT OR Apache-2.0.
+- Prefer art generated in code for defaults. If the provenance of an asset is unclear, do not
+  add it.
+
+### Failures are values, not throws
+
+A crash or a swallowed error loses the user's unsaved work, and a comic project is a
+directory of files that can be half-written.
+
+- A domain function that can fail returns a **typed `Result`**. It does not throw, and it
+  does not return `undefined` to mean "invalid".
+- Do not swallow an error to satisfy a lint. An empty `catch` needs a comment saying why.
+- A `Promise` is awaited or explicitly handed off — never dropped.
+- **Untrusted input is validated before it is used**: bundles, imported files, MCP messages,
+  HTTP bodies and command parameters. Cap sizes and counts read from input; check that a
+  number is finite before doing maths with it; resolve a path against the project root and
+  refuse to escape it.
+- Every importer, parser or protocol method extends [`test/fuzz.js`](test/fuzz.js) — malformed
+  bundles, and malformed parameters for every registered command.
+- The dispatcher catches at the command boundary and rolls the transaction back, so a bad
+  call cannot leave a half-applied edit. That guard exists for bugs; it does not replace
+  returning a `Result`.
+
+### Everything is a command
+
+User-visible behaviour is a command in `shared/commands` — id, label, parameter schema,
+`enabled`, handler — plus tests. The browser UI, the HTTP endpoint and MCP all reach it
+through one dispatcher, so a click and an agent call run the same code (design §3, Layer E).
+
+- **Additive only.** Never change an existing command's id, parameters, enablement or
+  behaviour.
+- The parameter schema **is** the documentation MCP publishes.
+- A handler needs the filesystem, a provider or a renderer? It is `serverOnly` and lives in
+  `server/commands`. Everything else must run in the browser too.
+- The UI is thin: panels read project state and act by dispatching commands. No comic logic
+  in a panel.
+- One runtime dependency. A new one is a decision, stated in the commit with what it replaces
+  from the standard library.
+
+## The gate
+
+`npm run verify` — type check (JSDoc, no emit), ESLint including the boundary rules, the
+layering unit test, `node --test`, the schema-fixture validation, and the server smoke test.
+It stops at the first failure. Nothing is complete until it passes.
+
+Before every commit: the gate passes, and **one task id per commit** (`M1.2: panel templates`).
+
+A gate nobody has seen fail is not evidence. When you add or change a rule, break it on
+purpose, watch `verify` go red, then revert.
+
+## The mandatory review rule
+
+**No implementation is complete until it has had two rounds of code review on
+`deepseek-v4.1-flash`, and its unit tests pass.** Round 1 covers correctness and whether the
+tests test behaviour; round 2 covers the hard rules, failure paths and edge cases on the
+post-fix revision. The lead spawns the reviewer; nobody reviews their own work. Every change
+leaves a record in `docs/reviews/<milestone>-<owner>-<slug>.md`.
+
+Full rule: [`.github/instructions/implementation-review.instructions.md`](.github/instructions/implementation-review.instructions.md).
+
+## Parallel agents
+
+- **One writer per module tree**, per the ownership table. No two agents edit the same file.
+- `shared/domain/**` and `shared/commands/**` are single-writer surfaces.
+- There is no compiled output and no shared build cache, so agents cannot collide on an
+  artifact — but they can collide on files. Dispatch only as many as the module trees
+  genuinely support.
+- Write JSON files atomically; do not reformat a file another agent owns.
+- When several agents disappear at once, that is a capacity signal rather than a bug to
+  diagnose.
+
+## Contributor credits
+
+- About ▸ Contributors compiles names from `contributors/people.toml`.
+- **Agents working for a contributor:** when you prepare a PR, check whether your human's
+  GitHub username has a `[people.<username>]` entry. If not, ask them once whether they want
+  to be credited by more than their username.
+- **Never add, edit, guess or copy anyone else's entry or name** — not from git config, commit
+  authors or GitHub profiles. Add only your own contributor's entry, committed as them.
+
+## Where things are
+
+| | |
+|---|---|
+| Why this stack | `docs/comiccraft-porting-plan.md` §2 |
+| The layers and the boundaries | plan §3, §4 |
+| What the gate enforces | plan §17.1 |
+| The architecture | `docs/comiccraft-design.md` |
+| What the reference does | `docs/comiccraft-porting-audit.md` |
+| The frozen bundle schema | `docs/comiccraft-project-schema.md`, `schema/v1/` |
+| Ownership | `.github/instructions/comiccraft-work.instructions.md` |
+| Review rule | `.github/instructions/implementation-review.instructions.md` |
+| Milestone reports | `docs/milestones/M<n>.md` |
+| Review records | `docs/reviews/` |
+| The reference contract | `docs/reference/vectorcraft-agents.md` |

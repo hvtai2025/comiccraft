@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComicCraft character",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 60,
+      "description": "A stable, never-reused comic id."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 2000,
+      "description": "Continuity note carried into every generation."
+    },
+    "referenceAssetIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 60,
+        "description": "A stable, never-reused comic id."
+      }
+    },
+    "canonicalDescription": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "approvedDesignVersion": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 60
+    },
+    "continuityRules": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "maxItems": 50
+    },
+    "continuityExceptions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "maxItems": 50
+    },
+    "appearance": {
+      "type": "object"
+    },
+    "designVersions": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "description",
+    "referenceAssetIds"
+  ],
+  "additionalProperties": false
+}

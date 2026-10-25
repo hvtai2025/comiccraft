@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "nextNodeId": 6,
+  "retiredArtboards": [],
+  "artboards": [
+    {
+      "id": 10,
+      "name": "Page 1",
+      "size": {
+        "width": 1275,
+        "height": 1950
+      },
+      "nodes": [
+        1,
+        2,
+        4,
+        5
+      ]
+    }
+  ],
+  "nodes": {
+    "1": {
+      "id": 1,
+      "kind": "frame",
+      "name": "Panel",
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "width": 1275,
+        "height": 1950
+      },
+      "fill": "#ffffff",
+      "stroke": "#111111",
+      "strokeWidth": 3
+    },
+    "2": {
+      "id": 2,
+      "kind": "image",
+      "name": "Art",
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "width": 1275,
+        "height": 1950
+      },
+      "assetId": "asset_1",
+      "fit": "cover",
+      "clipToFrame": true
+    },
+    "4": {
+      "id": 4,
+      "kind": "text",
+      "name": "Balloon",
+      "frame": {
+        "x": 100,
+        "y": 1500,
+        "width": 400,
+        "height": 120
+      },
+      "text": "IT FITS.",
+      "fontSize": 12,
+      "lineHeight": 1.25,
+      "align": "left",
+      "color": "#111111"
+    },
+    "5": {
+      "id": 5,
+      "kind": "frame",
+      "name": "Balloon Tail",
+      "frame": {
+        "x": 34,
+        "y": 84,
+        "width": 12,
+        "height": 12
+      },
+      "fill": "#ffffff",
+      "stroke": "#111111",
+      "strokeWidth": 2
+    }
+  }
+}

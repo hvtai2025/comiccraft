@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComicCraft dialogue",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 60,
+      "description": "A stable, never-reused comic id."
+    },
+    "characterId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "letteringId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 60,
+      "description": "A stable, never-reused comic id."
+    },
+    "text": {
+      "type": "string",
+      "maxLength": 4000
+    }
+  },
+  "required": [
+    "id",
+    "characterId",
+    "letteringId",
+    "text"
+  ],
+  "additionalProperties": false
+}

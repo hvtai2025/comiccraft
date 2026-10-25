@@ -1,6 +1,6 @@
 ---
 name: comiccraft-verify
-description: 'Verify a ComicCraft milestone independently. Use when closing a milestone, when asked to verify, validate or prove that ComicCraft work is done, before accepting a claim that something is complete, or when checking that a hazard from the baseline audit has a covering test. Runs the cargo xtask ci gate, turns each exit criterion into a runnable check, and returns an accept or reject verdict.'
+description: 'Verify a ComicCraft milestone independently. Use when closing a milestone, when asked to verify, validate or prove that ComicCraft work is done, before accepting a claim that something is complete, or when checking that a hazard from the reference audit has a covering test. Runs the npm run verify gate, turns each exit criterion into a runnable check, and returns an accept or reject verdict.'
 argument-hint: 'M0 | M1 | ...'
 ---
 
@@ -13,8 +13,8 @@ the report, and it refuses to accept a criterion nobody ran.
 
 - Closing a milestone.
 - Before accepting any claim that work is complete.
-- After merging upstream, to re-prove comic behaviour.
-- When asked whether a hazard from the audit is covered by a test.
+- After a schema or domain change, to re-prove comic behaviour.
+- When asked whether a hazard from the reference audit is covered by a test.
 
 ## Procedure
 
@@ -50,38 +50,44 @@ Exit codes: `0` complete, `1` gaps (including a named milestone with no records 
 bash ./scripts/gate.sh
 ```
 
-The gate is `cargo xtask ci` — fmt, clippy, test, assets, brands, layers, wasm — and it
-stops at the first failure. It takes a long time: run it with a generous wait or in the
-background, and read the tail when it finishes. It writes `docs/ci-<sha>.md` — Markdown on
-purpose, because `cargo xtask brands` scans non-Markdown text files under `docs/` and a
-build log contains vendor names in upstream test names.
+The gate is `npm run verify` — type check (JSDoc, no emit), ESLint including the boundary
+rules, the layering unit test, `node --test`, the schema-fixture validation and the server
+smoke test — and it stops at the first failure. It writes `docs/ci-<sha>.md`.
 
-The script refuses to run outside the fork, and refuses to run on a toolchain older than
-the workspace's `rust-version`, because an older cargo cannot even parse the manifest.
+The script refuses to run outside the ComicCraft checkout, on a Node older than 22, or
+without `node_modules`, because each of those produces a failure that looks like a code
+defect and is not one.
+
+**The gate must never need a Rust toolchain, a font file, or a browser.** If it does, that
+is itself the finding: a test that requires one of the three is a broken test on this stack
+(plan §17.1).
 
 ### 4. Check each criterion
 
 Hand the milestone to `verification-engineer` with the criteria and the gate result. They
-test at the seams the implementer cannot see: bundle round trips, cross-module behaviour,
-the CLI, MCP, and the rendered result.
+test at the seams the implementer cannot see: bundle round trips, cross-runtime behaviour,
+the command surface over HTTP and MCP, and the rendered result.
 
 Guidance for the checks themselves:
 
-- Rendered pages: compare perceptually with `testkit::raster::assert_similar` and keep the
-  diff artifact. Never assert byte equality of a PNG.
-- End to end: drive it through `vectorcraft-cli run` and `mcp --headless` under
-  `--automation-read-root` / `--automation-write-root`, the way an agent would.
-- Failure paths are criteria too: interrupted save, provider failure, cancelled job,
-  missing asset, missing font, deleted artboard.
-- Performance: `vectorcraft-cli perf` before and after, against M0's saved baseline. Report
-  noise rather than claiming a regression.
-- Every new comic command gets a malformed-input case in `engine/tests/command_sweep.rs`.
+- Rendered pages: compare with a perceptual diff and keep the artifact. Never assert byte
+  equality of a PNG.
+- **Both runtimes**: a criterion about the domain is not proven until it holds when the
+  module is loaded by Node *and* when it is loaded in a browser context. The cheapest honest
+  check is a `node --test` case plus the boundary test, not a browser launch.
+- End to end: drive it through the HTTP command endpoint and through MCP, the way an agent
+  would.
+- Failure paths are criteria too: interrupted save, provider failure, cancelled job, missing
+  asset, missing font, deleted artboard.
+- Performance: record page-load and render timings against the numbers recorded at M1.
+  Report noise rather than claiming a regression.
+- Every new comic command gets a malformed-parameter case in `test/fuzz.js`.
 
 ### 5. Check the hazards
 
-Cross-check the baseline audit's §12 hazards against the milestone. A hazard that has
-closed should have a test that fails without the fix — especially §12.3, the artboard-id
-reuse hazard, which is silent when it breaks.
+Cross-check the reference audit's §12 hazards against the milestone. A hazard that has closed
+should have a test that fails without the fix — especially §12.3, the artboard-id reuse
+hazard, which is silent when it breaks.
 
 ### 6. Verdict and report
 
@@ -90,7 +96,7 @@ complete, the gate passes, and no hazard is uncovered that this milestone claime
 Otherwise reject, and name the one thing that must change.
 
 Write `docs/milestones/M<n>.md` using the lead's format, and include the gate result
-verbatim — a milestone that claims `cargo xtask ci` passes must show it.
+verbatim — a milestone that claims `npm run verify` passes must show it.
 
 ```text
 Milestone:   M<n>
@@ -99,7 +105,8 @@ Criteria:    <each one: pass | fail | not run, with the command and its output>
 Reviews:     <per implementation: round 1 verdict, round 2 verdict, unit tests — from check-reviews.sh>
 Regressions: <what broke, with a minimal reproduction>
 Hazards:     <which audit hazards have a covering test, and which do not>
-Gate:        cargo xtask ci — pass | fail (<first failing step, verbatim>)
+Gate:        npm run verify — pass | fail (<first failing step, verbatim>)
+Runtime:     node <version>  (no Rust toolchain, no bundled font, no browser required)
 Verdict:     accept | reject (<the one thing that must change>)
 ```
 
@@ -113,9 +120,11 @@ Verdict:     accept | reject (<the one thing that must change>)
 - Do not accept "it should work". Run it, and cite the command and its output.
 - Report `not run` honestly rather than guessing at a criterion's outcome.
 - A criterion that cannot be run as written is a defect in the criterion; raise it.
+- **A gate that needs a Rust toolchain, a font file or a browser is a defect**, not a
+  prerequisite. Report it.
 
 ## Resources
 
-- [Gate script](./scripts/gate.sh) — runs `cargo xtask ci`, saves evidence, reports the first failure
+- [Gate script](./scripts/gate.sh) — runs `npm run verify`, saves evidence, reports the first failure
 - [Review-record checker](./scripts/check-reviews.sh) — two rounds, verdicts, unit tests, revision moved
 - [Verification playbook](./references/verification-playbook.md) — per-criterion checks and the harness to use

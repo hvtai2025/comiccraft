@@ -1,0 +1,12 @@
+{
+  "id": "lettering_1",
+  "kind": "balloon",
+  "nodeId": 4,
+  "text": "IT FITS.",
+  "overflowPolicy": "warn",
+  "tailNodeId": 5,
+  "tailTip": {
+    "x": 40,
+    "y": 90
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComicCraft manifest",
+  "description": "Written last, so it can never reference partially written data.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "documentVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 60,
+      "description": "A stable, never-reused comic id."
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "pageCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic project revision; generation jobs reconcile against it."
+    }
+  },
+  "required": [
+    "name",
+    "schemaVersion",
+    "documentVersion",
+    "projectId",
+    "title",
+    "pageCount"
+  ],
+  "additionalProperties": false
+}

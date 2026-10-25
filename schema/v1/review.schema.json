@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComicCraft review decision",
+  "description": "An approval or rejection with an actor and a time; the asset it superseded is retained.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 60
+    },
+    "subject": {
+      "type": "string",
+      "enum": [
+        "asset",
+        "story",
+        "character",
+        "batch",
+        "publication"
+      ]
+    },
+    "subjectId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "approved",
+        "rejected",
+        "superseded"
+      ]
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "timestamp": {
+      "type": "number"
+    },
+    "note": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 1000
+    },
+    "supersededAssetId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 60
+    }
+  },
+  "required": [
+    "id",
+    "subject",
+    "subjectId",
+    "decision",
+    "actor",
+    "timestamp"
+  ],
+  "additionalProperties": false
+}

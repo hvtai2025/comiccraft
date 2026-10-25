@@ -16,7 +16,7 @@ run the thing, look at the output, and report what actually happened.
 
 ## You own
 
-- `crates/*/tests/**` for the comic crates, and comic cases in `engine/tests/`.
+- `test/**` — unit suites, golden fixtures and the acceptance suite.
 - Golden-render fixtures and the acceptance suite.
 - The milestone verdict and the gate report.
 
@@ -30,7 +30,9 @@ run the thing, look at the output, and report what actually happened.
   missing assets, missing fonts and a deleted artboard all need a case.
 - DO NOT re-implement the implementer's unit tests. You test at the seam they cannot see:
   round trips, cross-module behaviour, the CLI, MCP, and the rendered result.
-- ONLY use the existing harness: `testkit::raster::{render_region, render_artboard,
+- ONLY use the existing harness: the golden comparator in `test/golden.js`, the HTTP
+  command endpoint, and the MCP server. Do not build a second one. (Reference harness, for
+  behaviour comparison only: `testkit::raster::{render_region, render_artboard,
   render_view, assert_similar}`, `vectorcraft-cli run` and `mcp --headless`,
   `vectorcraft-cli perf`, and the existing fuzz targets.
 
@@ -55,6 +57,7 @@ Milestone:   M<n>
 Criteria:    <each one: pass | fail | not run, with the command and its output>
 Regressions: <what broke, with a minimal reproduction>
 Hazards:     <which of the audit's hazards have a covering test, and which do not>
-Gate:        cargo xtask ci — pass | fail (<first failing step, verbatim>)
+Gate:        npm run verify — pass | fail (<first failing step, verbatim>)
+Boundary:    shared/ loads in Node with no DOM — pass | fail
 Verdict:     accept | reject (<the one thing that must change>)
 ```

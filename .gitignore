@@ -11,3 +11,10 @@ plan/
 # The 4.2 MB stale HTML export of comiccraft_design.md. Regenerated on demand, never committed;
 # docs/comiccraft-design.md is the source of truth.
 porting_plan_and_design/comiccraft_design.html
+
+# Installed dependencies and generated project output are never committed.
+/node_modules/
+/comiccraft-projects/
+/out/
+/demo/
+*.comiccraft

@@ -2,7 +2,7 @@
 # ComicCraft status: where is the team, and what is missing?
 #
 # Read-only and fast (no build). Reports the stage, the milestone trail, the artifacts
-# that should exist, upstream divergence, and the comic crates' registration.
+# that should exist, the shared-boundary health, and what the module trees contain.
 #
 # Usage: bash status.sh [repo-root]
 
@@ -16,10 +16,12 @@ echo "ComicCraft status"
 echo "root: $ROOT"
 
 # Stage
-if [ -f Cargo.toml ] && grep -q '^\[workspace\]' Cargo.toml 2>/dev/null && [ -d crates ]; then
-  STAGE="fork"
+if [ -f package.json ] && [ -d shared ] && [ -d server ] && [ -d public ]; then
+  STAGE="app"
+elif [ -f docs/comiccraft-porting-plan.md ]; then
+  STAGE="planned (M0 has not created the layout)"
 else
-  STAGE="planning"
+  STAGE="empty"
 fi
 echo "stage: $STAGE"
 
@@ -56,35 +58,59 @@ shopt -s nullglob
 for b in docs/ci-baseline-*.md; do printf '  yes  %s\n' "$b"; done
 shopt -u nullglob
 
-# Comic crates
+# The shared boundary — the one structural rule whose violation breaks both runtimes.
 echo
-echo "Comic crates"
-for c in comic-model comic-ai comic-layout; do
-  if [ -d "crates/$c" ]; then
-    reg="not in layers.rs"
-    grep -q "\"$c\"" xtask/src/layers.rs 2>/dev/null && reg="registered"
-    printf '  yes  crates/%-14s %s\n' "$c" "$reg"
+echo "Shared boundary"
+if [ -d shared ]; then
+  HITS="$(grep -rlnE "from ['\"]node:|require\(['\"]node:|document\.|window\.|\bfetch\(" shared/ 2>/dev/null || true)"
+  if [ -z "$HITS" ]; then
+    echo "  ok   shared/ has no runtime import and no DOM global"
   else
-    printf '  --   crates/%-14s absent\n' "$c"
+    echo "  BAD  shared/ reaches for a runtime (this breaks the browser and the server):"
+    printf '%s\n' "$HITS" | sed 's/^/         /'
   fi
-done
+  n_modules="$(find shared -name '*.js' 2>/dev/null | wc -l | tr -d ' ')"
+  echo "       $n_modules module(s) in shared/"
+  if [ -f test/boundary.test.js ]; then
+    echo "       test: test/boundary.test.js"
+  else
+    echo "       no test/boundary.test.js yet — M0 adds it"
+  fi
+else
+  echo "  --   shared/ absent (M0 creates it)"
+fi
 
 # Comic commands
 echo
 echo "Comic commands"
-if [ -d crates/engine/src/cmd/comic ]; then
-  # The id is the macro's first argument (or its second when `cmd!` is spelled `cmd!(query …)`, the
-  # non-journaling form), and rustfmt puts it on the line **after** `cmd!(` when the spec is long —
-  # which is most of them. A line-oriented `grep 'cmd!("comic\.'` therefore reported **0**, which is
-  # what this did before the fix. Strip newlines first, then match `cmd!(` and the quoted id with only
-  # whitespace and an optional `query` between them, so every form is counted and a `"comic.…"` inside
-  # a message or a comment is not.
-  strip() { cat crates/engine/src/cmd/comic/*.rs 2>/dev/null | tr '\n' ' '; }
-  n="$(strip | grep -oE 'cmd!\([[:space:]]*(query[[:space:]]+)?"comic\.[a-z0-9._]*"' | grep -oE '"comic\.[a-z0-9._]*"' | sort -u | wc -l | tr -d ' ')"
-  q="$(strip | grep -oE 'cmd!\([[:space:]]*query[[:space:]]+"comic\.[a-z0-9._]*"' | grep -oE '"comic\.[a-z0-9._]*"' | sort -u | wc -l | tr -d ' ')"
-  echo "  $n comic command id(s) registered ($q query, $((n - q)) journaling)"
+if [ -d shared/commands ]; then
+  # The id is a string literal in a command definition. Match the literal rather than a line
+  # shape, so a formatter change cannot silently report 0 — that failure mode cost this project
+  # a false "0 commands registered" reading once already.
+  n="$(grep -rhoE "['\"]comic\.[a-z0-9._]+['\"]" shared/commands server/commands 2>/dev/null \
+      | tr -d "'\"" | sort -u | wc -l | tr -d ' ')"
+  srv="$(grep -rlE "serverOnly[[:space:]]*:[[:space:]]*true" shared/commands 2>/dev/null | wc -l | tr -d ' ')"
+  echo "  $n comic command id(s) defined ($srv module(s) marking a server-only handler)"
+  if [ -f shared/commands/index.js ]; then
+    echo "       registry: shared/commands/index.js"
+  fi
 else
-  echo "  crates/engine/src/cmd/comic/ absent"
+  echo "  shared/commands/ absent"
+fi
+
+# Dependency footprint
+echo
+echo "Dependencies"
+if [ -f package.json ]; then
+  node -e '
+    const p = require("./package.json");
+    const rt = Object.keys(p.dependencies || {});
+    const dev = Object.keys(p.devDependencies || {});
+    console.log("  runtime : " + (rt.length ? rt.join(", ") : "none"));
+    console.log("  dev     : " + (dev.length ? dev.join(", ") : "none"));
+  ' 2>/dev/null || echo "  cannot read package.json"
+else
+  echo "  no package.json (M0 creates it; fastify should be the only runtime dependency)"
 fi
 
 # Reviews
@@ -111,20 +137,25 @@ else
   echo "  check them: bash $checker"
 fi
 
-# Divergence
+# Reference and working tree
 echo
-echo "Upstream"
-if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  if git remote get-url upstream >/dev/null 2>&1; then
-    echo "  ahead of upstream/main by $(git rev-list --count upstream/main..HEAD 2>/dev/null || echo '?') commit(s)"
-    echo "  comic files diverging:"
-    git diff --name-only upstream/main...HEAD 2>/dev/null \
-      | grep -E 'crates/comic-|crates/engine/src/cmd/comic/|crates/ui-egui/src/panels/comic/|xtask/src/layers.rs' \
-      | sed 's/^/    /' || true
+echo "Reference"
+if [ -d reference/vectorcraft ]; then
+  echo "  ref: $(git -C reference/vectorcraft rev-parse --short HEAD 2>/dev/null || echo '?')  (read-only; never imported)"
+  USED="$(grep -rlE "reference/vectorcraft" shared/ server/ public/ package.json 2>/dev/null || true)"
+  if [ -z "$USED" ]; then
+    echo "  ok   nothing in shared/, server/, public/ or package.json references it"
   else
-    echo "  no 'upstream' remote — divergence not measurable"
+    echo "  BAD  the reference tree is referenced as a dependency:"
+    printf '%s\n' "$USED" | sed 's/^/         /'
   fi
+else
+  echo "  reference/vectorcraft/ absent — M0 moves the audited baseline there"
+fi
+
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   echo "  working tree: $(git status --porcelain 2>/dev/null | wc -l | tr -d ' ') changed file(s)"
+  [ -n "$(git status --porcelain 2>/dev/null)" ] && echo "  NOTE: verify only on a quiescent tree"
 else
   echo "  not a git work tree"
 fi

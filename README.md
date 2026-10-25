@@ -1,353 +1,211 @@
-<p align="center">
-  <a href="https://getartcraft.com/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="docs/brand/artcraft-logo-white.svg">
-      <img alt="ArtCraft" src="docs/brand/artcraft-logo.svg" width="200">
-    </picture>
-  </a>
-</p>
+# ComicCraft
 
+Turn prompts, scripts and existing stories into **editable** comic books.
 
-<h1 align="center">VectorCraft</h1>
+ComicCraft is a story-to-comic production studio: write or import a story, have it broken
+into chapters, scenes, pages and panels, generate consistent character and panel artwork,
+compose the page with editable frames, balloons, captions and sound effects, then render,
+validate and publish it.
 
-<p align="center">
-  <b>Vector illustration; an open-source, clean-room reimplementation of Adobe Illustrator, rebuilt in pure Rust.</b>
-</p>
+**AI output stays editable.** Changing a line of dialogue, moving a balloon or replacing one
+panel image must never require regenerating a page.
 
-<p align="center">
-  A fast, open-source, clean-room take on the Adobe Illustrator workflow. It runs natively on
-  macOS, Windows, Linux and FreeBSD, and in the browser via WebAssembly. Built by the ArtCraft team.
-</p>
+> **Status: M0–M8 are done.** `npm install && node server.js` gives you the studio: a story
+> becomes a reviewable storyboard, pages are composed with editable panels, balloons, captions
+> and sound effects, artwork is generated as reviewable jobs, and books export to screen, print
+> and proofing. The same 95 commands drive the browser, the CLI, HTTP and MCP. The gate —
+> 139 tests plus type, boundary, brand, fixture, documentation and smoke checks — passes in
+> seconds. See [Where we are](#where-we-are).
 
-<p align="center">
-  <img alt="Status: in active development" src="https://img.shields.io/badge/status-in%20active%20development-e8573f">
-  <img alt="Written in pure Rust" src="https://img.shields.io/badge/pure-Rust-b83a24?logo=rust&logoColor=white">
-  <img alt="Runs on macOS, Windows, Linux, FreeBSD and the web" src="https://img.shields.io/badge/runs%20on-macOS%20%C2%B7%20Windows%20%C2%B7%20Linux%20%C2%B7%20FreeBSD%20%C2%B7%20Web-555555">
-  <img alt="MCP server for agents" src="https://img.shields.io/badge/agents-MCP%20server-555555">
-  <img alt="License: MIT OR Apache-2.0" src="https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-555555">
-</p>
+---
 
-<p align="center">
-  <a href="https://discord.gg/artcraft"><img alt="Join the ArtCraft community on Discord" src="https://img.shields.io/badge/Join%20us%20on%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" height="40"></a>
-</p>
+## The stack
 
-<p align="center">
-  <a href="https://getartcraft.com/apps/vectorcraft"><b>VectorCraft on getartcraft.com</b></a> ·
-  <a href="https://getartcraft.com/">ArtCraft</a> ·
-  <a href="https://getartcraft.com/apps">All Crafting Apps</a>
-</p>
+A **Node.js backend** plus a **client-side HTML/JavaScript frontend**, sharing one
+plain-JavaScript domain that both runtimes import unchanged.
 
-<br>
-
-<p align="center">
-  <img src="docs/images/shot-1-neon.png" alt="VectorCraft editing the Neon Drive poster: the title is selected, the Appearance panel shows the settings of its live Outer Glow, and the Properties panel shows its character settings" width="100%">
-  <br><sub><b>Neon Drive</b>: a Pathfinder-cut sun, live Outer Glow on the type and grid, and clipping masks · <code>examples/neon-drive.vectorcraft</code></sub>
-</p>
-
-> [!NOTE]
-> **ArtCraft is a community of artists from all walks of life.** Digital, generative, music,
-> games &mdash; if you make things, you're one of us. **[Come say hi on Discord](https://discord.gg/artcraft).**
-
-<p align="center">
-  <a href="#a-look-around">A look around</a> ·
-  <a href="#made-in-vectorcraft">Made in VectorCraft</a> ·
-  <a href="#why-vectorcraft">Why VectorCraft</a> ·
-  <a href="#quick-start">Quick start</a> ·
-  <a href="#status">Status</a> ·
-  <a href="#downloads">Downloads</a> ·
-  <a href="#the-crafting-apps">The Crafting Apps</a> ·
-  <a href="#license-and-credits">License</a>
-</p>
-
-## A look around
-
-<table>
-<tr>
-<td width="50%" valign="top">
-  <img src="docs/images/shot-2-ribbons.png" alt="Three live blend ribbons clipped to the artboard, one selected with its key paths showing; the Layers panel lists the clip group, the blends and the selected blend's two key paths" width="100%">
-  <p align="center"><sub><b>Live Blends and Layers</b>: editable key paths, smooth colour, every object a row</sub></p>
-</td>
-<td width="50%" valign="top">
-  <img src="docs/images/shot-4-bezier.png" alt="Direct Selection tool showing anchor points and Bézier handles on a crescent built with Pathfinder, with the contextual task bar below it" width="100%">
-  <p align="center"><sub><b>Pen and Direct Selection</b>: real Bézier anchors and handles, plus a contextual task bar</sub></p>
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-  <img src="docs/images/shot-5-perspective.png" alt="Two lit building facades drawn on the left and right planes of a two-point perspective grid at sunset, with the Perspective Selection tool and the Plane Switching Widget" width="100%">
-  <p align="center"><sub><b>Perspective Grid</b>: art attached to its planes stays editable in perspective · <code>examples/perspective-city.vectorcraft</code></sub></p>
-</td>
-<td width="50%" valign="top">
-  <img src="docs/images/shot-3-sheet.png" alt="Four artboards in the light UI theme: Pathfinder, Gradient Mesh, radial Repeat and Envelope Distort" width="100%">
-  <p align="center"><sub><b>Multiple artboards, light theme</b>: Pathfinder · Gradient Mesh · live radial Repeat · Envelope Distort · <code>examples/feature-sheet.vectorcraft</code></sub></p>
-</td>
-</tr>
-</table>
-
-## Made in VectorCraft
-
-Every piece below was built entirely through VectorCraft's command API, the same one the MCP server
-exposes to agents, and exported by VectorCraft's own renderer. The source files are in
-[`examples/`](examples).
-
-<table>
-<tr>
-<td width="50%" valign="top">
-  <img src="docs/images/art-neon-drive.png" alt="Neon Drive synthwave poster: a striped orange sun setting between purple mountains over a glowing pink grid" width="100%">
-  <p align="center"><sub><b>Neon Drive</b>: synthwave poster with glowing type and grid</sub></p>
-</td>
-<td width="50%" valign="top">
-  <img src="docs/images/dusk-poster.png" alt="Dusk poster: a gradient sky with stars and birds, a glowing sun behind layered purple mountains and pine trees" width="100%">
-  <p align="center"><sub><b>Dusk</b>: gradient sky, glowing sun, layered mountains</sub></p>
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top">
-  <img src="docs/images/art-ribbons.png" alt="Live Blends: three wide ribbons blending yellow to pink and teal to purple, crossing over a dark background" width="100%">
-  <p align="center"><sub><b>Live Blends</b>: 70 steps, smooth colour, editable spines</sub></p>
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-  <img src="docs/images/art-repeat.png" alt="Radial Repeat mandala: teal petals around a coral center, ringed by yellow dots" width="100%">
-  <p align="center"><sub><b>Radial Repeat</b>: a live mandala</sub></p>
-</td>
-<td width="50%" valign="top">
-  <img src="docs/images/art-envelope.png" alt="Envelope Distort: rainbow stripes and the word WARP bent into a waving flag" width="100%">
-  <p align="center"><sub><b>Envelope Distort</b>: striped type warped into a flag</sub></p>
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-  <img src="docs/images/art-mesh.png" alt="Gradient Mesh: three softly shaded purple, pink and cyan spheres on a dark background" width="100%">
-  <p align="center"><sub><b>Gradient Mesh</b>: shaded spheres</sub></p>
-</td>
-<td width="50%" valign="top">
-  <img src="docs/images/art-pathfinder.png" alt="Pathfinder: a purple gradient crescent moon and three orange stars on a peach background" width="100%">
-  <p align="center"><sub><b>Pathfinder</b>: a crescent and stars from exact booleans</sub></p>
-</td>
-</tr>
-</table>
-
-## Why VectorCraft
-
-- **Familiar.** Illustrator's layout, tools, menus, panels and shortcuts: the Pen, Direct Selection,
-  Pathfinder, Smart Guides, Appearance, Swatches, Layers and more. You already know how to use it.
-- **Fast.** Multithreaded SIMD rendering off the UI thread. 20,000 shapes render in about 27 ms at
-  full retina resolution while the interface stays at 120 fps.
-- **Robust.** Exact curve booleans (no "cannot perform operation"), unlimited undo via structural
-  sharing, and property-tested file round trips.
-- **Open.** A documented native format (`.vectorcraft`, JSON), first-class SVG, PDF (and
-  PDF-compatible `.ai`) import and export, PNG/JPEG/WebP export, Export for Screens, and SVGZ,
-  templates, GIF, TIFF and BMP on open.
-- **Agent-native.** Every menu item, tool gesture, panel and dialog can be driven over a JSON
-  control channel and an **MCP server**, so Claude and other agents can draw, edit and export the
-  way a person does.
-- **Everywhere.** One codebase for the desktop apps and the same UI in the browser.
-
-## Quick start
+**No Rust. No framework. No bundler. No build step.**
 
 ```sh
-cargo run --release -p vectorcraft                          # desktop app
-cargo run --release -p vectorcraft -- examples/dusk-poster.vectorcraft
-cargo run --release -p vectorcraft -- --control 7979        # + JSON control channel
-cargo run --release -p vectorcraft-cli -- mcp               # MCP server (stdio)
-cargo run --release -p vectorcraft-cli -- run --in examples/ribbons.vectorcraft --export out.pdf   # headless batch
-cargo run --release -p vectorcraft-cli -- bench examples/neon-drive.vectorcraft                   # render timing
-cargo xtask bundle                                        # dist/VectorCraft.app (macOS)
-cd apps/vectorcraft-web && trunk build --release            # web build → dist/web
-cargo xtask ci                                            # fmt, clippy, tests, layering, wasm, vendor names
+npm install        # fastify — the only runtime dependency
+node server.js     # serves public/ and the command API
+npm run verify     # the gate
 ```
 
-Japanese fonts come from [storytold/craft-fonts](https://github.com/storytold/craft-fonts), an optional
-build input (releases always use it): `CRAFT_FONTS_DIR="$PWD/../craft-fonts" cargo run --release -p vectorcraft` (an absolute path).
-Without it, Japanese text uses the installed system fonts. See [`docs/development.md`](docs/development.md#fonts-craft-fonts-optional-build-input).
+That is the whole setup. `npm run verify` runs the type check, the linter (including the
+dependency boundaries), the layering test, the unit suites, the schema-fixture validation and
+a server smoke test — in seconds, because nothing is compiled.
 
-On machines with two graphics processors, VectorCraft renders on the power-saving (integrated) one by default on
-Windows and macOS, and on the one the desktop runs on under Linux. To choose, use **Preferences › Performance ›
-Graphics Processor** and restart. If a graphics processor can't show the window, VectorCraft starts again on the
-next one. To pick one when starting the app, set `WGPU_POWER_PREF=high` (or `low`), or `WGPU_ADAPTER_NAME` to part of
-its name, such as `WGPU_ADAPTER_NAME=nvidia` (see [`docs/development.md`](docs/development.md#desktop-graphics-processor)).
-
-On native Wayland, winit 0.30 does not deliver dropped files. To open an SVG, use File › Open;
-to place artwork in the current document, copy and paste the file in a file manager; or run
-under XWayland (`WAYLAND_DISPLAY= vectorcraft`) for file drag-and-drop
-(see [`docs/development.md`](docs/development.md#linux-wayland-and-x11)).
-
-On Linux under KDE Plasma 6.3 or later with Wayland, a drawing tablet's pen moves the cursor but VectorCraft doesn't
-respond to it yet (#491). Start the app under XWayland instead: `WAYLAND_DISPLAY= vectorcraft` (see
-[`docs/development.md`](docs/development.md#linux-wayland-and-x11)).
-
-### Use it from Claude Code and other agents
-
-Register the MCP server with Claude Code:
-
-```sh
-claude mcp add vectorcraft -- /path/to/vectorcraft-cli mcp
-```
-
-To keep an agent to one project's files, give it folders to read and write (the same flags as PhotoCraft):
-
-```sh
-claude mcp add vectorcraft -- /path/to/vectorcraft-cli mcp --automation-read-root /work/project --automation-write-root /work/project
-```
-
-The details are in [`docs/mcp.md`](docs/mcp.md) and [`docs/control-protocol.md`](docs/control-protocol.md).
-
-For the experimental, unsupported 64-bit Windows 7 build, see [Windows 7 instructions](docs/windows7.md).
-
-## Status
-
-VectorCraft is under active development. [**ROADMAP.md**](ROADMAP.md) covers what ships today, the
-milestones, and honest time-to-parity estimates.
-
-**Where we are (2026-10-09):** roughly 69–75% of Illustrator's features exist and work, and about 40–55% of
-"a power user can't tell the difference". Everyday vector illustration is close to usable: drawing and path tools,
-Pathfinder and Shape Builder, paint, gradients, appearance and transparency, type with styles, threading and Hebrew/Arabic bidirectional layout, and
-files (SVG, PDF and PDF-compatible `.ai` with PDF/X, EPS, DXF, EMF/WMF, raster formats and PSD, Print, Package).
-Affinity documents (`.af` from Affinity 3, `.afdesign`, `.afpub` and, by their content, `.afphoto` from Affinity 1 and 2) open
-and place natively: layers, groups, artboards and pages, curves and shapes, fills, gradients and strokes, clipping
-and masks, text and images, with what didn't come in (effects, adjustments, brushes, master pages…) listed in the
-import warning; a file whose native data can't be read opens as its embedded preview, saying why. VectorCraft
-doesn't write Affinity files. Current `.af` validation includes 33 pinned files, native save/reload
-and every-board SVG/PDF/PSD export, with fixes for Affinity 3 artboards, source-backed JPEGs and text runs.
-[Scope and limits](crates/affinity/README.md); [source audit and remaining gaps](docs/affinity-validation.md).
-The interface
-speaks English, Japanese, Traditional and Simplified Chinese, Spanish, French, Italian, Russian and Ukrainian (and Czech and Brazilian Portuguese in the menus).
-The scores are
-self-assessed, so the [honest assessment](ROADMAP.md#honest-assessment-2026-10-05) explains how far to trust them.
-
-**What's missing:**
-- 3D and Materials;
-- the Photoshop-style raster effects (Effect Gallery);
-- CJK composition for vertical type (vertical type itself has initial support, with a Japanese interface);
-- Variables and scripting;
-- an interaction-fidelity pass covering every tool's modifiers and small behaviours;
-- packaging for Windows and Linux.
-
-**Where we're going:** next is the interaction-fidelity pass alongside the raster-effects package, then 3D and
-advanced type, then hardening and packaging for 1.0. The prioritized list is in
-[Where we're lacking](ROADMAP.md#where-were-lacking-in-priority-order).
-
-**Workspace:** `crates/{geom, color, doc, pathops, text, effects, trace, brush, render, svg, pdf, eps, cad, metafile, format, tools, engine, ui-egui, mcp, testkit}`
-and `apps/{vectorcraft, vectorcraft-cli, vectorcraft-web}`. The egui frontend is its own crate, so
-the UI can be swapped without touching the engine.
-
-Agent and contributor rules (clean-room, the asset policy, no panics in shipped code, quality gates) are in
-[`AGENTS.md`](AGENTS.md); [`docs/development.md`](docs/development.md#robustness-vectorcraft-never-crashes)
-explains how VectorCraft avoids crashing, and [`docs/releasing.md`](docs/releasing.md) how releases are built,
-signed and published. Every bundled asset is listed with its licence in [`ASSETS.md`](ASSETS.md).
-
-## Downloads
-
-**New to VectorCraft?** Download it from the [VectorCraft page on getartcraft.com](https://getartcraft.com/apps/vectorcraft). That's the easiest way to install it.
-
-**Want a specific build or format?** On GitHub, the [latest release](https://github.com/storytold/vectorcraft/releases/latest) has every build listed below, and [all releases](https://github.com/storytold/vectorcraft/releases) has earlier versions and their notes. `<ver>` in the file names is the version number, and `SHA256SUMS.txt` lists a checksum for every file.
-
-### Windows
-
-| Build | Installer | Portable |
-|---|---|---|
-| x64 (64-bit Intel/AMD) | `vectorcraft-<ver>-windows-x64.msi` | `vectorcraft-<ver>-windows-x64-portable.zip` |
-| arm64 (Snapdragon and other ARM PCs) | `vectorcraft-<ver>-windows-arm64.msi` | `vectorcraft-<ver>-windows-arm64-portable.zip` |
-| x86 (32-bit) | `vectorcraft-<ver>-windows-x86.msi` | `vectorcraft-<ver>-windows-x86-portable.zip` |
-
-Installers and executables are code-signed.
-
-### macOS
-
-| Build | File | Notes |
-|---|---|---|
-| App, universal (Apple silicon + Intel) | `vectorcraft-<ver>-macos-universal.dmg` | Signed and notarized |
-| Command-line tool, universal | `vectorcraft-cli-<ver>-macos-universal.zip` | Signed and notarized |
-
-### Linux
-
-| Format | x86_64 | aarch64 (ARM64) | Notes |
-|---|---|---|---|
-| AppImage | `vectorcraft-<ver>-linux-x86_64.AppImage` | `vectorcraft-<ver>-linux-aarch64.AppImage` | Runs anywhere; updates itself with [AppImageUpdate](https://github.com/AppImageCommunity/AppImageUpdate) (`.zsync` files) |
-| Flatpak | `vectorcraft-<ver>-linux-x86_64.flatpak` | `vectorcraft-<ver>-linux-aarch64.flatpak` | Sandboxed; `flatpak install --user <file>` |
-| Debian/Ubuntu | `vectorcraft-<ver>-linux-x86_64.deb` | `vectorcraft-<ver>-linux-aarch64.deb` | |
-| Fedora/RHEL/openSUSE | `vectorcraft-<ver>-linux-x86_64.rpm` | `vectorcraft-<ver>-linux-aarch64.rpm` | |
-| Tarball | `vectorcraft-<ver>-linux-x86_64.tar.gz` | `vectorcraft-<ver>-linux-aarch64.tar.gz` | Unpack anywhere |
-
-### FreeBSD
-
-| Build | File |
+| | |
 |---|---|
-| x86_64 | `vectorcraft-<ver>-freebsd-x86_64.tar.gz` |
+| **Runtime** | Node.js 22+ |
+| **Client** | HTML, CSS and ES modules the browser runs as-is |
+| **Editing** | Canvas 2D for rendering, SVG where vector output is the deliverable |
+| **Domain** | Plain JavaScript with JSDoc types, checked but never emitted |
+| **Storage** | A project is a directory bundle; a filesystem in development, object storage in deployment |
+| **Tests** | `node --test`, built in — no test framework |
 
-### Web (WebAssembly)
+### Why this stack
 
-| Build | File | Notes |
+The product is a document editor that must work offline, keep an undo history, and be
+drivable by agents through one command surface. None of that needs a framework — it needs a
+DOM, a canvas and a Node process. Dropping React/Next removed a bundler, a JSX transform, a
+hydration model and a server/client boundary, and left one executable artifact that installs
+in one command on a laptop.
+
+Two consequences worth knowing:
+
+- **The same module runs in both runtimes.** A rule is implemented once: the browser validates
+  a project before saving and the server validates it before writing, using the same code.
+- **Roles are separated by *injection*, not by a framework.** The domain never reaches for a
+  clock, a filesystem, text metrics or the network; the caller supplies them. That is what
+  makes it testable in plain Node and identical on both sides.
+
+Full reasoning: [porting plan §2](docs/comiccraft-porting-plan.md).
+
+---
+
+## Architecture
+
+```
+┌─ Browser ────────────────────────────────┐   ┌─ Node.js ────────────────────────────┐
+│ public/  index.html + ES modules         │   │ server/  HTTP API + static serving   │
+│   editor/  canvas, hit-test, undo stack  │◄──┤   commands/  server-only handlers    │
+│   ui/      panels, story navigator       │   │   jobs/      generation, render, exp │
+│   storage/ IndexedDB + local bundle      │   │   storage/   bundle read/write, R2   │
+└──────────────┬───────────────────────────┘   └──────────────┬───────────────────────┘
+               │            both import ↓                       │
+               └────────────► shared/ ◄──────────────────────────┘
+                       domain · commands · validation · schema
+```
+
+**One link points one way.** The comic model owns meaning — who speaks, what they say, which
+panel follows which — and the visual document owns geometry and artwork. They are linked by
+id, never by a duplicate field, because a second copy of a rectangle is the failure this
+architecture exists to prevent.
+
+**Everything is a command.** A click, a `curl` and an agent over MCP all reach the same
+dispatcher and run the same code, so there is never a second implementation of a behaviour
+for the UI's convenience.
+
+Read the architecture: [design document](docs/comiccraft-design.md) ·
+[the layers](docs/comiccraft-porting-plan.md) · [the audit of the reference](docs/comiccraft-porting-audit.md).
+
+---
+
+## The product workflow
+
+1. **Idea.** The user writes a story, premise or manuscript in **Design with AI**.
+2. **Design.** `comic.story.design` turns it into structured scenes, pages, panels, camera
+   notes, dialogue, captions and sound effects. The result is an inert **proposal**, never
+   authoritative project data. The default director is deterministic and offline; an optional
+   HTTP model can replace it through `server/ai/story.js` with credentials in the environment.
+3. **Review.** The Review view shows the logline, style, cast and every scene. Accept all, or
+   accept one scene at a time; an unselected scene is left byte-for-byte untouched.
+4. **Edit.** Accepting creates ordinary pages in the studio, where the user edits frames,
+   dialogue, typography, reading order and page composition with the same commands an agent uses.
+5. **Artwork.** `comic.artwork.paint` draws a panel locally in one of five styles with no key
+   or network; server-side generation jobs remain available for real models, with approval
+   before a result reaches a panel.
+6. **Publish.** Validate for screen, print or proofing, export pages/books/contact sheets, or
+   package the project for a round trip.
+
+The workflow bar in the studio derives the current step from project state — nothing is stored
+twice, and every step is reachable without an agent.
+
+---
+
+## Where we are
+
+The work is organized into nine milestones, M0–M8. Each has exit criteria that are the
+definition of done, and each closes on the gate passing on an integrated tree.
+
+| Milestone | Delivers | State |
 |---|---|---|
-| Static site | `vectorcraft-web-<ver>.zip` | Runs in a modern browser; host it on any static server |
+| M0 | Repository layout, the frozen bundle schema as JSON Schema with a fixture per entity, the gate | **Done** — [report](docs/milestones/M0-M1-node.md) |
+| M1 | Three-panel page vertical slice: bundle, artboards as pages, panels, artwork, lettering, undo, save/reopen, PNG and PDF out | **Done** — twelve acceptance tests, [report](docs/milestones/M0-M1-node.md) |
+| M2 | Panel engine, templates, gutters, lettering policy, reading order, golden render | **Done** — [report](docs/milestones/M2-node.md) |
+| M3 | Story import to a schema-validated, reviewable storyboard with stable ids | **Done** — [report](docs/milestones/M3-node.md) |
+| M4 | Character bible, capability-based providers, pollable jobs, asset provenance | **Done** — [report](docs/milestones/M4-node.md) |
+| M5 | Completed agent surface: parameter docs, batch operations, MCP, malformed-input sweep | **Done** — [report](docs/milestones/M5-node.md) |
+| M6 | Studio UI: story navigator, storyboard, canvas tools, review queue, publication gate | **Done** — [report](docs/milestones/M6-node.md) |
+| M7 | Rendering and publishing: presets, export gate, PDF geometry, deterministic package | **Done** — [report](docs/milestones/M7-node.md) |
+| M8 | QA, representative book, failure paths, performance, release checklist | **Done** — [report](docs/milestones/M8-node.md) |
 
-## The Crafting Apps
+**What is built** is 95 commands over 20 groups, one dispatcher behind the browser, HTTP, CLI and
+MCP, a domain that runs unchanged in both runtimes, and a gate that passes in seconds:
 
-VectorCraft is one of the **Crafting Apps**: free, open-source creative tools from the
-[ArtCraft](https://getartcraft.com/) team, each written from scratch in Rust and each able to
-stand on its own.
+```sh
+npm run verify            # typecheck, boundary, brands, 139 tests, fixtures, docs, smoke
+node server.js            # then open http://127.0.0.1:3000
+node server/cli.js demo   # the vertical slice, printed as it goes
+npm run mcp:list          # the command catalogue an agent sees, with parameter schemas
+npm run perf              # comic-shaped render/save/open budgets
+```
 
-| | App | What it's for | Code | Learn more |
-|:-:|---|---|---|---|
-| <img src="https://raw.githubusercontent.com/storytold/photocraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.photocraft.png" alt="" width="32" height="32"> | **PhotoCraft** | Image editing: layers, masks, type and real PSD files | [GitHub](https://github.com/storytold/photocraft) | [Website](https://getartcraft.com/apps/photocraft) |
-| <img src="https://raw.githubusercontent.com/storytold/vectorcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.vectorcraft.png" alt="" width="32" height="32"> | **VectorCraft** | **Vector illustration · you are here** | [GitHub](https://github.com/storytold/vectorcraft) | [Website](https://getartcraft.com/apps/vectorcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/filmcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.filmcraft.png" alt="" width="32" height="32"> | **FilmCraft** | Video editing, color and sound | [GitHub](https://github.com/storytold/filmcraft) | [Website](https://getartcraft.com/apps/filmcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/lightcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.lightcraft.png" alt="" width="32" height="32"> | **LightCraft** | Photo library and raw development | [GitHub](https://github.com/storytold/lightcraft) | [Website](https://getartcraft.com/apps/lightcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/pdfcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.pdfcraft.png" alt="" width="32" height="32"> | **PdfCraft** | Reading, organizing and protecting PDFs | [GitHub](https://github.com/storytold/pdfcraft) | [Website](https://getartcraft.com/apps/pdfcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/effectcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.effectcraft.png" alt="" width="32" height="32"> | **EffectCraft** | Motion graphics and visual effects | [GitHub](https://github.com/storytold/effectcraft) | [Website](https://getartcraft.com/apps/effectcraft) |
-| <img src="https://raw.githubusercontent.com/storytold/designcraft/main/assets/app-icon/hicolor/64x64/apps/ai.storyteller.designcraft.png" alt="" width="32" height="32"> | **DesignCraft** | Page layout and publishing | [GitHub](https://github.com/storytold/designcraft) | [Website](https://getartcraft.com/apps/designcraft) |
+The studio and the server are deliberately asymmetric: editing, lettering, validation and undo
+run in both; providers, print PDF and the filesystem are server-only, and the UI says so rather
+than embedding a credential path. Providers default to an **offline deterministic painter**, so
+the whole job lifecycle works with no key and no network; the optional HTTP adapter reads its
+credentials from the environment and never writes them into a bundle.
 
-And [**ArtCraft**](https://getartcraft.com/) itself, our AI image and video studio for artists who want real control.
+The **Rust implementation of the same design** is preserved as the reference: the frozen schema
+([the document](docs/comiccraft-project-schema.md)), a vertical slice, and a panel/lettering
+engine whose rules ported directly — which is why M0–M2 were port milestones with a known
+target rather than design milestones. Its milestones are in
+[`docs/milestones/M0.md`](docs/milestones/M0.md) onward and its reviews in
+[`docs/reviews/`](docs/reviews); [reference-owned files](docs/reference/README.md) lists what
+still belongs to the baseline.
 
-<br>
+---
 
-<p align="center">
-  <a href="https://discord.gg/artcraft"><img alt="Join the ArtCraft community on Discord" src="https://img.shields.io/badge/Join%20us%20on%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" height="40"></a>
-</p>
+## Working on it
 
-<h3 align="center">Come make things with us</h3>
+**Read [`AGENTS.md`](AGENTS.md) first** — it is the contract: the three structural rules, the
+clean-room and asset rules, the error-handling policy, and the review requirement.
 
-<p align="center">
-  Our Discord is where artists of every kind hang out: people who paint, shoot, draw, cut film,
-  set type, and people still figuring out what they like to make. Share what you're working on,
-  ask for help, tell us what's broken, or tell us what you wish these tools could do.
-  Whatever your medium and however long you've been at it, you're welcome here.
-</p>
+```sh
+npm run verify                 # the gate — must pass before every commit
+node --test test/foo.test.js   # one suite
+npm run cli -- commands        # the command surface, as an agent sees it
+npm run docs:commands          # regenerate docs/comiccraft-command-api.md
+npm run mcp:list               # MCP tools/list, without a client
+npm run perf                   # performance budgets on a synthetic book
+```
 
-<p align="center">
-  <a href="https://discord.gg/artcraft"><b>discord.gg/artcraft</b></a> ·
-  <a href="https://getartcraft.com/">getartcraft.com</a> ·
-  <a href="https://getartcraft.com/apps">The Crafting Apps</a> ·
-  <a href="https://getartcraft.com/apps/vectorcraft">VectorCraft</a>
-</p>
+**Nothing is complete without two rounds of code review** on `deepseek-v4.1-flash` with unit
+tests, recorded in `docs/reviews/`. The reviewer writes the tests; nobody reviews their own
+work.
 
-## Star history
+The team is defined in [`.github/agents/`](.github/agents), its ownership table in
+[`.github/instructions/comiccraft-work.instructions.md`](.github/instructions/comiccraft-work.instructions.md),
+and the milestone procedure in [`.github/prompts/`](.github/prompts).
 
-[![Star History Chart](https://api.star-history.com/svg?repos=storytold/vectorcraft&type=Date&legend=top-left)](https://www.star-history.com/?repos=storytold%2Fvectorcraft&type=date&legend=top-left)
+---
 
-## License and credits
+## The reference implementation
 
-VectorCraft is dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE), at your option.
-Copyright (c) 2026 ArtCraft Team and the VectorCraft contributors. Required notices are in [NOTICE](NOTICE).
+`reference/vectorcraft/` holds the audited baseline (VectorCraft, `3da4080b`) — a clean-room,
+open-source vector illustration application. It is **read, never imported**: it answers
+*"how should this behave?"* and it supplies the bundle format. No ComicCraft code links
+against it and no build step compiles it.
 
-Bundled fonts, icons, images and other assets keep their own open licenses; each one is listed
-with its author, source and license in [ASSETS.md](ASSETS.md). Release builds also embed the
-fonts of [craft-fonts](https://github.com/storytold/craft-fonts/blob/main/ATTRIBUTION.md) (Japanese,
-Simplified Chinese and Arabic faces; SIL Open Font License 1.1).
+Its documentation is preserved under [`docs/reference/`](docs/reference/README.md) with a note
+on every file, because reading *"Rust-native vector illustration app"* at the repository root
+would be the single most misleading thing a newcomer could open.
 
-The app icon (an engraved dragon on VectorCraft red, `#e8573f`) is the owner's original artwork; its
-palette and files are in [`assets/app-icon/`](assets/app-icon/README.md).
+---
 
-The ArtCraft name, wordmark and logos in [`docs/brand/`](docs/brand/) are trademarks of the
-ArtCraft Team and are not covered by this license. They may be used only unmodified, and only as
-part of this repository and VectorCraft, under [`docs/brand/LICENSE-brand.txt`](docs/brand/LICENSE-brand.txt).
-Forks and modified versions must remove them.
+## Licensing
 
-<sub>Adobe, Photoshop, Illustrator, Premiere Pro, Lightroom, Acrobat, After Effects and InDesign are trademarks or registered trademarks of Adobe Inc. in the United States and/or other countries. VectorCraft is an independent, open-source project and is not affiliated with, sponsored by or endorsed by Adobe Inc.; these names are used only to describe the workflows it is compatible with.</sub>
+Code and original assets are **MIT OR Apache-2.0** (`LICENSE-MIT`, `LICENSE-APACHE`,
+`NOTICE`). Every asset has a row in [`ASSETS.md`](ASSETS.md) with its author, source and
+licence.
 
-<p align="center">
-  <a href="https://getartcraft.com/"><img alt="ArtCraft" src="docs/brand/artcraft-mark.svg" width="28"></a><br>
-  <sub>Made by the <a href="https://getartcraft.com/">ArtCraft</a> team and community.</sub>
-</p>
+Two absolute rules come from the project owner and are not negotiable:
+
+- **Never use Adobe software** to research behaviour, make test files, or compare output.
+  Behaviour comes from public documentation and from files users own.
+- **No Adobe iconography, images or fonts, ever** — and no font file enters this repository
+  at all. Fonts live in [`storytold/craft-fonts`](https://github.com/storytold/craft-fonts)
+  and are referenced by URL.

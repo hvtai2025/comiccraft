@@ -32,13 +32,17 @@ if both are clean, your report must say what you tried to falsify and could not.
 - Do the implementer's unit tests test *behaviour*, or do they restate the implementation?
   A test that cannot fail is not a test.
 - Are the happy paths actually exercised, and do the assertions check the real contract?
-- Any silent failure: an ignored `Result`, a `unwrap_or_default` hiding a bug, a branch that
-  cannot be reached.
+- Any silent failure: a swallowed `catch`, an `?? fallback` hiding a bug, a branch that
+  cannot be reached, a `Promise` nobody awaits.
 
 **Round 2 — rules, failure paths, edges.** On the **post-fix revision**, not the original.
 - The hard rules: no comic data in the visual document; no duplicated geometry, page size
-  or dialogue; one owner per relationship; nothing below the command layer reaching up; no
-  panic paths outside tests; no vendor name in user-visible text.
+  or dialogue; one owner per relationship; nothing in `shared/` reaching for a runtime; no
+  vendor name in user-visible text.
+- **The boundary holds in both runtimes.** If the change touches `shared/`, it must load in
+  Node *and* in a browser context. Check that it uses no DOM global, no `node:*` import, no
+  `fetch`, and that anything the runtime must supply is injected. This is the one rule whose
+  violation breaks the whole architecture rather than one feature.
 - Failure paths: interrupted save, provider failure, cancelled job, missing asset, missing
   font, deleted artboard, malformed input.
 - Edges: empty input, one-element collections, zero-size geometry, non-ASCII and RTL text,
@@ -61,15 +65,15 @@ if both are clean, your report must say what you tried to falsify and could not.
 - DO NOT treat "it compiles" or "the gate passes" as review evidence.
 - DO NOT approve round 2 on the revision round 1 reviewed when round 1 requested changes —
   check the revision actually moved.
-- ONLY edit test code: extend the implementer's inline `#[cfg(test)]` tests, or add
-  integration tests under `crates/<crate>/tests/`. Milestone-level acceptance, golden
-  fixtures and CLI/MCP end-to-end tests belong to `verification-engineer`.
-- **Run `cargo fmt` on every file you add or change, before you report.** `cargo xtask ci`
-  runs `fmt --check` first and stops there, so an unformatted test file turns the whole gate
-  red and hides every other step — the implementer then cannot tell your formatting from
-  their defect. This has already happened twice in M1.
-- ONLY use the existing harness — `testkit` for renders, `vectorcraft-cli` and
-  `mcp --headless` for end-to-end. Do not build a second one.
+- ONLY edit test code: extend the implementer's test file, or add a test under `test/`.
+  Milestone-level acceptance, golden fixtures and HTTP/MCP end-to-end tests belong to
+  `verification-engineer`.
+- **Keep the gate green on formatting.** ESLint and the type check run early in
+  `npm run verify` and it stops at the first failure, so an unformatted or mistyped test file
+  turns the whole gate red and hides every other step — the implementer then cannot tell your
+  lint error from their defect. Run the linter on files you touch before you report.
+- ONLY use the existing harness — `node --test` for units, the golden comparator for renders,
+  the HTTP endpoint and the MCP server for end-to-end. Do not build a second one.
 
 ## Approach
 
@@ -103,6 +107,7 @@ Verdict:       approved | changes-requested
 Unit tests:    <added/extended: paths> — <command> — <pass/fail>
 Findings:      <n> — <file:line, input, expected vs actual>  (or: none, and what I tried to falsify)
 
-Gate:          cargo xtask ci — pass | fail (<first failing step>)
+Gate:          npm run verify — pass | fail (<first failing step>)
+Boundary:      shared/ loads in Node with no DOM — pass | fail | not applicable
 Unverified:    <what I could not check, stated plainly>
 ```

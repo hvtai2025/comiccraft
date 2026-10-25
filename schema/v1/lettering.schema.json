@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComicCraft lettering",
+  "description": "Balloons, captions and sound effects are one entity: their difference is presentation, not structure.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 60,
+      "description": "A stable, never-reused comic id."
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "balloon",
+        "caption",
+        "sound-effect"
+      ]
+    },
+    "nodeId": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "text": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "overflowPolicy": {
+      "type": "string",
+      "enum": [
+        "warn",
+        "shrink",
+        "resize-frame"
+      ]
+    },
+    "tailNodeId": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "tailTip": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "additionalProperties": false
+    },
+    "variant": {
+      "type": "string",
+      "enum": [
+        "speech",
+        "thought",
+        "shout",
+        "whisper"
+      ]
+    },
+    "tailAttached": {
+      "type": "boolean"
+    },
+    "fontFamily": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "fontSize": {
+      "type": "number",
+      "minimum": 4,
+      "maximum": 96
+    },
+    "align": {
+      "type": "string",
+      "enum": [
+        "left",
+        "center",
+        "right"
+      ]
+    },
+    "padding": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 80
+    },
+    "bold": {
+      "type": "boolean"
+    },
+    "italic": {
+      "type": "boolean"
+    },
+    "color": {
+      "type": "string",
+      "maxLength": 20
+    }
+  },
+  "required": [
+    "id",
+    "kind",
+    "nodeId",
+    "text",
+    "overflowPolicy"
+  ],
+  "additionalProperties": false
+}

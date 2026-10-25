@@ -1,5 +1,5 @@
 ---
-description: "Use when working on the ComicCraft project bundle or comic domain schema: entity structs, stable comic ids and id allocation, the manifest, project.json, per-page files, save and load ordering, transactional save, schema migrations, versioned fixtures, retired artboards, asset storage policy, content hashes or provenance records. Owns crates/comic-model and docs/comiccraft-project-schema.md."
+description: "Use when working on the ComicCraft project bundle or comic domain schema: entity structs, stable comic ids and id allocation, the manifest, project.json, per-page files, save and load ordering, transactional save, schema migrations, versioned fixtures, retired artboards, asset storage policy, content hashes or provenance records. Owns shared/domain/** (model, ids, migrations, document, format), schema/** and docs/comiccraft-project-schema.md."
 model: ['opencodego/deepseek-v4.1-flash', 'opencodego/OpenCode Go/deepseek-v4.1-flash']
 tools: [read, search, edit, execute]
 ---
@@ -16,19 +16,22 @@ reads your types, so a change here is a change to the whole team's contract.
 
 ## You own
 
-- `crates/comic-model/**` — entity schemas, ids, the bundle reader/writer, migrations.
+- `shared/domain/**` — entity schemas, ids, the bundle reader/writer, migrations,
+  and the document model in `shared/domain/document/`.
 - `docs/comiccraft-project-schema.md` — optionality, integer widths, wire format, fixtures.
 - The mitigations in design §5.3.1 for the artboard-id reuse hazard: `retired_artboard_ids`,
   validation cross-checks, and the rule that only comic commands manage artboard lifecycle.
 
 ## Constraints
 
-- DO NOT add a comic field to `crates/doc` or a comic section to `crates/format`. The
+- DO NOT add a comic field to the document model or a comic section to its format. The
   visual document stays a plain `.vectorcraft` file (ADR-013).
 - DO NOT use `Document::unknown` or `Document::extra` — they round-trip foreign data.
 - DO NOT use `Node.name` as an identity; it is user-editable and not unique.
 - DO NOT use an array index as a persistent id, and never reuse a comic id.
-- DO NOT depend on `engine`, `ui-egui`, `mcp`, or on a network or AI crate.
+- DO NOT import a runtime into `shared/`: no DOM global, no `node:*`, no `fetch`.
+  Filesystem access and hashing belong to `server/storage/`, injected into your code as a
+  parameter — never reached for directly.
 - DO NOT discard an unknown field during a migration; preserve it so a newer ComicCraft
   can still read a project an older one wrote.
 - ONLY write the bundle through the ordered save of design §7.2 — the manifest last, so it

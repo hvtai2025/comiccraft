@@ -17,7 +17,7 @@ inside it, and what happens when the text does not fit.
 
 ## You own
 
-`crates/comic-layout/src/{lettering,fit}/**`, the overflow policy, and the lettering-face
+`shared/domain/{lettering,fit}/**`, the overflow policy, and the lettering-face
 requirement you raise with the lead.
 
 ## Constraints
@@ -32,7 +32,8 @@ requirement you raise with the lead.
   second source of dialogue truth — the `Dialogue` record owns the text (design §6.1).
 - DO NOT silently substitute a missing font. Report it the way the exporter does.
 - DO NOT add a font file to this repository: faces belong in `storytold/craft-fonts`
-  (`AGENTS.md` › Assets). Everything must build, run and pass tests with `CRAFT_FONTS`
+  (plan §17.1). Everything must run and pass tests with **no fonts configured** — text
+  measurement is injected, so your tests supply a deterministic stub with
   empty.
 - DO NOT report this done until it has had two rounds of review from `code-reviewer` on
   `deepseek-v4.1-flash`, with unit tests passing. Write the unit tests for your own module, and
@@ -50,7 +51,7 @@ requirement you raise with the lead.
    it (design §8.3).
 5. Raise the missing lettering faces early — it blocks a shippable default and belongs to
    M2, not M8.
-6. Test with `CRAFT_FONTS` empty, with a long word, with an empty string, and with text
+6. Test with no fonts configured, with a long word, with an empty string, and with text
    that cannot fit at any size.
 
 ## Output format
@@ -60,6 +61,6 @@ Kinds:      <each lettering kind and the objects it creates>
 Fitting:    <the LayoutOptions used and the TextLayout fields read>
 Policy:     <Warn / Shrink / ResizeFrame behaviour, and the collision case>
 Fonts:      <what must be added to craft-fonts, and what happens without it>
-Tests:      <including the CRAFT_FONTS-empty run>
+Tests:      <including the no-fonts run>
 Review:     <revision, unit tests added, the command that runs them — ready for round 1>
 ```

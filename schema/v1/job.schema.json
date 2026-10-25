@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComicCraft generation job",
+  "description": "One pollable provider request. Jobs never mutate the document; applying a result is a separate command.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 60
+    },
+    "operation": {
+      "type": "string",
+      "enum": [
+        "text-to-image",
+        "reference-to-image",
+        "image-to-image",
+        "inpaint",
+        "variation"
+      ]
+    },
+    "targetPanelId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 60
+    },
+    "inputAssetIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 60
+      },
+      "maxItems": 32
+    },
+    "provider": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "request": {
+      "type": "object"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "completed",
+        "failed",
+        "awaiting_review",
+        "cancelled"
+      ]
+    },
+    "progress": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "error": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "resultAssetIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 60
+      },
+      "maxItems": 32
+    },
+    "targetRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "created": {
+      "type": "number"
+    },
+    "updated": {
+      "type": "number"
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "appliedAt": {
+      "type": "number"
+    },
+    "appliedRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "rejectedAt": {
+      "type": "number"
+    },
+    "discardedResult": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "id",
+    "operation",
+    "provider",
+    "model",
+    "request",
+    "status",
+    "resultAssetIds",
+    "targetRevision",
+    "created",
+    "updated",
+    "provenance"
+  ],
+  "additionalProperties": false
+}

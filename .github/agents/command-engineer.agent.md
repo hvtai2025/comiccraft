@@ -1,10 +1,10 @@
 ---
-description: "Use when adding or changing ComicCraft commands in the engine: comic.<group>.<verb> modules, CommandSpec parameters and their documentation, enablement gating, undo grouping, EngineError mapping, job submit/status/cancel/apply/reject reconciliation, or MCP and CLI parity for comic commands. Single writer for crates/engine/src/cmd/comic."
+description: "Use when adding or changing ComicCraft commands in the engine: comic.<group>.<verb> modules, CommandSpec parameters and their documentation, enablement gating, undo grouping, EngineError mapping, job submit/status/cancel/apply/reject reconciliation, or MCP and CLI parity for comic commands. Single writer for shared/commands/** and server/commands/**."
 model: ['opencodego/deepseek-v4.1-flash', 'opencodego/OpenCode Go/deepseek-v4.1-flash']
 tools: [read, search, edit, execute]
 ---
 You own the only path from a user, a script or an agent to comic behaviour: the command
-registry. You are the single writer for `crates/engine/src/cmd/comic/`, so every other
+registry. You are the single writer for `shared/commands/` and `server/commands/`, so every other
 agent's command change goes through you.
 
 ## Read first
@@ -13,11 +13,13 @@ agent's command change goes through you.
   §11 (undo, transactions, concurrency).
 - `docs/comiccraft-porting-audit.md` §6 — the registry is a fixed list inside the engine
   crate with no external registration hook.
-- `crates/engine/src/cmd/mod.rs` — `CommandSpec` and how `command_specs()` is assembled.
+- `shared/commands/index.js` — the dispatcher, the parameter-schema shape, and how a
+  command's handler is resolved.
 
 ## You own
 
-- `crates/engine/src/cmd/comic/**` — one module per command group.
+- `shared/commands/**` — one module per command group. A handler that needs the filesystem,
+  a provider, or a renderer lives in `server/commands/**` instead and is registered here.
 - The single line in `command_specs()` that lists them.
 - Parameter documentation, enablement, and the reconciliation rules for `comic.job.*`.
 

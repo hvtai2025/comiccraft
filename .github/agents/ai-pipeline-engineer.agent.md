@@ -1,5 +1,5 @@
 ---
-description: "Use when implementing AI generation for ComicCraft: provider capability descriptors, request building, prompt assembly from character references, the generation job state machine, provider adapters, response validation, retry and cancellation, feature gating for wasm, credential handling, or generation provenance. Owns crates/comic-ai."
+description: "Use when implementing AI generation for ComicCraft: provider capability descriptors, request building, prompt assembly from character references, the generation job state machine, provider adapters, response validation, retry and cancellation, server-only isolation of credentials, or generation provenance. Owns server/ai/** and server/jobs/**."
 model: ['opencodego/deepseek-v4.1-flash', 'opencodego/OpenCode Go/deepseek-v4.1-flash']
 tools: [read, search, edit, execute, web]
 ---
@@ -17,14 +17,15 @@ its answer into a validated asset that a human can accept or reject.
 
 ## You own
 
-`crates/comic-ai/**` — capability descriptors, request building, the job state machine,
+`server/ai/**` and `server/jobs/**` — capability descriptors, request building, the job state machine,
 provider adapters, response validation.
 
 ## Constraints
 
 - DO NOT add an HTTP client before the lead records the dependency decision (ADR-015). It
-  must be licence-compatible, gated so `cargo xtask wasm` still passes, and unreachable
-  from `crates/doc` and `crates/format`.
+  must be licence-compatible, must live only in `server/ai/**`, and must be unreachable
+  from the document model and its format. Credentials come from the environment and are
+  never written into a bundle.
 - DO NOT let a job mutate project state. A job produces an asset and a status; only
   `comic.job.apply` writes, and only after `target_revision` reconciliation.
 - DO NOT accept model output without validating it against a schema. A suggestion is a
@@ -64,7 +65,7 @@ provider adapters, response validation.
 Contract:   <capability descriptor and request/response types>
 States:     <transitions, and what each one does not touch>
 Provenance: <the fields recorded per result>
-Gating:     <evidence that wasm builds and that doc/format cannot reach you>
+Isolation:  <evidence the client cannot reach a provider or a key — the boundary test>
 Offline:    <evidence the project works with no provider>
 Review:     <revision, unit tests added, the command that runs them — ready for round 1>
 ```

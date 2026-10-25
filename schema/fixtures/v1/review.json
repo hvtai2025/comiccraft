@@ -1,0 +1,10 @@
+{
+  "id": "decision_1",
+  "subject": "asset",
+  "subjectId": "asset_1",
+  "decision": "approved",
+  "actor": "user",
+  "timestamp": 0,
+  "note": null,
+  "supersededAssetId": null
+}

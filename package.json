@@ -1,0 +1,35 @@
+{
+  "name": "comiccraft",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Turn prompts, scripts and stories into editable comic books.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "cli": "node server/cli.js",
+    "test": "node --test test/*.test.js",
+    "typecheck": "tsc --noEmit",
+    "check:boundary": "node tools/check-boundary.js",
+    "check:fixtures": "node tools/check-fixtures.js",
+    "check:brands": "node tools/check-brands.js",
+    "smoke": "node tools/smoke.js",
+    "verify": "npm run typecheck && npm run check:boundary && npm run check:brands && npm test && npm run check:fixtures && npm run check:docs && npm run smoke",
+    "test:watch": "node --test --watch test/*.test.js",
+    "docs:commands": "node tools/gen-command-docs.js",
+    "check:docs": "node tools/gen-command-docs.js --check",
+    "mcp": "node server/mcp.js --headless",
+    "mcp:list": "node server/mcp.js --list",
+    "perf": "node tools/perf.js"
+  },
+  "dependencies": {
+    "fastify": "^5.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^5.7.2"
+  }
+}

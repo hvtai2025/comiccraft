@@ -1,6 +1,6 @@
 ---
-description: "Use when implementing, reviewing or accepting any ComicCraft code change: the mandatory two-round code review and unit-test rule. Covers when a review is required, what each round must cover, the review record, who may fix production code, and what counts as evidence. Applies to every implementation, in every crate, including crate skeletons, layer-table edits and documentation."
-applyTo: ["crates/**", "apps/**", "xtask/**", "Cargo.toml", "docs/**"]
+description: "Use when implementing, reviewing or accepting any ComicCraft code change: the mandatory two-round code review and unit-test rule. Covers when a review is required, what each round must cover, the review record, who may fix production code, and what counts as evidence. Applies to every implementation, in every module tree, including directory skeletons, boundary-rule edits, schema fixtures and documentation."
+applyTo: ["shared/**", "public/**", "server/**", "schema/**", "test/**", "package.json", "docs/**"]
 ---
 # Two-round review and unit test — mandatory
 
@@ -12,8 +12,8 @@ unreviewed change is not done, and neither is a reviewed change without tests.
 
 Applies to:
 
-- every code change, in every crate, however small — including crate skeletons, a
-  `xtask/src/layers.rs` registration, and `Cargo.toml` edits;
+- every code change, in every module tree, however small — including an empty module
+  skeleton, a `package.json` edit, and a schema fixture;
 - every new or changed command, schema, layout rule, lettering rule, adapter or panel;
 - documentation, with the test requirement adjusted (see *Documentation-only changes*).
 
@@ -64,7 +64,7 @@ reproduction.
 executable evidence, and only one of the two survives losing your session.
 
 This is not hypothetical. Two reviewers were cleared mid-task in M2 and left no records at all. One of
-them had already written `crates/comic-layout/tests/m2_w4_round1_reviewer.rs`, and running it later
+them had already written its reviewer test file, and running it later
 recovered **two findings that would otherwise have been lost silently** — including a defect introduced
 by the fix for a previous one. The other left six passing tests, which at least showed *what* it had
 cleared. **A lost record is a lost finding; a test file is not**, because whoever comes next can execute
@@ -95,7 +95,7 @@ Verdict:       approved | changes-requested
 Unit tests:    <paths> — <command> — <pass/fail>
 Findings:      <n> — <file:line, input, expected vs actual>   (or: none, and what was tried)
 
-Gate:          cargo xtask ci — pass | fail (<first failing step>)
+Gate:          npm run verify — pass | fail (<first failing step>)
 Unverified:    <what was not checked>
 ```
 

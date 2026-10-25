@@ -2,17 +2,18 @@
 ## System Architecture Design
 
 **Document type:** Software Architecture Design (SAD)
-**Status:** Finalized (v1.0) — implementation-ready
-**Foundation:** VectorCraft 0.8.0 — `storytold/vectorcraft` @ `3da4080b`
+**Status:** Revised for a Node.js + client-side HTML/JavaScript implementation
+**Foundation:** Lightweight stack — `Node.js` backend, framework-free HTML/CSS/ES-module client, one shared JavaScript domain
 **Product:** Agent-native AI comic creation and editing studio
 **Companions:** [`comiccraft-porting-plan.md`](comiccraft-porting-plan.md) · [`comiccraft-porting-audit.md`](comiccraft-porting-audit.md)
 
-> **How to read this document.** Sections 1–15 state the design. Section 4 no longer
-> proposes code boundaries: it maps ComicCraft onto the real crates and the real layer
-> rules. Sections 16–18 record the finalized decisions, the acceptance criteria and the
-> first assignment. Sections 19–20 record what is verified to exist and what is still
-> an open risk. Every API named here was read from the baseline revision and is cited
-> in the audit; no API in this document is invented or assumed.
+> **Technology pivot.** The original Rust-heavy plan was replaced with a lightweight
+> implementation. The product goals are unchanged. The runtime is now a Node.js server
+> serving a framework-free browser client, sharing one plain-JavaScript domain, with the
+> static marketing site staying on Cloudflare Pages and the editor moving to its own
+> subdomain. Sections 4 onward still cite the Rust reference implementation by path where a
+> claim was verified against real code; those citations are evidence for the rule, not a
+> build dependency — see the porting plan §5 reading note.
 
 ---
 
@@ -55,24 +56,30 @@ flowchart TB
     L[Language Model Providers]
     E[Export Consumers]
 
-    U --> UI[ComicCraft Studio]
-    A --> API[Comic Command API]
-    UI --> APP[ComicCraft Application]
+    U --> UI[ComicCraft Studio<br/>browser: HTML + ES modules]
+    A --> API[Command API<br/>HTTP + MCP]
+    UI --> APP[Command dispatcher]
     API --> APP
 
-    APP --> DOMAIN[Comic Domain]
-    APP --> ENGINE[VectorCraft Editing Engine]
+    APP --> DOMAIN[Comic Domain<br/>shared/domain]
+    APP --> DOC[Editable Visual Document<br/>shared document model]
 
-    DOMAIN --> WORKFLOW[Production Workflow]
+    DOMAIN --> WORKFLOW[Production Workflow<br/>server/jobs]
     WORKFLOW --> L
     WORKFLOW --> G
 
-    ENGINE --> DOC[Editable Visual Documents]
-    DOMAIN --> STORE[Comic Project Store]
-    DOC --> STORE
+    DOC --> STORE[Comic Project Bundle]
+    DOMAIN --> STORE
 
-    STORE --> EXPORT[Publishing Pipeline]
+    STORE --> EXPORT[Publishing Pipeline<br/>server/export]
     EXPORT --> E
+
+    REF[(reference/vectorcraft<br/>read-only)] -.behavioural reference.-> DOMAIN
+
+    style UI fill:#e8f0fe
+    style API fill:#e8f0fe
+    style DOMAIN fill:#e6f4ea
+    style DOC fill:#e6f4ea
 ```
 
 The system has two distinct forms of state:
@@ -94,21 +101,21 @@ Responsibilities:
 
 - Story and chapter navigation.
 - Storyboard and page thumbnail views.
-- Comic page canvas.
-- Panel and balloon editing.
+- Comic page canvas — Canvas 2D for rendering, SVG where vector output is the deliverable.
+- Panel and balloon editing, selection and transform handles.
 - Character and asset library.
 - AI generation controls.
 - Validation results and publishing UI.
 
-The presentation layer must not contain authoritative story or project logic.
+The presentation layer must not contain authoritative story or project logic. It is plain
+HTML, CSS and ES modules, with no framework and no build step.
 
-It issues application commands and renders application state.
-
-The existing VectorCraft canvas and editing interactions should be reused wherever practical.
+It issues commands and renders the result, keeping only view state (zoom, scroll,
+selection) which is never persisted into the bundle.
 
 ## 3.2 Application subsystem
 
-The application layer coordinates use cases across the comic domain and the editing engine.
+The application layer coordinates use cases across the comic domain and the runtime.
 
 Responsibilities:
 
@@ -120,9 +127,9 @@ Responsibilities:
 - Validate project changes.
 - Save and export projects.
 
-Application use cases must be callable from the GUI, CLI and agent interfaces.
-
-A single use case must not have different business semantics depending on which interface invokes it.
+Application use cases must be callable from the UI, the HTTP API and agent interfaces. A
+single use case must not have different business semantics depending on which interface
+invokes it — the command dispatcher of §3 Layer E is what guarantees that.
 
 ## 3.3 Comic domain subsystem
 
@@ -156,9 +163,10 @@ The domain model must not depend directly on GUI components or external AI provi
 
 ## 3.4 Visual editing subsystem
 
-This subsystem adapts VectorCraft's existing engine to comic-specific editing.
+This subsystem implements comic-specific editing over the shared document model,
+matching the behaviour of the reference engine.
 
-Reuse existing capabilities for:
+Reuse the reference's behaviour for:
 
 - Geometry and transformations.
 - Vector paths and shapes.
@@ -180,7 +188,10 @@ Add comic-specific operations where needed:
 - Apply page templates.
 - Preserve semantic links between comic entities and visual objects.
 
-The adapter must use verified VectorCraft APIs. Do not assume that every required operation already exists.
+The implementation lives in `public/editor/` for interactive editing and
+`shared/domain/` for anything that must be validated or reproduced on the server. Where the
+reference's behaviour is ambiguous, the reference tree settles it; where its capability is
+not reproduced, the gap is recorded rather than silently approximated.
 
 ## 3.5 AI and workflow subsystem
 
@@ -218,109 +229,73 @@ The system must support local-first editing and must not require an online AI pr
 
 ---
 
-# 4. Code boundaries — reconciled with the workspace
+# 4. Code boundaries — reconciled with the stack
 
-The earlier draft of this section listed placeholder names and deferred them to a
-repository audit. That audit is now done
-([`comiccraft-porting-audit.md`](comiccraft-porting-audit.md) §3): the boundaries
-below are the actual crates, the actual layer numbers
-(`xtask/src/layers.rs:9-57`), and the three new crates ComicCraft adds.
+The earlier draft listed placeholder crate names and deferred them to a repository audit.
+That audit is done ([`comiccraft-porting-audit.md`](comiccraft-porting-audit.md) §3), and it
+verified the boundaries in the **reference** implementation below. This section maps that
+verified structure onto the actual implementation, which is the Node.js + vanilla-JS layout
+of [`comiccraft-porting-plan.md`](comiccraft-porting-plan.md) §4.
 
-### 4.1 Existing crates ComicCraft builds on
+### 4.1 Reference structure, and what replaces each part
 
-| Layer | Crate | Role for ComicCraft |
-|---|---|---|
-| L0 | `geom`, `color` | panels, gutters, page geometry, colour |
-| L1 | `doc` | the visual document: artboards, layers, objects, images, text, masks |
-| L2 | `text` | balloon and caption typesetting, wrapping, overflow, shrink-to-fit |
-| L2 | `effects` | live non-destructive art and lettering effects |
-| L2 | `pathops` | panel shape booleans, balloons, tails |
-| L2 | `brush`, `trace`, `plugins` | ink, tracing generated art, sandboxed effects |
-| L3 | `render` | page and panel rendering, thumbnails, raster export |
-| L3 | `pdf` | print output: one page per artboard, trim, bleed, marks |
-| L3 | `svg` | vector interchange for pages and panels |
-| L3 | `format` | the native `.vectorcraft` document format |
-| L4 | `tools` | pointer tool state machines (panel, balloon, tail tools) |
-| L5 | `engine` | **the command registry** — sessions, history, undo |
-| L6 | `ui-egui` | the thin egui front end, panels and dock |
-| L6 | `mcp` | MCP server: `tools/list`, `command_list`, resources |
-| — | `testkit` | golden-render comparison, dev-dependency only |
+The reference's layering is the model this stack reproduces; only the names change.
 
-### 4.2 New crates
-
-Three new crates, not twelve. Each takes the lowest layer that satisfies its
-dependencies; the exact intra-layer orderings are declared in `INTRA_LAYER_ORDER`
-(`xtask/src/layers.rs:65-84`) as part of adding them.
-
-| Crate | Layer | Depends on | Responsibility |
+| Ref. layer | Reference modules | Role for ComicCraft | Replaced by |
 |---|---|---|---|
-| `crates/comic-model` | L2 | `doc`, `geom`, serde | Project bundle schema, stable comic ids, narrative entities, page/panel records, lettering records, asset provenance records, schema migrations, and the bundle reader/writer. No network, no AI, no UI. |
-| `crates/comic-ai` | L3 | `comic-model`, an HTTP transport (feature-gated) | Provider-neutral generation interfaces: capability descriptors, request building, job state machine, response validation. No knowledge of `doc`, `render` or the UI. |
-| `crates/comic-layout` | L4 | `comic-model`, `doc`, `geom`, `text`, `render`, `pdf`, `svg` | Deterministic page and panel layout, templates, gutters, reading order, balloon fitting and overflow policy, validation rules, page/book export assembly. |
+| L0 | `geom`, `color` | panels, gutters, page geometry, colour | `shared/domain/geom` |
+| L1 | `doc` | the visual document: artboards, layers, objects, images, text, masks | `shared/domain/document` |
+| L2 | `text` | balloon and caption typesetting, wrapping, overflow, shrink-to-fit | `shared/domain/lettering` (measure function injected) |
+| L2 | `effects` | live non-destructive art and lettering effects | partially — canvas compositing; reduced scope |
+| L2 | `pathops` | panel shape booleans, balloons, tails | `shared/domain/geom/pathops` |
+| L3 | `render` | page and panel rendering, thumbnails, raster export | `public/editor/render` (screen), `server/export` (headless) |
+| L3 | `pdf` | print output: one page per artboard, trim, bleed, marks | `server/export/pdf` |
+| L3 | `svg` | vector interchange for pages and panels | browser SVG serialization |
+| L3 | `format` | the native document format | `shared/domain/format` |
+| L4 | `tools` | pointer tool state machines (panel, balloon, tail tools) | `public/editor/tools` |
+| L5 | `engine` | the command registry — sessions, history, undo | `shared/commands` + `public/editor/history.js` |
+| L6 | `ui-egui` | the thin desktop front end, panels and dock | `public/ui` |
+| L6 | `mcp` | MCP server: `tools/list`, `command_list`, resources | `server/mcp` |
+| — | `testkit` | golden-render comparison, dev-dependency only | `test/golden.js` |
 
-The layers are chosen so that **every dependency points downward and no same-layer edge
-exists** — comic-`model` sits above `doc`, comic-`ai` above `comic-model`, and
-comic-`layout` at L4 above the renderers and exporters it assembles. That matters
-because `cargo xtask layers` permits a same-layer dependency only when the pair is
-listed in `INTRA_LAYER_ORDER` (`xtask/src/layers.rs:65-84`), and each such pair is a
-hand-maintained entry. This placement needs none.
+### 4.2 Directory boundaries
 
-What the layers buy, concretely: `comic-model` and `comic-ai` cannot reach `engine`,
-`ui-egui` or `mcp`; `comic-layout` cannot either, even though it orchestrates rendering
-and export. Comic logic is therefore testable headlessly, which is what makes the CLI
-and MCP paths real rather than aspirational.
+| Directory | Runtime | Responsibility |
+|---|---|---|
+| `shared/domain` | both | The authoritative model: bundle schema, comic ids, narrative entities, page/panel records, lettering records, asset provenance, migrations, layout maths, reading order, lettering fitting, validation. Pure: no DOM, no `node:*`, no `fetch`. |
+| `shared/commands` | both | Command definitions, parameter schemas and the dispatcher. |
+| `public/` | browser | The editor and UI: rendering, tools, hit-testing, history, view state. |
+| `server/` | Node | HTTP, static serving, jobs, storage, export, provider adapters. |
 
-Two further surfaces are **added to existing crates** rather than forked into new
-ones, for reasons the baseline forces:
+The boundary is simpler than the reference's because there is only one split that matters:
+**`shared/` must run unchanged in both runtimes.** Everything else follows from it.
 
-- **Commands go in `crates/engine`.** `command_specs()` is a fixed concatenation
-  inside the engine crate and there is no external registration hook
-  (`crates/engine/src/cmd/mod.rs:85-132`). Comic commands are therefore additive
-  modules — `crates/engine/src/cmd/comic/*.rs`, each contributing `specs()` — so
-  that the GUI, the control channel, the CLI and MCP all reach them through the one
-  path everything else uses (`Session::execute`,
-  `crates/engine/src/lib.rs:1071-1095`). This is a deliberate, documented divergence
-  from upstream and is recorded as ADR-014.
-- **Comic panels go in `crates/ui-egui`.** egui/eframe are permitted only at L6
-  (`xtask/src/layers.rs:9-11`, `xtask/src/layers.rs:88-90`), and a separate UI crate
-  would need a same-layer edge to `ui-egui`. The comic workspace is therefore a
-  panel family inside the existing front end (`crates/ui-egui/src/panels/comic/`),
-  registered through `UI_COMMANDS`
-  (`crates/ui-egui/src/menus.rs:1-20`), reading engine state and acting only through
-  `app.run(id, params)`. The logic it displays lives in the comic crates (L2–L4), not
-  in the panel code.
+### 4.3 Three structural rules
 
-### 4.3 Two structural rules
-
-1. **Visual documents stay pure VectorCraft.** No comic field is added to
-   `crates/doc` or to `crates/format`. A page's visual document is a plain
-   `.vectorcraft` file that opens in VectorCraft itself, which keeps the fork thin
-   and upstream merges cheap. Comic metadata lives beside it and refers to it by id
-   (ADR-012, ADR-013).
-2. **No comic crate depends on the command layer or the UI.** `comic-model`,
-   `comic-ai` and `comic-layout` must not depend on `engine` (L5), `ui-egui` (L6) or
-   `mcp` (L6). The dependency arrow points one way: `engine` calls comic logic, never
-   the reverse. That is what keeps the deterministic core testable headlessly and lets
-   the same crates serve the desktop UI, the CLI and MCP.
+1. **Visual documents stay pure.** No comic field is added to the document model or to its
+   on-disk format. A page's visual document is a file that the reference editor itself
+   could open, which keeps the format compatible and upstream diffs readable. Comic
+   metadata lives beside it and refers to it by id (ADR-012, ADR-013).
+2. **Nothing in `shared/` depends on the UI or the runtime.** No DOM globals, no `node:*`,
+   no `fetch`, no provider SDK. Dependencies that the domain legitimately needs — a clock,
+   an id counter, a text-measure function, an HTTP transport for the AI layer — are
+   **injected** by the caller. This is what keeps the deterministic core testable in plain
+   `node --test` and identical on both sides.
+3. **The command layer calls the domain, never the reverse.** A domain function never
+   reaches for the dispatcher, the DOM or a provider. The arrow points one way.
 
 ```text
-Presentation      L6  ui-egui (comic panels) · mcp
-                       │
-Application       L5  engine (comic command modules)   ← sessions, history, undo
-                       │
-Assembly          L4  comic-layout · tools
-                       │
-Renderers         L3  comic-ai · render · pdf · svg · format
-                       │
-Domain            L2  comic-model · text · effects · pathops · brush · trace · plugins
-                       │
-Visual document   L1  doc          (artboards = pages, Node = visual object)
-                       │
-Foundations       L0  geom · color
+Browser UI        public/ui · public/editor        (canvas, tools, view state)
+                       │  imports
+Command surface   shared/commands                  (ids, params, dispatch, undo)
+                       │  imports
+Domain            shared/domain                    (model, layout, lettering, validation)
+                       │  injects
+Runtime adapters  public/* (DOM, canvas)  ·  server/* (fs, http, providers)
 ```
 
-Do not introduce a crate for every concept merely to match a diagram. If a
-responsibility fits naturally in one of the three crates, put it there.
+Do not add a directory for every concept merely to match a diagram. If a responsibility
+fits naturally in one of the four, put it there.
 
 ---
 
@@ -401,9 +376,9 @@ that follow:
 
 ## 5.2 Core entities
 
-These are the finalized entity set. They are `serde` types in `crates/comic-model`,
-serialized as JSON in the project bundle (§7). The previous draft listed a subset of
-what §3.3 promised and carried two contradictory fields; both are fixed here.
+These are the finalized entity set. They are plain-JavaScript record factories in
+`shared/domain/`, serialized as JSON in the project bundle (§7). The previous draft listed
+a subset of what §3.3 promised and carried two contradictory fields; both are fixed here.
 
 | Entity | Purpose |
 |---|---|
@@ -576,10 +551,11 @@ contradict this section.
 Every persistent entity has a stable identifier, and the two visual identities are
 taken from the engine rather than invented.
 
-**Comic entities** use their own newtypes over `u64` in `crates/comic-model`
-(`ComicId`, `ChapterId`, `SceneId`, `CharacterId`, `PanelId`, `DialogueId`,
-`LetteringId`, `AssetId`, `JobId`). They are allocated from a persisted counter in
-the project manifest, so they survive save/reopen, reordering and regeneration.
+**Comic entities** use typed id strings — `ComicId`, `ChapterId`, `SceneId`,
+`CharacterId`, `PanelId`, `DialogueId`, `LetteringId`, `AssetId`, `JobId` — in
+`shared/domain/ids.js`. They are allocated from a counter persisted in the project
+manifest, so they survive save/reopen, reordering and regeneration. Document node ids stay
+numeric so the visual document round-trips through the reference format unchanged.
 
 **Visual objects** are identified by `NodeId(pub u64)` — *"Stable per-document object
 id. Never reused."* — which is serialized transparently and never reassigned
@@ -663,11 +639,11 @@ must not silently become a second source of dialogue truth.
 **Three rules make this enforceable rather than aspirational:**
 
 1. **Every cross-model link points one way — from the comic model into the visual
-   document.** No comic field is added to `crates/doc` and no comic section is added to
-   `crates/format` (ADR-013). §5.2.1 names the owning side of every relationship.
-2. **A visual document never stores comic meaning.** It stays a plain `.vectorcraft`
-   file that opens in VectorCraft itself. Anything a comic reader needs must be
-   reachable from `crates/comic-model` by `NodeId` or `artboard_id`.
+   document.** No comic field is added to the document model and no comic section is added
+   to its on-disk format (ADR-013). §5.2.1 names the owning side of every relationship.
+2. **A visual document never stores comic meaning.** It stays a plain document file that
+   the reference editor itself would open. Anything a comic reader needs must be
+   reachable from `shared/domain/document` by `NodeId` or `artboard_id`.
 3. **Deleting or renaming a visual object is never allowed to invent comic content.**
    When a link dangles, the application reports it and offers repair (§6.3).
 
@@ -746,11 +722,11 @@ replaced or synced independently. The cost — several files that must stay mutu
 consistent — is handled by §7.2.
 
 **How the two formats relate.** The visual document uses VectorCraft's native format
-unchanged, so `document/comic.vectorcraft` opens in VectorCraft itself and in any
-other tool that reads it. The comic schema is versioned independently in
-`manifest.json` and never touches `crates/format`. The two versions move
-independently: a newer VectorCraft can raise `format::VERSION` and migrate the
-document inside a bundle whose comic schema version is unchanged.
+unchanged, so `document/main.json` (or whichever name the reference format uses) opens in
+VectorCraft itself and in any other tool that reads it. The comic schema is versioned
+independently in `manifest.json` and never touches the document format. The two versions
+move independently: a newer document format version is migrated by `shared/domain/format`
+inside a bundle whose comic schema version is unchanged.
 
 The per-page comic file is keyed by `Page.id` rather than by a file ordinal, so
 renaming or renumbering a page never has to move a file. `Page.artboard_id` is what
@@ -763,12 +739,12 @@ bundle is written in this order. Steps 4 and 5 are both observable, and the gap 
 the one window a load must tolerate (schema §14):
 
 1. Serialize every changed comic file into `<bundle>/.save-tmp/`.
-2. Save the visual document through the native format writer (`crates/format`) into
-   the same staging directory. This is what handles the appended blob section for
-   embedded images.
-3. Verify the staged document by loading it back
-   (`format::load_file` rejects an unknown `format` and any `version > VERSION`,
-   `crates/format/src/lib.rs:438-442`).
+2. Save the visual document through the format writer
+   (`shared/domain/format`) into the same staging directory, which also handles the
+   appended blob section for embedded images.
+3. Verify the staged document by loading it back — the reader rejects an unknown format
+   marker and any version above the supported one, and this rejection is what makes the
+   staging directory safe to abandon.
 4. **Replace the content files** — every file except the manifest — with atomic per-file
    renames. The manifest still describes the previous generation, so a reader that trusts it
    (as it must: it is the only file that declares the bundle's contents) still sees the
@@ -786,21 +762,18 @@ rather than locking the creator out. On Windows, where
 replacing a directory is not atomic, per-file replacement plus the manifest ordering
 gives the same guarantee at the granularity that matters.
 
-Embedded images live inside the visual document's blob section
-(`crates/format/src/lib.rs:1-14`, `crates/format/src/lib.rs:69-98`); project assets
-live in `assets/` and are content-addressed, so an interrupted save cannot overwrite
-an approved asset — it writes a new file with a new hash.
+Embedded images live inside the visual document's blob section; project assets live in
+`assets/` and are content-addressed, so an interrupted save cannot overwrite an approved
+asset — it writes a new file with a new hash.
 
 ## 7.3 Migrations
 
 Every persisted schema has an identifiable version: `manifest.schema_version` for the
-bundle, and `format::File.version` for the visual document
-(`crates/format/src/lib.rs:161-168`).
+bundle, and a version field for the visual document.
 
-The comic schema migrates in `crates/comic-model`, following the shape the engine
-already uses: `format::load_file` runs `drop_edit_modes`, `migrate_overprint_black`,
-`migrate_color_profiles`, `fix_next_id` and `tidy_saved_selections` after parsing
-(`crates/format/src/lib.rs:451-461`). A comic migration must:
+The comic schema migrates in `shared/domain/migrations`, following the shape the document
+reader already uses: it runs a chain of small fix-up passes after parsing rather than a
+single version switch. A comic migration must:
 
 - Validate its input and refuse rather than guess.
 - Preserve every stable id, including `retired_artboard_ids`.
@@ -809,8 +782,8 @@ already uses: `format::load_file` runs `drop_edit_modes`, `migrate_overprint_bla
   newer ComicCraft can read a project an older one saved.
 - Ship with a fixture from every previous version, tested in CI.
 
-`crates/format` behaviour is not changed by ComicCraft. If a migration is needed for
-the document itself, it is an upstream change and gets an upstream test.
+The document format's behaviour is not changed by ComicCraft. If a migration is needed for
+the document itself, it is a format change and it gets its own tests and fixture.
 
 ## 7.4 Asset storage and integrity
 
@@ -826,9 +799,9 @@ changed file.
 **Two hashes, two jobs.** `LinkInfo.hash` is FNV-1a 64-bit
 (`crates/doc/src/links.rs:76-79`). It answers "has this file changed since I last read
 it", which is exactly what the engine uses it for, and it is *not* collision-resistant.
-`Asset.content_hash` is SHA-256: `sha2` is already a direct dependency of `crates/pdf`
-(`crates/pdf/Cargo.toml:34`), so this needs a workspace dependency entry rather than a
-new crate, and it is what integrity and provenance rely on.
+`Asset.content_hash` is SHA-256, computed with `node:crypto` on the server and
+`crypto.subtle` in the browser — both are standard-library, so this needs no dependency at
+all, and it is what integrity and provenance rely on.
 
 Keep the original generated asset when creating edited derivatives:
 `Asset.parent_asset_ids` records lineage, and regeneration must never overwrite the only
@@ -855,10 +828,10 @@ twice produces identical bytes, which is also what makes it testable.
 # 8. Comic layout engine
 
 The layout engine converts semantic panel and lettering data into a visual composition.
-It is deterministic code in `crates/comic-layout`: it computes a plan and returns it, it
-never invents narrative content, and it never calls back into the engine. The engine's
-comic command modules apply that plan to the document, which is what makes the result
-one undoable operation (§11.2).
+It is deterministic code in `shared/domain/layout`: it computes a plan and returns it, it
+never invents narrative content, and it never calls back into the dispatcher. The comic
+command handlers apply that plan to the document, which is what makes the result one
+undoable operation (§11.2).
 
 ## 8.1 Page layout
 
@@ -929,15 +902,17 @@ it, `Shrink` uses the shrink-to-fit path, `ResizeFrame` grows the frame. Automat
 resizing must never move unrelated page elements; growing a frame that would collide
 with another panel or lettering object is reported, not applied.
 
-**Lettering faces are not available in the repository.** The bundled fonts are Inter,
-JetBrains Mono, Source Sans 3 and Source Serif 4 — UI and body text
-(`crates/text/build.rs:1-16`, `assets/fonts/`). Comic lettering and sound-effect faces
-belong in `storytold/craft-fonts`, never in this repository (`AGENTS.md:31`), so this
-is a dependency on a companion repository, not on a design change. Everything must
-build, run and pass tests with `CRAFT_FONTS` empty, and a project whose lettering font
-is missing must surface exactly the missing-font report the exporter already produces.
+**Lettering faces are not available in this repository.** No font file lives here. Comic
+lettering and sound-effect faces belong in `storytold/craft-fonts` and are referenced by
+URL, so this is a dependency on a companion repository, not on a design change. Everything
+must run and pass tests with **no fonts installed**, and a project whose lettering font is
+missing must surface a missing-font report rather than rendering silently wrong.
 
-**Resolved (ADR-017).** The two faces are now in `craft-fonts`, both OFL-1.1 and used
+Because text measurement is injected (§4.3), this is testable without a font: tests supply
+a deterministic measure function, and the browser supplies real metrics when the face is
+available.
+
+**Resolved (ADR-017).** The two faces live in `craft-fonts`, both OFL-1.1 and used
 unmodified:
 
 | Face | Styles | For |
@@ -950,8 +925,9 @@ the Japanese, Chinese and Arabic faces already there, and `craft-fonts`'s own te
 (`every_file_matches_its_manifest_checksum`, `every_font_ships_its_licence`,
 `every_font_is_the_family_the_manifest_says`) cover them. ComicCraft names them as **defaults**
 in `ProjectSettings.default_lettering_style` (schema §5.3) rather than hard-coding them, so a
-project can choose different faces and a build without `CRAFT_FONTS_DIR` still works — the
-lettering then falls back with a missing-font report rather than failing to render.
+project can choose different faces and a deployment with no font service configured still
+works — the lettering then falls back with a missing-font report rather than failing to
+render.
 
 ---
 
@@ -1014,16 +990,17 @@ Record the actual provider, model and request parameters used for every generati
 `GenerationJob.request` and `Asset.provenance`. A result that cannot be traced to a
 request is not acceptable.
 
-**No HTTP client crate appears anywhere in `Cargo.lock`, direct or transitive**
-([`comiccraft-porting-audit.md`](comiccraft-porting-audit.md) §12.4). Adding one is
-a deliberate, gate-visible decision (ADR-015):
+**The reference implementation has no HTTP client at all**
+([`comiccraft-porting-audit.md`](comiccraft-porting-audit.md) §12.4) — it is offline by
+construction. Talking to a provider is therefore a deliberate, gate-visible decision
+(ADR-015):
 
 - It must be MIT/Apache-2.0 or equivalent and must survive the repository's
   dependency and asset rules.
-- It must not break `cargo xtask wasm`. Provider calls are therefore behind a feature
-  that is **off** for the wasm build, and `comic-ai` must compile to a
-  capability-empty stub there (`xtask/src/main.rs:175-205` runs the wasm gate).
-- It must not be reachable from `crates/doc` or `crates/format`: the visual document
+- It must never run in the browser. Provider calls live only in `server/ai/`, so a client
+  build cannot contain a key path at all; the boundary test enforces this by forbidding
+  `fetch` and provider SDKs anywhere in `shared/` or `public/`.
+- It must not be reachable from the document model or its format: the visual document
   and its format stay offline and deterministic.
 - Credentials live in user configuration outside the project bundle, are never
   serialized into `manifest.json`, `project.json` or a job record, and are never
@@ -1063,13 +1040,13 @@ command bus, a second automation protocol, or a parallel state container.
 
 ```mermaid
 flowchart TD
-    UI[Comic panels in crates/ui-egui]
-    CLI[vectorcraft-cli run / mcp]
-    MCP[crates/mcp server]
-    CTL[Control channel: engine.execute]
-    REG[engine command registry<br/>crates/engine/src/cmd/comic]
-    DOM[comic-model · comic-layout · comic-ai]
-    ENG[doc · render · text · format]
+    UI[public/ui + public/editor]
+    CLI[comiccraft CLI]
+    MCP[server/mcp]
+    CTL[HTTP command endpoint]
+    REG[shared/commands registry + dispatcher]
+    DOM[shared/domain: model · layout · lettering]
+    ENG[shared/domain: document · geom · format]
     STORE[Project bundle]
 
     UI --> CTL
@@ -1173,7 +1150,7 @@ ignores both; there is no job, progress or cancellation API
 (ADR-016) rather than push-based, until and unless a progress API is contributed
 upstream.
 
-The job model in `crates/comic-model` and `crates/comic-ai`:
+The job model in `shared/domain/jobs.js` and `server/ai/`:
 
 - Job ID, operation type, target entity ids.
 - Request as sent, for provenance.
@@ -1368,33 +1345,39 @@ External AI services must be optional for editing and publishing existing projec
 
 ### 13.1 Controls the repository already imposes
 
-These are not suggestions; `cargo xtask ci` fails on them
-(`xtask/src/main.rs:175-205`), and comic code inherits all of them.
+These are not suggestions; `npm run verify` fails on them, and every change inherits all
+of them. The concrete list is in
+[`comiccraft-porting-plan.md`](comiccraft-porting-plan.md) §17.1; the two that shape the
+design are:
 
-- **No panics in shipped code.** `unwrap()`, `expect()`, `panic!`, `unreachable!`,
-  `todo!` and `unimplemented!` are denied outside tests, and `unsafe_code` is denied
-  workspace-wide (`Cargo.toml:84-96`). Fallible comic work returns `Result`/`Option`.
-  `vectorcraft_engine::guard` catches a panic at every entry point, rolls the document
-  back and reports an internal error — but it is a bug net, not a design
-  (`AGENTS.md:35-48`). The wasm build has no such net: a panic aborts it.
-- **Parsers are fuzzed.** A new comic importer, parser or protocol method extends
-  `engine/tests/import_fuzz.rs`, `engine/tests/command_sweep.rs`,
-  `format/tests/prop_format.rs` and `mcp/tests/protocol_props.rs` (`AGENTS.md:46-48`).
-- **Agent file access is confined.** `--automation-read-root` and
-  `--automation-write-root` limit what an agent-driven session may touch
-  (`apps/vectorcraft-cli/src/main.rs:154-181`). A project bundle is a directory, so
-  these roots are also what stops an agent wandering outside a project.
-- **Vendor names are gated.** User-visible string literals, `Cargo.toml` descriptions
-  and packaging text may not name the vendor list in `xtask/src/brands.rs:14-29`.
-  Comic command labels, parameter docs, panel text and MCP tool definitions are all
-  scanned.
+- **A failed operation is a returned value, not a throw.** A domain function that can fail
+  returns a typed `Result`; a throw is reserved for a programming error. The dispatcher
+  catches at the command boundary, rolls the transaction back and reports a structured
+  error, so a bad command cannot leave a half-applied edit — the equivalent of the
+  reference engine's panic guard, achieved by not throwing in the first place.
+- **Every parser and every command is exercised with malformed input.** A new bundle
+  reader, migration or command extends `test/fuzz.js`: the bundle reader gets malformed
+  bundles and the command dispatcher gets malformed parameter sets for every registered
+  command.
+- **Agent file access is confined.** The server resolves every project path against a
+  configured project root and refuses to escape it — a bundle is a directory, so a
+  traversal attempt is a path-confinement failure, not a filesystem call. This is the same
+  guarantee the reference provided with automation read/write roots, and it is tested with
+  `..` and absolute-path inputs rather than assumed.
+- **Vendor names are gated.** User-visible strings, `package.json` text and packaging
+  metadata go through `npm run check:brands`. Comic command labels, parameter docs, UI copy
+  and MCP tool definitions are all scanned.
 - **Assets are attributed.** Every asset file needs a row in `ASSETS.md`, no Adobe
   iconography or GPL/AGPL code, and ComicCraft needs its own original branding: the
   ArtCraft logos in `docs/brand/` are trademarks that must not be reused
-  (`AGENTS.md:14-34`, `docs/brand/LICENSE-brand.txt`).
-- **Clean-room.** Behaviour is derived from public documentation, never from
-  observing another application (`AGENTS.md:15-28`). This constrains how comic
-  composition features may be researched, not only how they are written.
+  (`docs/brand/LICENSE-brand.txt`). The rule is ComicCraft's own, restated in
+  [`../AGENTS.md`](../AGENTS.md) — it is inherited from the reference project, not derived
+  from it.
+- **Clean-room.** Behaviour is derived from public documentation, never from observing
+  another application. This constrains how comic composition features may be researched, not
+  only how they are written. Restated in [`../AGENTS.md`](../AGENTS.md); the reference
+  project's original wording is in
+  [`reference/vectorcraft-agents.md`](reference/vectorcraft-agents.md).
 - **Credentials never enter the bundle.** No token, key or endpoint credential is
   written to `manifest.json`, `project.json`, a job record, an exported package, or
   a log line.
@@ -1434,16 +1417,18 @@ lettering objects) must be added to that harness rather than reusing the 50k-pat
 Do not introduce a distributed job platform in the initial release. Begin with an
 in-process job manager and durable job metadata where needed.
 
-### 14.1 The web build is a reduced target
+### 14.1 The browser is not the whole product
 
-**Never break wasm** (`cargo xtask wasm`, part of CI) — but the wasm build is not
-feature-equal, and the design must say so rather than discover it:
+There is exactly one client — the browser — but it is not feature-equal to the server, and
+the design says so rather than discovering it:
 
-| Area | Desktop | Web (`apps/vectorcraft-web`) |
+| Area | Browser (`public/`) | Server (`server/`) |
 |---|---|---|
-| Control server | `--control <port>` | none (`apps/vectorcraft-web/src/main.rs:1-12`) |
-| Files | native paths, automation roots | browser picker and downloads only |
-| Fonts | system + app + optional craft-fonts | one embedded UI face, others fetched (`crates/text/build.rs:9-11`) |
+| Editing, lettering, validation, undo | yes | headless, for jobs and tests |
+| Bundle storage | in-memory + IndexedDB; download/upload a folder | filesystem, or object storage in deployment |
+| Text measurement | real canvas metrics | injected stub or a headless canvas |
+| AI providers | never — no key path exists | yes, `server/ai/` only |
+| Print PDF export | not attempted | yes, `server/export/` |
 | Project bundle | a directory on disk | needs an in-memory or OPFS bundle |
 | AI providers | feature-enabled | off by default; browser calls raise CORS questions |
 
@@ -1457,7 +1442,7 @@ usable without a filesystem so the same logic serves both.-
 
 Local-first desktop application, a fork of the existing desktop binary:
 
-- The existing VectorCraft runtime and its `crates/*` engine.
+- The reference runtime and its document engine.
 - Local project bundles on disk (§7.1).
 - A local asset library inside the bundle.
 - Optional, explicitly configured external AI provider connections.
@@ -1470,9 +1455,10 @@ rather than reusing the ArtCraft marks.
 
 ## Web build
 
-The wasm build ships the deterministic surface — editing, lettering, validation and
-export — with the limitations in §14.1 stated in the UI rather than discovered by the
-user. AI providers and project-bundle storage are desktop-first.
+The browser ships the deterministic surface — editing, lettering, validation and vector
+and raster export — with the limitations in §14.1 stated in the UI rather than discovered
+by the user. AI providers and print-quality PDF assembly are server-side; a project that
+needs them is sent to the server, and the UI says so before the user tries.
 
 ## Later options
 
@@ -1503,8 +1489,8 @@ ADR-017 were taken or revised in this document.
 | ADR-011 | **One project is one visual document; each page is one artboard** | Accepted (new) |
 | ADR-012 | **The working project is a directory bundle; a single file is an export** | Accepted (new) |
 | ADR-013 | **No comic data inside the visual document or the native format** | Accepted (new) |
-| ADR-014 | **Comic commands are additive modules in `crates/engine`** | Accepted (new) |
-| ADR-015 | **Networking is a feature-gated addition; AI stays optional** | Accepted (new) |
+| ADR-014 | ~~**Comic commands are additive modules in `crates/engine`**~~ — **superseded by revision v1.2**; comic commands are ordinary entries in `shared/commands` with no divergence | Superseded |
+| ADR-015 | **Networking is server-only; AI stays optional** | Accepted (revised in v1.2) |
 | ADR-016 | **Generation jobs are pollable commands, not push notifications** | Accepted (new) |
 | ADR-017 | **Comic lettering uses Comic Neue, and Bangers for display, from `storytold/craft-fonts`** | Accepted (new) |
 
@@ -1521,8 +1507,8 @@ archive dependency before anything works. *Rejected:* a single-file archive as t
 working format, deferred to §7.5 as an export.
 
 **ADR-013 — no comic data in the visual document.** Keeps a page's visual document a
-plain `.vectorcraft` file that opens in VectorCraft, keeps `crates/format` untouched,
-and makes upstream merges cheap. *Rejected:* `Document.extra` / `Document.unknown`,
+plain document file that opens in VectorCraft, keeps the format untouched, and makes
+format compatibility cheap. *Rejected:* `Document.extra` / `Document.unknown`,
 which exist to round-trip *foreign* data, and a new `comic` section in `format::File`,
 both of which would change the native format and its migrations.
 
@@ -1534,11 +1520,12 @@ only, no change to existing command semantics, and a small optional upstream
 contribution — a generic command-group registration seam — recorded as a follow-up so
 the divergence can shrink.
 
-**ADR-015 — feature-gated networking.** The workspace has no HTTP client
-([`comiccraft-porting-audit.md`](comiccraft-porting-audit.md) §12.4). Adding one is
-a real dependency decision, so it is isolated behind a feature that is off for wasm
-and unreachable from the document and format layers. *Rejected:* making a provider a
-hard requirement, and calling providers from the UI crate.
+**ADR-015 — server-only networking.** The product ships with no provider configured and
+no provider dependency installed; a provider is opt-in (`npm install` of an adapter plus
+a key in the environment). Provider code lives only in `server/ai/` and is unreachable from
+the domain and format layers, so a browser bundle can never contain a key path.
+*Rejected:* making a provider a hard requirement; calling providers from the client;
+sending user artwork without explicit consent and recorded provenance.
 
 **ADR-016 — pollable jobs.** MCP accepts and ignores progress and cancellation
 notifications (`crates/mcp/src/server.rs:167-168`), so push-based progress would be a
@@ -1547,14 +1534,14 @@ change to the MCP crate. Polling commands work today for the CLI and for agents.
 which `comic.job.status` remains as the authoritative record.
 
 **ADR-017 — comic lettering faces.** ComicCraft cannot look like a comic without comic
-typography, and fonts may never live in this repository (`AGENTS.md`). The faces therefore went
+typography, and fonts may never live in this repository. The faces therefore went
 to `storytold/craft-fonts` — Comic Neue for dialogue, captions and narration, Bangers for sound
 effects and titles — OFL-1.1, pinned to `google/fonts` commits with their licences and
 SHA-256s. *Rejected:* a bundled font file here (breaks the rule), and hard-coding a family name
-in code (a project could not choose differently, and a build without `CRAFT_FONTS_DIR` would
+in code (a project could not choose differently, and a deployment with no font service would
 fail rather than report a missing font). The schema names them as *defaults*, not fields
-(schema §5.3), and the app loads them by name after the bundled fonts, so no existing document
-renders differently. Reasoning in full at §8.3; the risk it closes is R1 (§20).
+(schema §5.3), and the client loads them by name on demand, so no existing document renders
+differently when they are unavailable. Reasoning in full at §8.3; the risk it closes is R1 (§20).
 
 ---
 
@@ -1582,10 +1569,10 @@ for the milestones in [`comiccraft-porting-plan.md`](comiccraft-porting-plan.md)
   asset.
 - AI jobs cannot silently overwrite newer approved edits.
 - The project can be reopened, validated and exported with no AI provider configured.
-- Lettering renders correctly with `CRAFT_FONTS` empty, and reports a missing font
-  rather than substituting silently.
-- `cargo xtask ci` is green, including the layer, brand, asset and wasm gates, and
-  every new crate is registered in `xtask/src/layers.rs`.
+- Lettering renders correctly with no fonts installed or configured, and reports the
+  missing font rather than substituting silently.
+- `npm run verify` is green, including the boundary, brand, asset and fixture gates, and
+  every bundle schema version has a fixture.
 - New capabilities are clearly distinguished from existing ones, and no existing
   command's semantics have changed.
 
@@ -1659,15 +1646,15 @@ Ranked by how much damage they do if they are discovered late.
 
 | # | Risk | Impact | Action |
 |---|---|---|---|
-| R1 | Comic lettering faces were missing; fonts must be added to `storytold/craft-fonts` and never to this repository | A comic product with no comic typography | **Resolved (ADR-017):** Comic Neue (dialogue) and Bangers (display) are in `craft-fonts`, OFL-1.1, tests green. Lettering must still work, and be tested, with `CRAFT_FONTS` empty |
+| R1 | Comic lettering faces must live in `storytold/craft-fonts`, never in this repository | A comic product with no comic typography | **Resolved (ADR-017):** Comic Neue (dialogue) and Bangers (display) are in `craft-fonts`, OFL-1.1. Lettering must still work, and be tested, with **no fonts configured** |
 | R2 | `Artboard.id` reuse after a delete (§5.3.1) | Silent page-identity drift | Mitigations 1–4 are mandatory in M1 (§5.3.1 lists five; 5 is the upstream fix that would relax them); push U1 upstream |
 | R3 | Command registry divergence from upstream (ADR-014) | Merge cost grows with every command | Keep modules additive; contribute the registration seam; track divergence in one place |
 | R4 | A comic project is one large document: many artboards, many embedded images. Note the native format's guard — a **compressed** `.vectorcraft` file may not unpack beyond 512 MiB (`crates/format/src/lib.rs:63-64`) | Open/save time, memory, thumbnail cost; a long book saved with compression could hit the ceiling | Comic-shaped benchmark in M1; measure before optimising; decide whether a large book keeps assets linked rather than embedded |
-| R5 | Networking is a new dependency (ADR-015) | Licence/CI/wasm failures, and a product that phones home | Decide and gate in M4, before any provider code |
+| R5 | A provider is a new dependency (ADR-015) | Licence, CI and secret-handling failures; a product that phones home | Decide and gate in M4, before any provider code |
 | R6 | Provider terms, cost and content licensing | Legal and reputational exposure; provenance rules | Decide in M4; record provider, model and request per asset either way |
 | R7 | Imported bundles are untrusted input | Path traversal, resource exhaustion | Confine and cap on load; fuzz the bundle reader |
-| R8 | wasm cannot host the bundle or providers (§14.1) | Feature matrix nobody planned for | Declare web behaviour per feature from M1 |
-| R9 | Content-hash algorithm | Low — resolved by the audit | Use the `sha2` already present via `crates/pdf`; promote it to a workspace dependency in M1 |
+| R8 | The browser cannot host providers or print-PDF assembly (§14.1) | A feature matrix nobody planned for | Declare browser vs server behaviour per feature from M1 |
+| R9 | Content-hash algorithm | Low — resolved | SHA-256 via `node:crypto` on the server and `crypto.subtle` in the browser; no new dependency |
 | R10 | Long-form quality cannot be judged from a three-panel page | Late discovery that the model does not scale | Grow the representative test book from M1; complete it in M8 |
 
 **Final design principle:** ComicCraft is not an image editor with an AI button. It is a

@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComicCraft story proposal",
+  "description": "Inert until accepted. Scenes carry stable keys so regenerate-and-accept keeps ids.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 60
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "approved",
+        "rejected",
+        "superseded"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "sourceText": {
+      "type": "string",
+      "maxLength": 200000
+    },
+    "idMap": {
+      "type": "object"
+    },
+    "baseRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "created": {
+      "type": "number"
+    },
+    "updated": {
+      "type": "number"
+    },
+    "acceptedAt": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "note": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 1000
+    },
+    "scenes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "synopsis": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "pages": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 200,
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "template": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "panels": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 6,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120
+                      },
+                      "shotDescription": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 500
+                      },
+                      "camera": {
+                        "type": "string",
+                        "maxLength": 200
+                      },
+                      "characters": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 200
+                        },
+                        "maxItems": 20
+                      },
+                      "artworkPrompt": {
+                        "type": "string",
+                        "maxLength": 1000
+                      },
+                      "lettering": {
+                        "type": "array",
+                        "maxItems": 20,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "key": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 120
+                            },
+                            "text": {
+                              "type": "string",
+                              "maxLength": 4000
+                            },
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "balloon",
+                                "caption",
+                                "sound-effect"
+                              ]
+                            },
+                            "variant": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "enum": [
+                                "speech",
+                                "thought",
+                                "shout",
+                                "whisper",
+                                null
+                              ]
+                            },
+                            "character": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "maxLength": 200
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "text",
+                            "kind"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "shotDescription",
+                      "characters",
+                      "lettering",
+                      "artworkPrompt"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "key",
+                "name",
+                "template",
+                "panels"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "synopsis",
+          "pages"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "logline": {
+      "type": "string",
+      "maxLength": 240
+    },
+    "style": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "all ages",
+        "teen",
+        "mature"
+      ]
+    },
+    "design": {
+      "type": "object",
+      "description": "Who designed the proposal (local director or configured model) and with what options."
+    },
+    "acceptedSceneKeys": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+      },
+      "maxItems": 200
+    }
+  },
+  "required": [
+    "id",
+    "status",
+    "title",
+    "sourceText",
+    "idMap",
+    "baseRevision",
+    "created",
+    "updated",
+    "scenes"
+  ],
+  "additionalProperties": false
+}

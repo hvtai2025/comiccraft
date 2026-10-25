@@ -1,0 +1,47 @@
+{
+  "_comment": [
+    "Strict JSDoc type checking over the code that ships: the shared domain, the server, and",
+    "the gate tools. No build output is produced \u2014 this only checks.",
+    "",
+    "test/ is deliberately NOT included. Tests construct malformed parameters and interrogate",
+    "the Result union on purpose, so a strict check there produces a steady stream of complaints",
+    "about the very things a test is for. Test code is verified by RUNNING it, which is a",
+    "stronger check for a test than a type check: `npm test` exercises every assertion, while a",
+    "type check only reads it.",
+    "",
+    "reference/ is excluded: it is the audited baseline, read but never built.",
+    "public/ is excluded from this config because it needs the DOM lib and runs in a browser.",
+    "It is covered by the boundary test, which loads modules the way the browser does."
+  ],
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": [
+      "es2023"
+    ],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "shared/**/*.js",
+    "server/**/*.js",
+    "server.js",
+    "tools/**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "public/**",
+    "test/**",
+    "reference/**"
+  ]
+}

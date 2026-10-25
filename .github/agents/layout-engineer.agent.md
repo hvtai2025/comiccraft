@@ -17,7 +17,7 @@ independently of canvas coordinates.
 
 ## You own
 
-`crates/comic-layout/src/{layout,panel,template,reading_order,validate}/**`.
+`shared/domain/{layout,panel,template,reading-order,validate}/**`.
 
 ## Constraints
 

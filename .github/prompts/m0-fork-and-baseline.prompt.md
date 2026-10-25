@@ -1,8 +1,21 @@
 ---
-description: "Run M0: create the ComicCraft fork from the local VectorCraft checkout at 3da4080b, record the baseline gate, freeze the project schema, and register the three comic crates — each reviewed twice with unit tests."
+description: "SUPERSEDED — run M0 for the old Rust fork. Use m0-node-baseline.prompt.md instead."
 agent: comiccraft-lead
-argument-hint: "Optional: the path to the baseline checkout, if not ../vectorcraft"
+argument-hint: "Superseded; no arguments needed"
 tools: [read, search, edit, execute, agent, todo]
+---
+> ## ⚠️ SUPERSEDED — do not run this prompt
+>
+> This prompt drives the **v1.0 Rust** M0: forking the tree, running `cargo xtask ci`,
+> registering the three comic crates in `xtask/src/layers.rs`. That plan was replaced —
+> twice. The current target is a **Node.js backend + client-side HTML/JavaScript frontend**
+> with no Rust, no framework and no bundler, and the current M0 is
+> [`m0-node-baseline.prompt.md`](m0-node-baseline.prompt.md).
+>
+> It is kept because the Rust M0 is **history**: it completed (`86bd47ef`) and its record is
+> cited as evidence in `docs/comiccraft-porting-plan.md` §2.4. Nothing here should be
+> executed. See plan §6 for why every gate below is now `npm run verify`.
+
 ---
 Run milestone **M0 — Baseline** from `docs/comiccraft-porting-plan.md` §6, following
 `§18 First task for the coding agent` exactly. Do not start comic features.

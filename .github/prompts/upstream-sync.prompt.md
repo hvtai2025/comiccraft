@@ -4,6 +4,19 @@ agent: comiccraft-lead
 argument-hint: "Upstream ref to merge, e.g. upstream/main"
 tools: [read, search, edit, execute, agent, todo]
 ---
+
+> ## ⚠️ SUPERSEDED — do not run this prompt
+>
+> This prompt merges upstream VectorCraft into the ComicCraft fork. **There is no longer a
+> fork to merge**: the reference tree is read-only and is never imported, built or merged
+> (plan §2.4). Its replacement is
+> [`reference-sync.prompt.md`](reference-sync.prompt.md), which keeps the reference pinned
+> and re-proves behaviour against it instead of merging it.
+>
+> Kept because the Rust fork is history — it existed, it was recorded, and its milestone
+> reports are cited as evidence.
+
+---
 Bring upstream changes into the fork without losing comic behaviour. Default ref:
 `upstream/main`.
 

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComicCraft panel",
+  "description": "Carries a frame *reference*, never its own geometry: two copies of a rectangle is the failure this architecture prevents.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 60,
+      "description": "A stable, never-reused comic id."
+    },
+    "frameNodeId": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "shotDescription": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "dialogueIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 60,
+        "description": "A stable, never-reused comic id."
+      }
+    },
+    "letteringIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 60,
+        "description": "A stable, never-reused comic id."
+      }
+    },
+    "artworkRefs": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "continuityIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 60,
+        "description": "A stable, never-reused comic id."
+      }
+    },
+    "locked": {
+      "type": "boolean"
+    },
+    "camera": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "artworkPrompt": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "artworkRoles": {
+      "type": "object",
+      "description": "Role per artwork node id: primary, background or overlay."
+    }
+  },
+  "required": [
+    "id",
+    "frameNodeId",
+    "dialogueIds",
+    "letteringIds",
+    "artworkRefs",
+    "continuityIds",
+    "locked"
+  ],
+  "additionalProperties": false
+}

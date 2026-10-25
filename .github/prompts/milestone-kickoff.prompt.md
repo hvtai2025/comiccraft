@@ -21,16 +21,22 @@ One owner per module tree, from the ownership table in
 - the module tree,
 - the design section that constrains it,
 - the exit criteria it is responsible for,
-- its own `CARGO_TARGET_DIR`.
+- the test command that proves it, and which directory it owns.
 
-Serialise anything touching `crates/engine/src/cmd/comic/`, `Cargo.toml`,
-`xtask/src/layers.rs` or a crate's `lib.rs` through the single owner for that surface.
+Serialise anything touching `shared/domain/**`, `shared/commands/**`, `package.json` or
+`server.js` through the single owner for that surface.
+
+**Dispatch only as many agents as the module trees genuinely support.** There is no compiled
+output and no shared build cache here, so agents cannot collide on an artifact — but they can
+collide on files, and when several agents disappear at once that is a capacity signal rather
+than a bug to diagnose. The work is parallelisable by module tree, not by wall clock.
 
 ## 3. Build
 
 Delegate. Do not implement a specialist's tree yourself. Review each diff before
-integrating: does it respect the two structural rules (no comic data in the visual
-document; no duplicated geometry or page size) and its own constraints?
+integrating: does it respect the three structural rules (no comic data in the visual
+document; no duplicated geometry or page size; **nothing in `shared/` reaching for a
+runtime**) and its own constraints?
 
 ## 4. Review loop — two rounds per implementation
 
@@ -53,7 +59,11 @@ saw, after round 1 requested changes, is not a round — check the revision move
 
 ## 5. Gate
 
-Integrate, then run `cargo xtask ci` on the whole tree. Fix nothing by weakening a gate.
+Integrate, then run `npm run verify` on the whole tree. Fix nothing by weakening a gate.
+
+**Prove the gate bites at least once.** Break a boundary on purpose — import `node:fs` into a
+`shared/` module — watch `verify` go red, then revert. A gate nobody has seen fail is not
+evidence, and the boundary rule is the one this architecture depends on most.
 
 ## 6. Verdict
 

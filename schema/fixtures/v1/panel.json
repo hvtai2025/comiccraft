@@ -1,0 +1,15 @@
+{
+  "id": "panel_1",
+  "frameNodeId": 1,
+  "dialogueIds": [
+    "dialogue_1"
+  ],
+  "letteringIds": [
+    "lettering_1"
+  ],
+  "artworkRefs": [
+    2
+  ],
+  "continuityIds": [],
+  "locked": false
+}

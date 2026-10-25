@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ComicCraft</title>
+<link rel="stylesheet" href="/styles/app.css?v=m9">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><span class="mark">▚</span> ComicCraft</div>
+    <div class="project-title" id="projectTitle">Untitled Comic</div>
+    <nav class="views" aria-label="Workspace views">
+      <button id="viewCanvasBtn" class="tab current" type="button" aria-pressed="true">Canvas</button>
+      <button id="viewStoryboardBtn" class="tab" type="button" aria-pressed="false">Storyboard</button>
+      <button id="viewReviewBtn" class="tab" type="button" aria-pressed="false">Review</button>
+    </nav>
+    <div class="spacer"></div>
+    <div class="history">
+      <button id="undoBtn" class="ghost" type="button" title="Undo">↶ Undo</button>
+      <button id="redoBtn" class="ghost" type="button" title="Redo">↷ Redo</button>
+    </div>
+    <button id="openBtn" class="ghost" type="button">Open</button>
+    <button id="newBtn" class="ghost" type="button">New</button>
+    <button id="saveBtn" class="primary" type="button">Save</button>
+  </header>
+
+  <nav class="workflow" id="workflow" aria-label="Comic workflow">
+    <span class="workflow-step" data-step="idea">1 · Idea</span>
+    <span class="workflow-step" data-step="design">2 · Design</span>
+    <span class="workflow-step" data-step="review">3 · Review</span>
+    <span class="workflow-step" data-step="edit">4 · Edit</span>
+    <span class="workflow-step" data-step="art">5 · Artwork</span>
+    <span class="workflow-step" data-step="publish">6 · Publish</span>
+    <span class="workflow-hint" id="workflowHint">Start with a story idea.</span>
+  </nav>
+
+  <div class="body">
+    <aside class="rail rail-left">
+      <section>
+        <h2>Story</h2>
+        <div id="storyNav" class="story-nav"></div>
+        <div class="button-row">
+          <button id="addChapterBtn" class="ghost" type="button">+ Chapter</button>
+          <button id="addSceneBtn" class="ghost" type="button">+ Scene</button>
+        </div>
+        <button id="designBtn" class="primary wide" type="button">Design with AI</button>
+      </section>
+      <section>
+        <h2>Pages</h2>
+        <ul id="pageList" class="page-list"></ul>
+        <button id="addPageBtn" class="ghost wide" type="button">+ Add page</button>
+        <label class="field">
+          <span>Template</span>
+          <select id="templateSelect"></select>
+        </label>
+      </section>
+      <section>
+        <h2>Characters</h2>
+        <ul id="characterList" class="plain"></ul>
+        <button id="addCharacterBtn" class="ghost wide" type="button">+ Add character</button>
+      </section>
+      <section>
+        <h2>Assets <span class="badge" id="assetCount">0</span></h2>
+        <ul id="assetList" class="asset-list"></ul>
+        <input id="assetFile" type="file" accept="image/*,font/*" hidden>
+        <button id="uploadAssetBtn" class="ghost wide" type="button">+ Add asset</button>
+      </section>
+    </aside>
+
+    <main class="stage">
+      <div id="canvasView" class="view">
+        <div class="canvas-toolbar" role="toolbar" aria-label="Comic tools">
+          <button id="panelAddBtn" type="button" title="Add a panel to the current page">+ Panel</button>
+          <span class="toolbar-label">Lettering:</span>
+          <button id="balloonAddBtn" type="button" title="Add a speech balloon to the selected panel">Balloon</button>
+          <button id="thoughtAddBtn" type="button" title="Add a thought balloon">Thought</button>
+          <button id="captionAddBtn" type="button" title="Add a narration caption">Caption</button>
+          <button id="sfxAddBtn" type="button" title="Add a sound effect">SFX</button>
+          <span class="toolbar-label">Artwork:</span>
+          <button id="artworkPlaceBtn" type="button" title="Place the selected asset in the selected panel">Place</button>
+          <button id="cropBtn" type="button" title="Crop the selected panel's artwork">Crop</button>
+          <button id="clipBtn" type="button" title="Clip artwork to the panel frame">Clip</button>
+          <span class="toolbar-label">Panel:</span>
+          <button id="lockBtn" type="button" title="Lock or unlock the selected panel">Lock</button>
+          <button id="deleteBtn" type="button" title="Delete the selected panel or lettering">Delete</button>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="canvas" width="800" height="1100"></canvas>
+        </div>
+        <div class="statusbar">
+          <span id="statusLine">Ready.</span>
+          <span class="spacer"></span>
+          <span id="selectionState" class="pill">No selection</span>
+          <label class="zoom">Zoom <input id="zoom" type="range" min="0.2" max="1.4" step="0.05" value="0.5"></label>
+          <span id="zoomLabel">50%</span>
+        </div>
+      </div>
+
+      <div id="storyboardView" class="view" hidden>
+        <div class="view-header">
+          <h1>Storyboard</h1>
+          <p class="muted">Pages in narrative order. Click a page to edit it; proposals appear in Review until accepted.</p>
+        </div>
+        <div id="storyboard" class="storyboard"></div>
+      </div>
+
+      <div id="reviewView" class="view" hidden>
+        <div class="view-header">
+          <h1>Review</h1>
+          <p class="muted">Proposed story changes, pending generations, approved artwork and validation findings, kept visually distinct.</p>
+        </div>
+        <section class="review-section">
+          <h2>Story proposals <span class="badge" id="proposalCount">0</span></h2>
+          <div id="proposalList" class="cards"></div>
+        </section>
+        <section class="review-section">
+          <h2>Generation queue <span class="badge" id="jobCount">0</span></h2>
+          <div id="jobList" class="cards"></div>
+        </section>
+        <section class="review-section">
+          <h2>Awaiting review <span class="badge" id="awaitingCount">0</span></h2>
+          <div id="reviewQueue" class="cards"></div>
+        </section>
+        <section class="review-section">
+          <h2>Findings</h2>
+          <div id="reviewProblems" class="problems"></div>
+        </section>
+      </div>
+    </main>
+
+    <aside class="rail rail-right">
+      <section>
+        <h2>Selection</h2>
+        <div id="inspector" class="inspector"><p class="muted">Nothing selected.</p></div>
+      </section>
+      <section>
+        <h2>Typography</h2>
+        <div id="typography" class="typography"><p class="muted">Select a balloon, caption or sound effect.</p></div>
+      </section>
+      <section>
+        <h2>Reading order</h2>
+        <ol id="readingOrder" class="order"></ol>
+      </section>
+      <section>
+        <h2>Generate artwork</h2>
+        <label class="field">
+          <span>Prompt</span>
+          <textarea id="generatePrompt" rows="3" placeholder="A rainy rooftop at night, two figures under a streetlight"></textarea>
+        </label>
+        <label class="field">
+          <span>Local art style</span>
+          <select id="artStyle">
+            <option value="black ink">Black ink</option>
+            <option value="manga">Manga</option>
+            <option value="noir">Noir</option>
+            <option value="watercolour">Watercolour</option>
+            <option value="retro">Retro</option>
+          </select>
+        </label>
+        <div class="button-row">
+          <button id="artPanelBtn" class="ghost" type="button">Draw panel</button>
+          <button id="artAllBtn" class="ghost" type="button">Draw all</button>
+        </div>
+        <button id="generateBtn" class="wide" type="button">Submit AI job (server)</button>
+        <p id="generateStatus" class="muted small">Local drawings run here; AI jobs run on the server, where provider credentials live. Both stay editable.</p>
+      </section>
+      <section>
+        <h2>Publication</h2>
+        <label class="field">
+          <span>Preset</span>
+          <select id="publicationPreset">
+            <option value="screen">Screen</option>
+            <option value="print">Print (bleed and marks)</option>
+            <option value="proofing">Proofing</option>
+          </select>
+        </label>
+        <button id="validatePublicationBtn" class="wide" type="button">Validate</button>
+        <div id="publication" class="problems"><p class="muted small">Validate before exporting. Server-side export writes files beside the project.</p></div>
+      </section>
+      <section>
+        <h2>Problems</h2>
+        <div id="problems" class="problems"><p class="muted">Not validated yet.</p></div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script type="module" src="/app.js?v=m9f"></script>
+<noscript>ComicCraft is a client-side editor, so it needs JavaScript enabled.</noscript>
+</body>
+</html>

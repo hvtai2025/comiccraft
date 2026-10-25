@@ -1,0 +1,67 @@
+{
+  "id": "proposal_1",
+  "status": "proposed",
+  "title": "The Long Night",
+  "sourceText": "SCENE: Rooftop\nMAYA: The city is quiet.",
+  "idMap": {
+    "scenes": {},
+    "pages": {},
+    "panels": {},
+    "characters": {}
+  },
+  "baseRevision": 1,
+  "created": 0,
+  "updated": 0,
+  "acceptedAt": null,
+  "note": null,
+  "scenes": [
+    {
+      "key": "scene-1",
+      "name": "Rooftop",
+      "synopsis": "Maya on a roof.",
+      "pages": [
+        {
+          "key": "scene-1-page-1",
+          "name": "Page 1",
+          "template": "single",
+          "panels": [
+            {
+              "key": "scene-1-page-1-panel-1",
+              "shotDescription": "Maya looks over the city.",
+              "camera": "establishing shot",
+              "characters": [
+                "MAYA"
+              ],
+              "artworkPrompt": "Maya on a roof; black ink",
+              "lettering": [
+                {
+                  "key": "scene-1-page-1-panel-1-lettering-1",
+                  "text": "The city is quiet.",
+                  "kind": "balloon",
+                  "variant": "speech",
+                  "character": "MAYA"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "logline": "Maya watches the city go dark.",
+  "style": "black ink",
+  "audience": "all ages",
+  "design": {
+    "provider": "local-director",
+    "model": "deterministic-storyboard-v1",
+    "style": "black ink",
+    "audience": "all ages",
+    "panelsPerPage": 3,
+    "characters": [
+      "MAYA"
+    ],
+    "createdAt": 0,
+    "brief": "SCENE: Rooftop"
+  },
+  "acceptedSceneKeys": []
+}

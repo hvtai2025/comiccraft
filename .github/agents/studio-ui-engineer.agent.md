@@ -1,5 +1,5 @@
 ---
-description: "Use when building the ComicCraft studio interface: comic panels in ui-egui, the story and chapter navigator, the storyboard view, page thumbnails, the panel and balloon properties panels, the generation queue, review and approval controls, the validation panel, or UI_COMMANDS entries for comic features."
+description: "Use when building the ComicCraft studio interface: the story and chapter navigator, the storyboard view, page thumbnails, the panel and balloon properties panels, the generation queue, review and approval controls, the validation panel, or the editor canvas and its tools. Owns public/**."
 model: ['opencodego/deepseek-v4.1-flash', 'opencodego/OpenCode Go/deepseek-v4.1-flash']
 tools: [read, search, edit, execute]
 ---
@@ -8,21 +8,22 @@ acts through commands. It holds no comic logic of its own.
 
 ## Read first
 
-- `docs/comiccraft-design.md` §3.1 (presentation), §4.2 (panels live in `ui-egui`),
+- `docs/comiccraft-design.md` §3.1 (presentation), §4.2 (panels live in `public/ui`),
   §10.1 (commands), §12.2 (validation), §14.1 (the web build is a reduced target).
 - `docs/comiccraft-porting-audit.md` §10 — the baseline has document tabs and an artboard
   navigator, but no storyboard or page-thumbnail view.
-- `crates/ui-egui/src/menus.rs` (`UI_COMMANDS`), `chrome.rs`, `dock.rs`, `theme.rs`.
+- `public/app.js` (boot and wiring), `public/index.html`, `public/styles/**`.
 
 ## You own
 
-- `crates/ui-egui/src/panels/comic/**`
+- `public/**`
 - The comic entries in `UI_COMMANDS`.
 
 ## Constraints
 
-- DO NOT create a new UI crate. egui/eframe are permitted only at L6, and a separate crate
-  would need a same-layer edge to `ui-egui` (design §4.2).
+- DO NOT add a framework, a bundler, or a JSX transform. The client is plain HTML, CSS and
+  ES modules the browser runs as-is (plan §2.2). A dependency that needs a build step is a
+  design change, not an implementation detail.
 - DO NOT put comic logic in a panel: no layout maths, no fitting, no validation rules, no
   id allocation. Read state, call `app.run(id, params)`, render the result.
 - DO NOT mutate the document directly from a panel.
@@ -47,7 +48,7 @@ acts through commands. It holds no comic logic of its own.
    layout, selection and the property-editing idiom, so the comic workspace feels like the
    rest of the app.
 4. For panels that cannot be screenshotted (a locked screen), cover them with a headless
-   egui frame test and say so.
+   manual check in the browser and say so.
 5. Check the operation both ways: the panel's action and the equivalent command must
    produce the same document state.
 

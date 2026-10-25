@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComicCraft visual document",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "nextNodeId": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "retiredArtboards": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "description": "A retired id is never reissued."
+    },
+    "artboards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "name": {
+            "type": "string"
+          },
+          "size": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "number",
+                "minimum": 1
+              },
+              "height": {
+                "type": "number",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "width",
+              "height"
+            ],
+            "additionalProperties": false
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "size",
+          "nodes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "nodes": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "version",
+    "artboards",
+    "nodes",
+    "nextNodeId",
+    "retiredArtboards"
+  ],
+  "additionalProperties": false
+}

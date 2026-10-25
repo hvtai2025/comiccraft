@@ -1,48 +1,55 @@
 ---
-description: "Use when adding or editing a ComicCraft engine command under crates/engine/src/cmd/comic. Covers the CommandSpec shape, parameter validation and documentation, enablement, undo grouping and additive-only rules."
-applyTo: "crates/engine/src/cmd/comic/**"
+description: "Use when adding or editing a ComicCraft command in shared/commands or server/commands. Covers the command definition shape, parameter validation and documentation, enablement, undo grouping, transport parity and additive-only rules."
+applyTo: ["shared/commands/**", "server/commands/**"]
 ---
 # Comic command authoring
 
-Every user-visible comic behaviour is a command here. The GUI, the control channel, the
-CLI and MCP all reach it through this registry and nothing else.
+Every user-visible comic behaviour is a command here. The browser UI, the HTTP endpoint and
+MCP all reach it through this registry and nothing else — so a command defined once behaves
+identically for a click, a `curl` and an agent. That property is the point of the design,
+not a side effect.
 
 ## Shape
 
-```rust
-CommandSpec {
-    id,        // "comic.<group>.<verb>" — no collision with existing ids
-    label,     // user-visible; scanned by `cargo xtask brands`
-    menu,      // menu path, or empty
-    shortcut,  // rarely; comic commands mostly have none
-    params,    // the documentation agents read — treat it as the schema
-    enabled,   // honest: false without an open comic project
-    run,       // the handler
-    journal,   // present when the edit participates in history
-}
+```js
+/**
+ * @typedef {object} CommandSpec
+ * @property {string}   id        // "comic.<group>.<verb>" — no collision with existing ids
+ * @property {string}   label     // user-visible; scanned by `npm run check:brands`
+ * @property {object}   params    // the JSON Schema agents read — treat it as the contract
+ * @property {(ctx) => boolean} enabled   // honest: false without an open comic project
+ * @property {(ctx, params) => Result} run
+ * @property {boolean}  journal   // true when the edit participates in undo history
+ * @property {boolean}  serverOnly // true when the handler must run on the server
+ */
 ```
 
 ## Rules
 
 - **Additive only.** Never change an existing command's id, parameters, enablement or
-  behaviour. That is what keeps upstream merges cheap (ADR-014).
-- **`params` and the accepted JSON must agree.** If the documentation string is awkward to
-  write, the parameter set is wrong — fix the parameters, not the wording.
-- **Validate, then act.** Use the engine's helpers (`str_param`, `id_param`, `ids_param`,
-  `f64_req`, `bad(..)`) and return `EngineError::BadParams` for bad input. `Other` is a
-  last resort; an agent needs to know *which* parameter was wrong.
-- **One user action, one undo step.** Apply document changes through the engine's edit
-  path, and group multi-object edits with `UndoGroup`. Do not hand-roll history.
-- **Jobs never write.** `comic.job.submit` returns an id; only `comic.job.apply` writes,
-  and only after comparing `target_revision` with the document's current revision.
-- **One module per command group**, contributing `specs()`, registered once in
-  `command_specs()`.
-- **Always add a malformed-input case** to `engine/tests/command_sweep.rs`.
+  behaviour. Agents and saved automations address commands by id.
+- **`params` and the accepted JSON must agree.** The schema *is* the parameter
+  documentation, and it is what MCP publishes. If the schema is awkward to write, the
+  parameter set is wrong — fix the parameters, not the wording.
+- **Validate, then act.** Check against the declared schema *before* the handler runs.
+  Return a typed `BadParams` failure naming the offending parameter; never throw, and never
+  treat an unknown extra field as acceptable. A malformed call must not be able to
+  half-apply an edit.
+- **One user action, one undo step.** Apply changes through the transaction API so a
+  multi-object edit is grouped. Do not hand-roll history.
+- **Jobs never write.** `comic.job.submit` returns an id; only `comic.job.apply` writes, and
+  only after comparing `target_revision` with the project's current revision.
+- **One module per command group**, registered once in the registry index.
+- **A handler that needs the filesystem, a provider or a renderer is `serverOnly`** and
+  lives in `server/commands/**`. Everything else must run in the browser too, which means it
+  must not import a runtime (see `comiccraft-work.instructions.md` §3).
+- **Always add a malformed-parameter case** to `test/fuzz.js`.
 
 ## Before you call it done
 
 ```sh
-cargo xtask ci
-vectorcraft-cli commands          # the command and its params doc appear
-vectorcraft-cli run --in FILE --cmd comic.<id> --params '{"…":…}'
+npm run verify
+npm run cli -- commands                 # the command and its params doc appear
+npm run cli -- run --project ./p --cmd comic.<id> --params '{"…":…}'
+curl -s localhost:3000/api/comic/comic.<id> -d '{"…":…}'   # same result, same code path
 ```

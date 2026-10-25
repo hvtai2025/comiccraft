@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComicCraft page",
+  "description": "A page *is* an artboard. Reading order is explicit and never derived from coordinates.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 60,
+      "description": "A stable, never-reused comic id."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "artboardId": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "panelIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 60,
+        "description": "A stable, never-reused comic id."
+      },
+      "description": "Reading order."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "generated",
+        "lettered",
+        "approved",
+        "published"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "artboardId",
+    "panelIds"
+  ],
+  "additionalProperties": false
+}

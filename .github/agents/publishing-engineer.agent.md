@@ -17,7 +17,7 @@ output — and the guarantee that rendered output never becomes the editable sou
 
 ## You own
 
-`crates/comic-layout/src/{publish,export}/**` — presets, the export gate, assembly, and the
+`shared/domain/publish/**` for the rules and `server/export/**` — presets, the export gate, assembly, and the
 package archive.
 
 ## Constraints

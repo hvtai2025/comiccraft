@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComicCraft asset",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 60,
+      "description": "A stable, never-reused comic id."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "contentHash": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The asset is stored under this name: a new file, never an overwrite."
+    },
+    "data": {
+      "type": "string",
+      "maxLength": 20000000
+    },
+    "nodeIds": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "storageReference": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "assetType": {
+      "type": "string",
+      "enum": [
+        "source",
+        "generated",
+        "edited",
+        "reference"
+      ]
+    },
+    "mime": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 100
+    },
+    "mediaMetadata": {
+      "type": "object"
+    },
+    "parentAssetIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 60
+      },
+      "maxItems": 32
+    },
+    "inputAssetIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 60
+      },
+      "maxItems": 32
+    },
+    "approvalStatus": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ]
+    },
+    "approvedAt": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "contentHash",
+    "nodeIds"
+  ],
+  "additionalProperties": false
+}

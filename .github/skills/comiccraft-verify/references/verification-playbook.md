@@ -5,21 +5,30 @@ already exists — do not build a second one.
 
 ## Harnesses
 
+There is one harness, and it is the one that ships. Do not build a second one.
+
 | Need | Use | Where |
 |---|---|---|
-| Render a page region | `testkit::raster::render_region`, `render_artboard`, `render_view` | `crates/testkit/src/raster.rs` |
-| Compare renders | `assert_similar` with a tolerance; keeps the diff artifact | `crates/testkit/src/raster.rs` |
-| Run commands headlessly | `vectorcraft-cli run --in FILE --cmd ID --params JSON --export FILE` | `apps/vectorcraft-cli` |
-| Drive it as an agent would | `vectorcraft-cli mcp --headless --automation-read-root … --automation-write-root …` | `apps/vectorcraft-cli/tests/mcp_e2e.rs` |
-| Check the registry | `vectorcraft-cli commands`; MCP `command_list` / `tools/list` | `crates/mcp/src/tools.rs` |
-| Performance | `vectorcraft-cli perf`; `vectorcraft-cli bench FILE` | `apps/vectorcraft-cli/src/perf.rs` |
-| Malformed input | `engine/tests/command_sweep.rs`, `import_fuzz.rs`, `format/tests/prop_format.rs`, `mcp/tests/protocol_props.rs` | `crates/engine/tests/` |
-| The whole gate | `cargo xtask ci` via `./scripts/gate.sh` | `xtask/src/main.rs` |
+| Unit and integration tests | `node --test` (built in — no framework) | `test/**` |
+| Render a page | the client's renderer, driven headlessly through the command surface | `public/editor/render/**` |
+| Compare renders | the perceptual comparator; keeps the diff artifact next to the fixture | `test/golden.js` |
+| Run commands headlessly | `npm run cli -- run --project DIR --cmd ID --params JSON --export FILE` | `server/cli.js` |
+| Drive it as an agent would | the MCP server over the same registry | `server/mcp.js`, `test/mcp.e2e.js` |
+| Check the registry | `npm run cli -- commands`; MCP `tools/list`; `GET /api/comic` | `shared/commands/index.js` |
+| **Prove the shared boundary** | the boundary test: load every `shared/` module in bare Node, then assert no `node:` import and no DOM global anywhere in the tree | `test/boundary.test.js` |
+| Performance | page-load and render timings recorded as JSON for comparison across runs | `test/perf.js` |
+| Malformed input | `test/fuzz.js` — malformed bundles and malformed parameters for every registered command | `test/fuzz.js` |
+| The whole gate | `npm run verify` via `./scripts/gate.sh` | `package.json` scripts |
 
 ## Per-criterion checks
 
 **A page renders at the expected size.** Render the artboard at a known `ppi` and assert the
 pixel dimensions, then compare perceptually against the fixture. Do not assert PNG bytes.
+
+**The domain runs in both runtimes.** If a criterion touches `shared/`, it is not proven by a
+Node test alone. Bound it with the boundary test, plus one case that loads the module the way
+the browser does (an ES-module import with no Node globals available). Launching a real
+browser is *not* required, and requiring one is itself a defect (plan §17.1).
 
 **Ids survive a round trip.** Save the bundle, load it, and assert every `PageId`,
 `PanelId`, `NodeId` and `artboard_id` is unchanged — and that no id was reallocated. This is
@@ -35,7 +44,8 @@ that the previous asset still exists.
 
 **Text fits or reports.** For each lettering kind: assert no overflow, or assert the
 declared policy fired — `Warn` reported, `Shrink` scaled via `fit_scale`, `ResizeFrame`
-grown. Run it with `CRAFT_FONTS` empty as well as set.
+grown. Run it with **no fonts configured**: measurement is injected, so the test supplies a
+deterministic stub. A test that needs a real font installed is a broken test.
 
 **PDF geometry.** Assert the page count, and each page's trim box equals its artboard, the
 bleed box is grown by the bleed, and the media box includes the marks. Read the boxes; do

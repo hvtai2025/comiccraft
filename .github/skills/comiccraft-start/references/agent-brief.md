@@ -22,7 +22,7 @@ Constraints:      <the three or four rules from the dispatch table that apply he
 Interface:        <what you consume, and what you expose to the command layer>
 Blocker to raise: <the decision this task depends on, if any>
 
-Environment:      CARGO_TARGET_DIR=<path>   (yours alone; delete it when you finish)
+Environment:      node <version>; no Rust toolchain, no font files, no browser needed
 Report back:      <the output format from your agent file>
 ```
 
@@ -35,5 +35,8 @@ Report back:      <the output format from your agent file>
 - **State the blocker even if it is not yours to solve.** An unresolved dependency decision
   (a new crate, provider terms, a missing font) must surface at dispatch time, not at the
   gate.
-- **Give one `CARGO_TARGET_DIR` per agent.** They are not shared, and each grows to
+- **Keep the gate cheap.** There is no build step and no compiled output, so a full
+  `npm run verify` run is seconds rather than minutes. Run it often — the thing to avoid is
+  not the cost of the gate but the cost of a finding that arrives late. What each agent needs
+  is its own module tree, not its own build directory:
   roughly 30 GB.

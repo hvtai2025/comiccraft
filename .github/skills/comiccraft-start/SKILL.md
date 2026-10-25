@@ -34,7 +34,7 @@ Read the verdict and obey it:
 | `BLOCKED` | a `FAIL` line must be fixed first | **stop** and report the FAIL lines; dispatch nothing |
 
 Do not dispatch past a `FAIL`. The checks that block are real: an older toolchain cannot
-parse the manifest at all, and a crate that is not in the layer table fails `cargo xtask ci`.
+load at all, and a module that reaches for a runtime inside `shared/` fails the boundary test.
 
 ### 2. Resolve the target
 
@@ -71,9 +71,9 @@ is cheaper to fix than a wrong diff.
 ### 6. Hand off
 
 - One owner per module tree, always. Never dispatch two agents into the same tree.
-- Give every parallel agent its own `CARGO_TARGET_DIR`.
-- Serialise anything touching `crates/engine/src/cmd/comic/`, `Cargo.toml`,
-  `xtask/src/layers.rs` or a crate's `lib.rs` through its single owner.
+- Give every parallel agent its own module tree, and no two the same file.
+- Serialise anything touching `shared/domain/**`, `shared/commands/**`, `package.json` or
+  `server.js` through its single owner.
 - Do not start a milestone whose predecessor's exit criteria are unmet.
 - **Every implementation gets two rounds of code review on `deepseek-v4.1-flash` with unit tests.**
   You spawn `code-reviewer`; nobody reviews their own work. See the `comiccraft-verify`
@@ -81,7 +81,7 @@ is cheaper to fix than a wrong diff.
 
 ## After the agents return
 
-Integrate, run `cargo xtask ci`, then use the `comiccraft-verify` skill for the independent
+Integrate, run `npm run verify`, then use the `comiccraft-verify` skill for the independent
 verdict before calling the milestone done. Record the result in `docs/milestones/M<n>.md`.
 
 ## Resources

@@ -1,0 +1,14 @@
+{
+  "id": "asset_1",
+  "name": "Panel 1 art",
+  "contentHash": "sha256-fixture",
+  "nodeIds": [
+    3
+  ],
+  "provenance": {
+    "provider": "local",
+    "model": null,
+    "request": null,
+    "placedAt": 0
+  }
+}

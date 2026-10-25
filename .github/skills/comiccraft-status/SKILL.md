@@ -33,14 +33,15 @@ expected and correct answer.
 | `stage` | `planning` = M0 has not created the fork; `fork` = the workspace exists |
 | `Milestones` | the report trail; the newest entry is the current position. `<no status line>` means the report exists but does not follow the lead's format — fix the report |
 | `Artifacts` | which deliverables exist. A `--` on a document the current milestone owes is the gap to close |
-| `Comic crates` | `not in layers.rs` is a hard failure: `cargo xtask layers` will reject it |
+| `Module trees` | a `shared/` module that imports a runtime is a hard failure: the boundary test rejects it |
 | `Comic commands` | the size of the agent surface; zero before M1 is expected |
 | `Upstream` | divergence. A rising count, or files diverging that are not comic files, is drift — investigate before merging upstream |
 
 ### 3. For a fuller picture
 
 - Gate evidence: `docs/ci-baseline-<short-sha>.md` (M0) and `docs/ci-<sha>.md` (each run).
-  Markdown on purpose — `cargo xtask brands` scans non-Markdown text files under `docs/`,
+  Markdown on purpose — kept that way so the existing evidence files stay readable and the
+  status scripts can find the latest run by extension,
   and a build log contains vendor names in upstream test names.
 - The last milestone report's `Not done` and `Next` lines are the resume point.
 - To re-check readiness rather than position, use the `comiccraft-start` skill — its
