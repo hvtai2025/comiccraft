@@ -195,6 +195,8 @@ test('local drawings are deterministic and every advertised style is distinct', 
   const first = makeDrawing({ prompt: 'A rooftop at night', style: 'noir', width: 400, height: 300, seed: 'panel_1' });
   const second = makeDrawing({ prompt: 'A rooftop at night', style: 'noir', width: 400, height: 300, seed: 'panel_1' });
   assert.equal(first.data, second.data);
+  const decoded = decodeURIComponent(first.data.slice(first.data.indexOf(',') + 1));
+  assert.ok(!decoded.includes('A rooftop at night'), 'the prompt is metadata, not text baked into the artwork');
   const hashes = new Set(ART_STYLES.map((style) => makeDrawing({ prompt: 'A rooftop', style, seed: 'panel_1' }).data));
   assert.equal(hashes.size, ART_STYLES.length, 'the styles do not collapse into one palette');
 });

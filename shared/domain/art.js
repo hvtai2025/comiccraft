@@ -111,8 +111,6 @@ export function makeDrawing({ prompt, style = 'black ink', width = 800, height =
     shapes.push('</g>');
   }
   shapes.push(`<rect x="8" y="8" width="${w - 16}" height="${h - 16}" fill="none" stroke="${p.ink}" stroke-width="6"/>`);
-  shapes.push(`<rect x="18" y="${h - 54}" width="${w - 36}" height="36" fill="${chosen === 'noir' ? '#0b0e14' : '#ffffff'}" opacity="0.86"/>`);
-  shapes.push(`<text x="30" y="${h - 28}" font-family="sans-serif" font-size="${Math.max(12, Math.round(Math.min(w, h) / 26))}" fill="${chosen === 'noir' ? p.caption : '#111'}">${escapeSvg(caption)}</text>`);
   if (chosen === 'watercolour') {
     shapes.push(`<rect width="${w}" height="${h}" fill="${p.accent}" opacity="0.06"/>`);
   }
